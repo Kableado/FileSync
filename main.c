@@ -12,6 +12,7 @@ void help(char *exe){
 	printf("%s scan [dir] [tree] \n",exe);
 	printf("%s rescan [dir] [tree] \n",exe);
 	printf("%s read [file] [tree]\n",exe);
+	printf("%s dir [dir]\n",exe);
 }
 
 int main(int argc,char *argv[]){
@@ -59,6 +60,28 @@ int main(int argc,char *argv[]){
 		FileNode *fn;
 		fn=FileNode_Load(argv[2]);
 		if(fn)FileNode_Print(fn);
+	}else
+	if(!strcmp(argv[1],"dir") && argc==3){
+		// Leer informacion de dir
+		char *path=argv[2];
+		char dirNodesFile[4092];
+		FileNode *fn;
+
+		printf("Checking Directory.. %s\n",path);
+		if(File_ExistePath(path) && File_EsDirectorio(path)){
+			// Get the FileNode from the dir
+			snprintf(dirNodesFile,4092,"%s/"FileNode_Filename,path);
+			fn=FileNode_Load(dirNodesFile);
+			if(fn){
+				fn=FileNode_Refresh(fn,path);
+			}else{
+				fn=FileNode_Build(path);
+			}
+			if(fn){
+				FileNode_Print(fn);
+				FileNode_Save(fn,dirNodesFile);
+			}
+		}
 	}else{
 		help(argv[0]);
 	}

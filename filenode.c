@@ -374,6 +374,10 @@ FileNode *FileNode_Build(char *path){
 int FileNode_Build_Iterate(char *path,char *name,void *d){
 	FileNode *file,*fn_padre=d;;
 
+	if(!strcmp(name,FileNode_Filename)){
+		return(0);
+	}
+
 	file=FileNode_Build(path);
 	FileNode_AddChild(fn_padre,file);
 
@@ -483,6 +487,10 @@ FileNode *FileNode_Refresh(FileNode *fn,char *path){
 int FileNode_Refresh_Iterate(char *path,char *name,void *d){
 	FileNode *fn=d;
 	FileNode *fn_child;
+
+	if(!strcmp(name,FileNode_Filename)){
+		return(0);
+	}
 
 	// Buscar el fichero entre los del arbol
 	fn_child=fn->child;
