@@ -98,7 +98,7 @@ void FileTime_Print(FileTime t){
 	struct tm *tms;
 
 	tms=localtime((time_t *)&t);
-	printf("%d/%d/%d %02d:%02d:%02d",
+	printf("%04d-%02d-%02d %02d:%02d:%02d",
 		tms->tm_year+1900,
 		tms->tm_mon+1,
 		tms->tm_mday,
@@ -260,7 +260,7 @@ void File_IterateDir(char *path,
 		if(strcmp(fileinfo.name,".") &&
 		   strcmp(fileinfo.name,".."))
 		{
-			// Apartir de aqui hay un fichero
+			// A partir de aqui hay un fichero
 			// (o directorio)
 			snprintf(f_path,512,
 			   "%s/%s",path,fileinfo.name);

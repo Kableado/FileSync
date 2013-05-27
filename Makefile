@@ -9,7 +9,8 @@ OBJS_BASE =  \
 		$(BUILDDIR)/util.o \
 		$(BUILDDIR)/crc.o \
 		$(BUILDDIR)/fileutil.o \
-		$(BUILDDIR)/filenode.o
+		$(BUILDDIR)/filenode.o \
+		$(BUILDDIR)/filenodecmp.o
 OBJS_APP = \
 		$(OBJS_BASE) \
 		$(BUILDDIR)/main.o
@@ -49,6 +50,8 @@ $(BUILDDIR)/fileutil.o: fileutil.c $(HEADS)
 $(BUILDDIR)/filenode.o: filenode.c $(HEADS)
 	$(DO_CC)
 
+$(BUILDDIR)/filenodecmp.o: filenodecmp.c $(HEADS)
+	$(DO_CC)
 
 
 $(BUILDDIR)/main.o: main.c $(HEADS)

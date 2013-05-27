@@ -51,6 +51,7 @@ void FileNode_GetCRC(FileNode *fn,char *file);
 void FileNode_Save(FileNode *fn,char *fichero);
 FileNode *FileNode_Load(char *fichero);
 
+void FileNode_PrintNode(FileNode *fn);
 void FileNode_Print(FileNode *fn);
 
 

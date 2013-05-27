@@ -96,6 +96,7 @@ char *FileNode_GetPath(FileNode *fn,char *path){
 		strcat(pathptr,"/");
 	}
 	strcat(pathptr,fn->name);
+	return temppath;
 }
 
 
@@ -275,13 +276,7 @@ FileNode *FileNode_Load(char *fichero){
 }
 
 
-
-
-
-void FileNode_Print(FileNode *fn){
-	FileNode *padre;
-
-	// Nombre
+void FileNode_PrintNode(FileNode *fn){
 	printf(FileNode_GetPath(fn,NULL));
 	if(fn->flags&FileFlag_Normal){
 		printf(" File");
@@ -300,7 +295,7 @@ void FileNode_Print(FileNode *fn){
 	}
 	printf("\n");
 
-/*
+
 	// Tamanho
 	if(fn->flags&FileFlag_TieneTamanho){
 		printf("\\-Tamanho: %lld\n",fn->size);
@@ -315,14 +310,27 @@ void FileNode_Print(FileNode *fn){
 	if(fn->flags&FileFlag_TieneCRC){
 		printf("\\-CRC    : [%08X]\n",fn->crc);
 	}
-*/
-	// Hijos
-	if(fn->flags&FileFlag_Directorio){
-		FileNode *fn2;
-		fn2=fn->child;
-		while(fn2){
-			FileNode_Print(fn2);
-			fn2=fn2->sig;
+
+}
+
+
+void FileNode_Print(FileNode *fn){
+	FileNode *fnAux=fn;
+
+	while(fnAux!=NULL){
+
+		FileNode_PrintNode(fnAux);
+
+		if(fnAux->child){
+			fnAux=fnAux->child;
+		}else{
+			if(fnAux->sig==NULL){
+				fnAux=fnAux->padre;
+				if(fnAux==fn){
+					break;
+				}
+			}
+			fnAux=fnAux->sig;
 		}
 	}
 }

@@ -6,31 +6,35 @@
 #include "crc.h"
 #include "fileutil.h"
 #include "filenode.h"
+#include "filenodecmp.h"
 
 void help(char *exe){
-	printf("%s info [file] {[file] {..}}\n",exe);
-	printf("%s scan [dir] [tree] \n",exe);
-	printf("%s rescan [dir] [tree] \n",exe);
-	printf("%s read [file] [tree]\n",exe);
-	printf("%s dir [dir]\n",exe);
+	char exeFilename[1024];
+	File_GetName(exe,exeFilename);
+	printf("Modo de uso:\n");
+	printf("\t%s info [file] {[file] {..}}\n",exeFilename);
+	printf("\t%s scan [dir] [tree] \n",exeFilename);
+	printf("\t%s rescan [dir] [tree] \n",exeFilename);
+	printf("\t%s read [file] [tree]\n",exeFilename);
+	printf("\t%s dir [dir]\n",exeFilename);
+	printf("\t%s sync [dirIzquierda] [dirDerecha]\n",exeFilename);
 }
 
 int main(int argc,char *argv[]){
 	FILE *f;
-	unsigned long crc;
+	unsigned long crc=0;
 	FileTime ft;
 	int i;
 
-	if(argc<2){
-		help(argv[0]);
-	}else
 	if(!strcmp(argv[1],"info") && argc>=3){
 		// Informacion de ficheros
 		for(i=2;i<argc;i++){
-			f=fopen(argv[i],"rb");
-			if(f){
-				crc=CRC_File(f);
-				fclose(f);
+			if(File_ExistePath(argv[i])){
+				f=fopen(argv[i],"rb");
+				if(f){
+					crc=CRC_File(f);
+					fclose(f);
+				}
 				ft=FileTime_Get(argv[i]);
 				printf("%s:\t[%08X]\t",argv[i],crc);
 				FileTime_Print(ft);printf("\n");
@@ -82,6 +86,53 @@ int main(int argc,char *argv[]){
 				FileNode_Save(fn,dirNodesFile);
 			}
 		}
+	}else
+	if(!strcmp(argv[1],"sync") && argc==4){
+		// Leer informacion de dir
+		char *pathIzquierda=argv[2];
+		char *pathDerecha=argv[3];
+		char dirNodesFileIzq[4092];
+		char dirNodesFileDer[4092];
+		FileNode *fnIzquierda,*fnDerecha;
+
+		if(!File_ExistePath(pathIzquierda) || !File_EsDirectorio(pathIzquierda))
+		{
+			printf("Error, directory does not exist: %s\n",pathIzquierda);
+			return 0;
+		}
+		if(!File_ExistePath(pathDerecha) || !File_EsDirectorio(pathDerecha))
+		{
+			printf("Error, directory does not exist: %s\n",pathDerecha);
+			return 0;
+		}
+
+		// Comprobar directorio izquierdo
+		printf("Checking Directory.. %s\n",pathIzquierda);
+		snprintf(dirNodesFileIzq,4092,"%s/"FileNode_Filename,pathIzquierda);
+		fnIzquierda=FileNode_Load(dirNodesFileIzq);
+		if(fnIzquierda){
+			fnIzquierda=FileNode_Refresh(fnIzquierda,pathIzquierda);
+		}else{
+			fnIzquierda=FileNode_Build(pathIzquierda);
+		}
+
+		// Comprobar directorui derecho
+		printf("Checking Directory.. %s\n",pathDerecha);
+		snprintf(dirNodesFileDer,4092,"%s/"FileNode_Filename,pathDerecha);
+		fnDerecha=FileNode_Load(dirNodesFileDer);
+		if(fnDerecha){
+			fnDerecha=FileNode_Refresh(fnDerecha,pathDerecha);
+		}else{
+			fnDerecha=FileNode_Build(pathIzquierda);
+		}
+
+		// Construir acciones
+		printf("Building action list.. \n");
+		AccionFileNode *afn=NULL;
+		afn=AccionFileNode_Build(fnIzquierda,fnDerecha);
+		AccionFileNode_Print(afn);
+
+
 	}else{
 		help(argv[0]);
 	}

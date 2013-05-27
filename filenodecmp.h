@@ -1,5 +1,5 @@
-#ifndef _FILENODE_H_
-#define _FILENODE_H_
+#ifndef _FILENODECMP_H_
+#define _FILENODECMP_H_
 
 #include "filenode.h"
 
@@ -9,7 +9,9 @@ typedef enum {
 	AccionFileCmp_IzquierdaADerecha,
 	AccionFileCmp_DerechaAIzquierda,
 	AccionFileCmp_BorrarIzquierda,
-	AccionFileCmp_BorrarDerecha
+	AccionFileCmp_BorrarDerecha,
+	AccionFileCmp_FechaIzquierdaADerecha,
+	AccionFileCmp_FechaDerechaAIzquierda
 } AccionFileCmp;
 
 
@@ -26,5 +28,6 @@ void AccionFileNode_Destruir(AccionFileNode *afn);
 
 AccionFileNode *AccionFileNode_Build(FileNode *izquierda,FileNode *derecha);
 
+void AccionFileNode_Print(AccionFileNode *afn);
 
 #endif
