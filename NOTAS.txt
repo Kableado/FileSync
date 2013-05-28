@@ -6,10 +6,8 @@ POR HACER
 * GUI
 
 
-
 HECHO
 =====
-
 * CRC de ficheros (CRC_File en crc.h)
 * Lectura y Escritura de fechas de ficheros (FileTime end fileutil.h)
 * Utilidades de ficheros (fileutil.h)
@@ -17,3 +15,4 @@ HECHO
 	de cada fichero; crc, fecha, estado (FileNode en filenode.h)
 * Scaneo, construccion y reconstruccion de arboles FileNode, detectando cambios.
 * Comparador de FileNodes que genere una lista de AccionFileCmp (filenodecmp.h)
+

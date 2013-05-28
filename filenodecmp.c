@@ -68,22 +68,32 @@ void AccionFileNode_CheckPair(
 	}
 	if(!fnIzq && fnDer){
 		afnNew->accion=AccionFileCmp_DerechaAIzquierda;
-		if(fnDer->child){
+		if(fnDer->child && fnDer->estado!=EstadoFichero_Borrado){
 			doChilds=1;
+		}
+
+		// Anular en caso de se operacion nula
+		if(fnDer->estado==EstadoFichero_Borrado){
+			afnNew->accion=AccionFileCmp_Nada;
 		}
 	}
 	if(fnIzq && !fnDer){
 		afnNew->accion=AccionFileCmp_IzquierdaADerecha;
-		if(fnIzq->child){
+		if(fnIzq->child && fnIzq->estado!=EstadoFichero_Borrado){
 			doChilds=1;
+		}
+
+		// Anular en caso de se operacion nula
+		if(fnIzq->estado==EstadoFichero_Borrado){
+			afnNew->accion=AccionFileCmp_Nada;
 		}
 	}
 	if(fnIzq && fnDer){
 		// Realizar comparacion completa
-		if(fnIzq->child){
+		if(fnIzq->child && fnIzq->estado!=EstadoFichero_Borrado){
 			doChilds=1;
 		}
-		if(fnIzq->child){
+		if(fnIzq->child && fnDer->estado!=EstadoFichero_Borrado){
 			doChilds=1;
 		}
 
@@ -93,9 +103,22 @@ void AccionFileNode_CheckPair(
 		}else
 		if(fnIzq->ft<fnDer->ft){
 			afnNew->accion=AccionFileCmp_DerechaAIzquierda;
+			if(fnDer->estado==EstadoFichero_Borrado){
+				afnNew->accion=AccionFileCmp_BorrarIzquierda;
+			}
 		}else
 		if(fnIzq->ft>fnDer->ft){
 			afnNew->accion=AccionFileCmp_IzquierdaADerecha;
+			if(fnIzq->estado==EstadoFichero_Borrado){
+				afnNew->accion=AccionFileCmp_BorrarDerecha;
+			}
+		}
+
+		// Anular en caso de se operacion nula
+		if(fnDer->estado==EstadoFichero_Borrado &&
+			fnIzq->estado==EstadoFichero_Borrado)
+		{
+			afnNew->accion=AccionFileCmp_Nada;
 		}
 	}
 

@@ -295,7 +295,7 @@ void FileNode_PrintNode(FileNode *fn){
 	}
 	printf("\n");
 
-
+/*
 	// Tamanho
 	if(fn->flags&FileFlag_TieneTamanho){
 		printf("\\-Tamanho: %lld\n",fn->size);
@@ -310,27 +310,32 @@ void FileNode_PrintNode(FileNode *fn){
 	if(fn->flags&FileFlag_TieneCRC){
 		printf("\\-CRC    : [%08X]\n",fn->crc);
 	}
-
+*/
 }
 
 
 void FileNode_Print(FileNode *fn){
 	FileNode *fnAux=fn;
+	int end=0;
 
-	while(fnAux!=NULL){
+	while(fnAux!=NULL && !end){
 
 		FileNode_PrintNode(fnAux);
 
 		if(fnAux->child){
 			fnAux=fnAux->child;
 		}else{
-			if(fnAux->sig==NULL){
+			while(fnAux->sig==NULL){
 				fnAux=fnAux->padre;
-				if(fnAux==fn){
+				if(fnAux==fn || fnAux==NULL){
+					printf("End\n");
+					end=1;
 					break;
 				}
 			}
-			fnAux=fnAux->sig;
+			if(!end){
+				fnAux=fnAux->sig;
+			}
 		}
 	}
 }
