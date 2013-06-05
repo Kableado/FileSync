@@ -11,7 +11,9 @@ typedef enum {
 	AccionFileCmp_BorrarIzquierda,
 	AccionFileCmp_BorrarDerecha,
 	AccionFileCmp_FechaIzquierdaADerecha,
-	AccionFileCmp_FechaDerechaAIzquierda
+	AccionFileCmp_FechaDerechaAIzquierda,
+	AccionFileCmp_CrearDirDerecha,
+	AccionFileCmp_CrearDirIzquierda
 } AccionFileCmp;
 
 
@@ -20,14 +22,20 @@ typedef struct Tag_AccionFileNode {
 	FileNode *izquierda;
 	FileNode *derecha;
 	struct Tag_AccionFileNode *sig;
+	char motivo[128];
 } AccionFileNode;
 
 
 AccionFileNode *AccionFileNode_Crear();
 void AccionFileNode_Destruir(AccionFileNode *afn);
+AccionFileNode *AccionFileNode_CrearNormal(FileNode *fnIzq,FileNode *fnDer);
 
 AccionFileNode *AccionFileNode_Build(FileNode *izquierda,FileNode *derecha);
 
+
 void AccionFileNode_Print(AccionFileNode *afn);
+
+void AccionFileNode_RunList(AccionFileNode *afn,
+	char *pathIzquierda,char *pathDerecha);
 
 #endif

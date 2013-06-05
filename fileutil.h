@@ -15,6 +15,9 @@ void FileTime_Print(FileTime t);
 
 ///////////////////////////////////////////////
 // File
+#define MaxPath 4096
+#define MaxFilename 512
+
 void File_GetName(char *path,char *name);
 
 int File_ExistePath(char *path);
@@ -30,7 +33,8 @@ int File_CrearDir(char *path);
 void File_IterateDir(char *path,
 	int (*func)(char *path,char *name,void *data),void *data);
 
-
+void File_Borrar(char *path);
+void File_BorrarDirectorio(char *path);
 
 
 #endif

@@ -1,7 +1,6 @@
 
 POR HACER
 =========
-* Realizar las acciones especificadas por la lista de AccionFileCmp
 * Demonio
 * GUI
 
@@ -15,4 +14,5 @@ HECHO
 	de cada fichero; crc, fecha, estado (FileNode en filenode.h)
 * Scaneo, construccion y reconstruccion de arboles FileNode, detectando cambios.
 * Comparador de FileNodes que genere una lista de AccionFileCmp (filenodecmp.h)
+* Realizar las acciones especificadas por la lista de AccionFileCmp
 

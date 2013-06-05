@@ -81,9 +81,9 @@ void FileNode_GetPath_Rec(FileNode *fn,char **pathnode){
 		pathnode[0]=NULL;
 	}
 }
-char temppath[1024];
+char temppath[MaxPath];
 char *FileNode_GetPath(FileNode *fn,char *path){
-	char *pathnodes[100];
+	char *pathnodes[128];
 	int levels,i;
 	char *pathptr=temppath;
 	if(path)pathptr=path;
@@ -92,6 +92,23 @@ char *FileNode_GetPath(FileNode *fn,char *path){
 	levels=0;while(pathnodes[levels]){levels++;}
 	strcpy(pathptr,"");
 	for(i=levels-1;i>=0;i--){
+		strcat(pathptr,pathnodes[i]);
+		strcat(pathptr,"/");
+	}
+	strcat(pathptr,fn->name);
+	return temppath;
+}
+char *FileNode_GetFullPath(FileNode *fn,char *basePath,char *path){
+	char *pathnodes[128];
+	int levels,i;
+	char *pathptr=temppath;
+	if(path)pathptr=path;
+
+	FileNode_GetPath_Rec(fn,pathnodes);
+	levels=0;while(pathnodes[levels]){levels++;}
+	strcpy(pathptr,basePath);
+	strcat(pathptr,"/");
+	for(i=levels-2;i>=0;i--){
 		strcat(pathptr,pathnodes[i]);
 		strcat(pathptr,"/");
 	}
@@ -320,7 +337,9 @@ void FileNode_Print(FileNode *fn){
 
 	while(fnAux!=NULL && !end){
 
-		FileNode_PrintNode(fnAux);
+		if(fnAux->padre!=NULL){
+			FileNode_PrintNode(fnAux);
+		}
 
 		if(fnAux->child){
 			fnAux=fnAux->child;
@@ -414,10 +433,8 @@ int FileNode_Build_Iterate(char *path,char *name,void *d){
 int FileNode_Refresh_Iterate(char *path,char *name,void *d);
 
 FileNode *FileNode_Refresh(FileNode *fn,char *path){
-
-
 	if(!File_ExistePath(path)){
-		// El fichero ha sido borrado
+		// El fichero/directorio ha sido borrado
 		if(!fn){
 			fn=FileNode_New();
 			File_GetName(path,fn->name);
@@ -468,7 +485,7 @@ FileNode *FileNode_Refresh(FileNode *fn,char *path){
 			fn_child=fn->child;while(fn_child){
 				if(fn_child->flags&FileFlag_MarcaRevision){
 					fn_child->flags&=~FileFlag_MarcaRevision;
-					fn_child->estado=EstadoFichero_Borrado;
+					FileNode_SetEstadoRec(fn_child,EstadoFichero_Borrado);
 				}
 				fn_child=fn_child->sig;
 			}

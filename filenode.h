@@ -21,7 +21,7 @@ typedef enum {
 } EstadoFichero;
 
 typedef struct FileNode_Tag{
-	char name[512];
+	char name[MaxFilename];
 
 	int flags;
 
@@ -43,6 +43,8 @@ typedef struct FileNode_Tag{
 FileNode *FileNode_New();
 void FileNode_Delete(FileNode *fn);
 void FileNode_AddChild(FileNode *file,FileNode *file2);
+
+char *FileNode_GetFullPath(FileNode *fn,char *basePath,char *path);
 
 void FileNode_GetTamanho(FileNode *fn,char *file);
 void FileNode_GetFecha(FileNode *fn,char *file);

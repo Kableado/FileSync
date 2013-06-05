@@ -243,13 +243,13 @@ void File_IterateDir(char *path,
 {
 	int handle;
 	struct _finddata_t fileinfo;
-	char f_path[512];
+	char f_path[MaxPath];
 	int fin=0;
 	int findnext_rc;
-	char path_aux[512];
+	char path_aux[MaxPath];
 	char *ptr;
 
-	snprintf(path_aux,512,
+	snprintf(path_aux,MaxPath,
 	   "%s/*",path);
 	handle=_findfirst(path_aux,&fileinfo);
 	if(handle==-1)
@@ -278,7 +278,7 @@ void File_IterateDir(char *path,
 {
 	DIR *directorio;
 	struct dirent *entidad_dir;
-	char f_path[512];
+	char f_path[MaxPath];
 	int fin=0;
 	char *ptr;
 
@@ -295,7 +295,7 @@ void File_IterateDir(char *path,
 			{
 				// A partir de aqui hay un fichero
 				// (o directorio)
-				snprintf(f_path,512,
+				snprintf(f_path,MaxPath,
 				   "%s/%s",path,entidad_dir->d_name);
 				fin=func(f_path,
 				   entidad_dir->d_name,
@@ -309,4 +309,48 @@ void File_IterateDir(char *path,
 
 
 
+void File_Borrar(char *path){
+	unlink(path);
+}
 
+void File_BorrarDirectorio(char *path){
+	rmdir(path);
+}
+
+
+#define MaxBuffer 16384
+int File_Copiar( const char *pathOrig,const char *pathDest){
+	FILE *fOrig,*fDest;
+    char buffer[MaxBuffer];
+	int readLen=0;
+	int writeLen=0;
+	int ok=0;
+
+	if((fOrig=fopen(pathOrig,"rb"))==NULL){
+		return 0;
+	}
+	if((fDest=fopen(pathDest,"wb"))==NULL){
+		return 0;
+	}
+
+	do{
+		readLen=fread(&buffer,1,MaxBuffer,fOrig);
+		if(readLen>0){
+			writeLen=fwrite(&buffer,1,readLen,fDest);
+			if(writeLen!=readLen){
+				// Error
+				fclose(fOrig);
+				fclose(fDest);
+				return 0;
+			}
+		}
+	}while(readLen==MaxBuffer);
+
+	if(feof(fOrig)){
+		ok=1;
+	}
+
+	fclose(fOrig);
+	fclose(fDest);
+	return ok;
+}
