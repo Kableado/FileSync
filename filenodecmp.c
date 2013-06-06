@@ -36,7 +36,6 @@ AccionFileNode *AccionFileNode_Crear(){
 	afn->izquierda=NULL;
 	afn->derecha=NULL;
 	afn->sig=NULL;
-	afn->motivo[0]=0;
 
 	return(afn);
 }
@@ -159,7 +158,6 @@ void AccionFileNode_DeletePair(
 		if(fnDer->estado!=EstadoFichero_Borrado){
 			// Accion de borrado para el nodo
 			afnNew->accion=AccionFileCmp_BorrarDerecha;
-			strcpy(afnNew->motivo,"DEL: solo existe Der");
 			(*afnCola)->sig=afnNew;
 			(*afnCola)=afnNew;
 		}else{
@@ -176,7 +174,6 @@ void AccionFileNode_DeletePair(
 		if(fnIzq->estado!=EstadoFichero_Borrado){
 			// Accion de borrado para el nodo
 			afnNew->accion=AccionFileCmp_BorrarIzquierda;
-			strcpy(afnNew->motivo,"DEL: solo existe Izq");
 			(*afnCola)->sig=afnNew;
 			(*afnCola)=afnNew;
 		}else{
@@ -197,7 +194,6 @@ void AccionFileNode_DeletePair(
 		if(fnIzq->estado!=EstadoFichero_Borrado){
 			// Accion de borrado para el nodo izquierdo
 			afnNew->accion=AccionFileCmp_BorrarIzquierda;
-			strcpy(afnNew->motivo,"DEL: existe Izq");
 			(*afnCola)->sig=afnNew;
 			(*afnCola)=afnNew;
 			afnNew=NULL;
@@ -206,7 +202,6 @@ void AccionFileNode_DeletePair(
 			if(!afnNew){ afnNew=AccionFileNode_CrearNormal(fnIzq,fnDer); }
 			// Accion de borrado para el nodo derecho
 			afnNew->accion=AccionFileCmp_BorrarDerecha;
-			strcpy(afnNew->motivo,"DEL: existe Der");
 			(*afnCola)->sig=afnNew;
 			(*afnCola)=afnNew;
 			afnNew=NULL;
@@ -233,7 +228,6 @@ void AccionFileNode_CheckPair(
 				afnNew->accion=AccionFileCmp_Nada;
 
 				// Anhadir a la lista de acciones
-				strcpy(afnNew->motivo,"CMP: nada, solo der borrada");
 				(*afnCola)->sig=afnNew;
 				(*afnCola)=afnNew;
 
@@ -241,7 +235,6 @@ void AccionFileNode_CheckPair(
 				afnNew->accion=AccionFileCmp_CrearDirIzquierda;
 
 				// Anhadir a la lista de acciones
-				strcpy(afnNew->motivo,"CMP: dir izquierdo no existe");
 				(*afnCola)->sig=afnNew;
 				(*afnCola)=afnNew;
 
@@ -252,7 +245,6 @@ void AccionFileNode_CheckPair(
 				// Crear nueva accion para copiar la fecha
 				afnNew=AccionFileNode_CrearNormal(fnIzq,fnDer);
 				afnNew->accion=AccionFileCmp_FechaDerechaAIzquierda;
-				strcpy(afnNew->motivo,"CMP: dir izquierdo no existe");
 				(*afnCola)->sig=afnNew;
 				(*afnCola)=afnNew;
 			}
@@ -260,10 +252,8 @@ void AccionFileNode_CheckPair(
 			// File
 			if(fnDer->estado==EstadoFichero_Borrado){
 				afnNew->accion=AccionFileCmp_Nada;
-				strcpy(afnNew->motivo,"CMP: nada, solo der borrada");
 			}else{
 				afnNew->accion=AccionFileCmp_DerechaAIzquierda;
-				strcpy(afnNew->motivo,"CMP: solo existe der");
 			}
 			(*afnCola)->sig=afnNew;
 			(*afnCola)=afnNew;
@@ -276,7 +266,6 @@ void AccionFileNode_CheckPair(
 				afnNew->accion=AccionFileCmp_Nada;
 
 				// Anhadir a la lista de acciones
-				strcpy(afnNew->motivo,"CMP: nada, solo izq borrada");
 				(*afnCola)->sig=afnNew;
 				(*afnCola)=afnNew;
 
@@ -284,7 +273,6 @@ void AccionFileNode_CheckPair(
 				afnNew->accion=AccionFileCmp_CrearDirDerecha;
 
 				// Anhadir a la lista de acciones
-				strcpy(afnNew->motivo,"CMP: dir der no existe");
 				(*afnCola)->sig=afnNew;
 				(*afnCola)=afnNew;
 
@@ -295,7 +283,6 @@ void AccionFileNode_CheckPair(
 				// Crear nueva accion para copiar la fecha
 				afnNew=AccionFileNode_CrearNormal(fnIzq,fnDer);
 				afnNew->accion=AccionFileCmp_FechaIzquierdaADerecha;
-				strcpy(afnNew->motivo,"CMP: dir der no existe");
 				(*afnCola)->sig=afnNew;
 				(*afnCola)=afnNew;
 			}
@@ -303,10 +290,8 @@ void AccionFileNode_CheckPair(
 			// File
 			if(fnIzq->estado==EstadoFichero_Borrado){
 				afnNew->accion=AccionFileCmp_Nada;
-				strcpy(afnNew->motivo,"CMP: nada, solo izq borrada");
 			}else{
 				afnNew->accion=AccionFileCmp_IzquierdaADerecha;
-				strcpy(afnNew->motivo,"CMP: solo existe der");
 			}
 			(*afnCola)->sig=afnNew;
 			(*afnCola)=afnNew;
@@ -319,7 +304,7 @@ void AccionFileNode_CheckPair(
 			// Directorios
 
 			// Preparar accion para el par de directorios
-			if(fnIzq->ft==fnDer->ft){
+			if(abs(fnIzq->ft-fnDer->ft)<=1){ // appoximadamente iguales
 				if(fnDer->estado==EstadoFichero_Borrado &&
 					fnIzq->estado==EstadoFichero_Borrado)
 				{
@@ -374,7 +359,6 @@ void AccionFileNode_CheckPair(
 			}
 
 			// Encolar accion para el directorio padre
-			strcpy(afnNew->motivo,"CMP: dir cmp");
 			(*afnCola)->sig=afnNew;
 			(*afnCola)=afnNew;
 
@@ -408,8 +392,6 @@ void AccionFileNode_CheckPair(
 				}
 			}else
 			if(fnIzq->ft<fnDer->ft){
-				//strcpy(afnNew->motivo,"CMP: izq<der");
-				sprintf(afnNew->motivo,"i:%lld < d:%lld",fnIzq->ft,fnDer->ft);
 				afnNew->accion=AccionFileCmp_DerechaAIzquierda;
 				if(fnDer->estado==EstadoFichero_Borrado){
 					afnNew->accion=AccionFileCmp_BorrarIzquierda;
@@ -419,8 +401,6 @@ void AccionFileNode_CheckPair(
 				}
 			}else
 			if(fnIzq->ft>fnDer->ft){
-				//strcpy(afnNew->motivo,"CMP: der<izq");
-				sprintf(afnNew->motivo,"d:%lld < i:%lld",fnDer->ft,fnIzq->ft);
 				afnNew->accion=AccionFileCmp_IzquierdaADerecha;
 				if(fnIzq->estado==EstadoFichero_Borrado){
 					afnNew->accion=AccionFileCmp_BorrarDerecha;
@@ -458,17 +438,12 @@ AccionFileNode *AccionFileNode_Build(
 
 
 void AccionFileNode_Print(AccionFileNode *afn){
-	char pathIzq[MaxPath],pathDer[MaxPath];
+	char showPath[MaxPath];
 	while(afn!=NULL){
 		if(afn->izquierda){
-			FileNode_GetPath(afn->izquierda,pathIzq);
+			FileNode_GetFullPath(afn->izquierda,"",showPath);
 		}else{
-			strcpy(pathIzq,"(null)");
-		}
-		if(afn->derecha){
-			FileNode_GetPath(afn->derecha,pathDer);
-		}else{
-			strcpy(pathDer,"(null)");
+			FileNode_GetFullPath(afn->derecha,"",showPath);
 		}
 
 		switch(afn->accion){
@@ -476,21 +451,21 @@ void AccionFileNode_Print(AccionFileNode *afn){
 				//printf("%s == %s\n",pathIzq,pathDer);
 				break;
 			case AccionFileCmp_IzquierdaADerecha:
-				printf("%s => %s %s\n",pathIzq,pathDer,afn->motivo);break;
+				printf(" => %s\n",showPath);break;
 			case AccionFileCmp_DerechaAIzquierda:
-				printf("%s <= %s %s\n",pathIzq,pathDer,afn->motivo);break;
+				printf(" <= %s\n",showPath);break;
 			case AccionFileCmp_BorrarIzquierda:
-				printf("%s *- %s %s\n",pathIzq,pathDer,afn->motivo);break;
+				printf(" *- %s\n",showPath);break;
 			case AccionFileCmp_BorrarDerecha:
-				printf("%s -* %s %s\n",pathIzq,pathDer,afn->motivo);break;
+				printf(" -* %s\n",showPath);break;
 			case AccionFileCmp_FechaIzquierdaADerecha:
-				printf("%s -> %s %s\n",pathIzq,pathDer,afn->motivo);break;
+				printf(" -> %s\n",showPath);break;
 			case AccionFileCmp_FechaDerechaAIzquierda:
-				printf("%s <- %s %s\n",pathIzq,pathDer,afn->motivo);break;
+				printf(" <- %s\n",showPath);break;
 			case AccionFileCmp_CrearDirDerecha:
-				printf("%s -D %s %s\n",pathIzq,pathDer,afn->motivo);break;
+				printf(" -D %s\n",showPath);break;
 			case AccionFileCmp_CrearDirIzquierda:
-				printf("%s D- %s %s\n",pathIzq,pathDer,afn->motivo);break;
+				printf(" D- %s\n",showPath);break;
 		}
 
 		afn=afn->sig;
@@ -510,6 +485,8 @@ void AccionFileNodeAux_CopyDate(char *pathOrig,char *pathDest){
 void AccionFileNodeAux_Copy(char *pathOrig,char *pathDest){
 	if(File_Copiar(pathOrig,pathDest)){
 		AccionFileNodeAux_CopyDate(pathOrig,pathDest);
+	}else{
+		File_Borrar(pathDest);
 	}
 }
 void AccionFileNodeAux_Delete(char *pathOrig,char *pathDest){
@@ -524,7 +501,7 @@ void AccionFileNodeAux_MakeDir(char *pathOrig,char *pathDest){
 }
 
 void AccionFileNode_RunList(AccionFileNode *afn,char *pathIzquierda,char *pathDerecha){
-	char pathIzq[MaxPath],pathDer[MaxPath];
+	char pathIzq[MaxPath],pathDer[MaxPath],showPath[MaxPath];
 	while(afn!=NULL){
 		if(afn->izquierda){
 			FileNode_GetFullPath(afn->izquierda,pathIzquierda,pathIzq);
@@ -536,41 +513,47 @@ void AccionFileNode_RunList(AccionFileNode *afn,char *pathIzquierda,char *pathDe
 		}else{
 			FileNode_GetFullPath(afn->izquierda,pathDerecha,pathDer);
 		}
+		if(afn->izquierda){
+			FileNode_GetFullPath(afn->izquierda,"",showPath);
+		}else{
+			FileNode_GetFullPath(afn->derecha,"",showPath);
+		}
+
 
 		switch(afn->accion){
 			case AccionFileCmp_Nada:
 				//printf("%s == %s\n",pathIzq,pathDer);
 				break;
 			case AccionFileCmp_IzquierdaADerecha:
-				printf("%s => %s\n",pathIzq,pathDer);
+				printf(" => %s\n",showPath);
 				AccionFileNodeAux_Copy(pathIzq,pathDer);
 				break;
 			case AccionFileCmp_DerechaAIzquierda:
-				printf("%s <= %s\n",pathIzq,pathDer);
+				printf(" <= %s\n",showPath);
 				AccionFileNodeAux_Copy(pathDer,pathIzq);
 				break;
 			case AccionFileCmp_BorrarIzquierda:
-				printf("%s *- %s\n",pathIzq,pathDer);
+				printf(" *- %s\n",showPath);
 				AccionFileNodeAux_Delete(pathDer,pathIzq);
 				break;
 			case AccionFileCmp_BorrarDerecha:
-				printf("%s -* %s\n",pathIzq,pathDer);
+				printf(" -* %s\n",showPath);
 				AccionFileNodeAux_Delete(pathIzq,pathDer);
 				break;
 			case AccionFileCmp_FechaIzquierdaADerecha:
-				printf("%s -> %s\n",pathIzq,pathDer);
+				printf(" -> %s\n",showPath);
 				AccionFileNodeAux_CopyDate(pathIzq,pathDer);
 				break;
 			case AccionFileCmp_FechaDerechaAIzquierda:
-				printf("%s <- %s\n",pathIzq,pathDer);
+				printf(" <- %s\n",showPath);
 				AccionFileNodeAux_CopyDate(pathDer,pathIzq);
 				break;
 			case AccionFileCmp_CrearDirDerecha:
-				printf("%s -D %s\n",pathIzq,pathDer);
+				printf(" -D %s\n",showPath);
 				AccionFileNodeAux_MakeDir(pathIzq,pathDer);
 				break;
 			case AccionFileCmp_CrearDirIzquierda:
-				printf("%s D- %s\n",pathIzq,pathDer);
+				printf(" D- %s\n",showPath);
 				AccionFileNodeAux_MakeDir(pathDer,pathIzq);
 				break;
 		}

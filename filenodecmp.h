@@ -22,7 +22,6 @@ typedef struct Tag_AccionFileNode {
 	FileNode *izquierda;
 	FileNode *derecha;
 	struct Tag_AccionFileNode *sig;
-	char motivo[128];
 } AccionFileNode;
 
 

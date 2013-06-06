@@ -68,7 +68,7 @@ FileTime FileTime_Get(char *filename){
 void FileTime_Set(char *filename,FileTime t){
 	HANDLE hFile;
 	FILETIME ftWrite;
-	hFile = CreateFile(filename, GENERIC_WRITE, FILE_SHARE_READ,
+	hFile = CreateFile(filename, GENERIC_WRITE, FILE_SHARE_WRITE,
 		NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	ftWrite=POSIX_to_FileTime(t);
 	SetFileTime(hFile, NULL, NULL, &ftWrite);
