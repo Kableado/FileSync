@@ -423,7 +423,7 @@ void AccionFileNode_CheckPair(
 }
 
 
-AccionFileNode *AccionFileNode_Build(
+AccionFileNode *AccionFileNode_BuildSync(
 	FileNode *izquierda,FileNode *derecha)
 {
 	AccionFileNode *afnRaiz=AccionFileNode_CrearNormal(izquierda,derecha);
@@ -435,6 +435,111 @@ AccionFileNode *AccionFileNode_Build(
 	return afnRaiz;
 }
 
+
+
+
+
+
+
+
+void AccionFileNode_Copy(
+	FileNode *fnIzq,FileNode *fnDer,AccionFileNode **afnCola)
+{
+	AccionFileNode *afnNew=AccionFileNode_CrearNormal(fnIzq,fnDer);
+
+	if(!fnIzq && !fnDer){
+		AccionFileNode_Destruir(afnNew);
+		return;
+	}
+	if(!fnIzq && fnDer){
+		if(fnDer->flags&FileFlag_Directorio){
+			AccionFileNode_CompareChilds(afnNew,afnCola,
+				AccionFileNode_DeletePair);
+		}
+
+		if(fnDer->estado!=EstadoFichero_Borrado){
+			afnNew->accion=AccionFileCmp_BorrarDerecha;
+		}else{
+			afnNew->accion=AccionFileCmp_Nada;
+		}
+		(*afnCola)->sig=afnNew;
+		(*afnCola)=afnNew;
+	}
+	if(fnIzq && !fnDer){
+		if(fnIzq->estado!=EstadoFichero_Borrado){
+			if(fnIzq->flags&FileFlag_Directorio){
+				afnNew->accion=AccionFileCmp_CrearDirDerecha;
+				(*afnCola)->sig=afnNew;
+				(*afnCola)=afnNew;
+				AccionFileNode_CompareChilds(afnNew,afnCola,
+					AccionFileNode_Copy);
+				afnNew=AccionFileNode_CrearNormal(fnIzq,fnDer);
+				if(abs(fnIzq->ft-fnDer->ft)<=1){ // appox. equal
+					afnNew->accion=AccionFileCmp_Nada;
+				}else{
+					afnNew->accion=AccionFileCmp_FechaIzquierdaADerecha;
+				}
+			}else{
+				afnNew->accion=AccionFileCmp_IzquierdaADerecha;
+			}
+		}else{
+			afnNew->accion=AccionFileCmp_Nada;
+		}
+		(*afnCola)->sig=afnNew;
+		(*afnCola)=afnNew;
+	}
+	if(fnIzq && fnDer){
+		if(fnIzq->flags&FileFlag_Directorio ||
+			fnDer->flags&FileFlag_Directorio)
+		{
+			if(fnIzq->estado!=EstadoFichero_Borrado){
+				AccionFileNode_CompareChilds(afnNew,afnCola,
+					AccionFileNode_Copy);
+				if(abs(fnIzq->ft-fnDer->ft)<=1){ // appox. equal
+					afnNew->accion=AccionFileCmp_Nada;
+				}else{
+					afnNew->accion=AccionFileCmp_FechaIzquierdaADerecha;
+				}
+			}else{
+				AccionFileNode_CompareChilds(afnNew,afnCola,
+					AccionFileNode_DeletePair);
+				afnNew->accion=AccionFileCmp_BorrarDerecha;
+			}
+		}else{
+			if(fnIzq->estado!=EstadoFichero_Borrado){
+				if(abs(fnIzq->ft-fnDer->ft)<=1){ // appox. equal
+					afnNew->accion=AccionFileCmp_Nada;
+				}else{
+					afnNew->accion=AccionFileCmp_IzquierdaADerecha;
+				}
+			}else{
+				if(fnDer->estado!=EstadoFichero_Borrado){
+					afnNew->accion=AccionFileCmp_BorrarDerecha;
+				}
+			}
+		}
+		(*afnCola)->sig=afnNew;
+		(*afnCola)=afnNew;
+	}
+}
+
+
+
+
+
+
+
+AccionFileNode *AccionFileNode_BuildCopy(
+	FileNode *izquierda,FileNode *derecha)
+{
+	AccionFileNode *afnRaiz=AccionFileNode_CrearNormal(izquierda,derecha);
+	AccionFileNode *afnCola=afnRaiz;
+
+	AccionFileNode_CompareChilds(afnRaiz,&afnCola,
+		AccionFileNode_Copy);
+
+	return afnRaiz;
+}
 
 
 void AccionFileNode_Print(AccionFileNode *afn){

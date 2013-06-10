@@ -29,8 +29,8 @@ AccionFileNode *AccionFileNode_Crear();
 void AccionFileNode_Destruir(AccionFileNode *afn);
 AccionFileNode *AccionFileNode_CrearNormal(FileNode *fnIzq,FileNode *fnDer);
 
-AccionFileNode *AccionFileNode_Build(FileNode *izquierda,FileNode *derecha);
-
+AccionFileNode *AccionFileNode_BuildSync(FileNode *izquierda,FileNode *derecha);
+AccionFileNode *AccionFileNode_BuildCopy(FileNode *izquierda,FileNode *derecha);
 
 void AccionFileNode_Print(AccionFileNode *afn);
 

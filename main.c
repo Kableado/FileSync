@@ -12,16 +12,26 @@ void help(char *exe){
 	char exeFilename[MaxPath];
 	File_GetName(exe,exeFilename);
 	printf("Modo de uso:\n");
-	printf("\t%s info [file] {[file] {..}}\n",exeFilename);
-	printf("\t%s scan [dir] [tree] \n",exeFilename);
-	printf("\t%s rescan [dir] [tree] \n",exeFilename);
-	printf("\t%s read [file] [tree]\n",exeFilename);
-	printf("\t%s dir [dir]\n",exeFilename);
-	printf("\t%s sync [dirIzquierda] [dirDerecha]\n",exeFilename);
+	printf("    %s info [file] {[file] {..}}\n",exeFilename);
+	printf("    %s scan [dir] [tree] \n",exeFilename);
+	printf("    %s rescan [dir] [tree] \n",exeFilename);
+	printf("    %s read [file] [tree]\n",exeFilename);
+	printf("    %s dir [dir]\n",exeFilename);
+	printf("\n");
+	printf("    %s sync [dirIzquierda] [dirDerecha]\n",exeFilename);
+	printf("    %s resync [dirIzquierda] [dirDerecha]\n",exeFilename);
+	printf("    %s synctest [dirIzquierda] [dirDerecha]\n",exeFilename);
+	printf("    %s resynctest [dirIzquierda] [dirDerecha]\n",exeFilename);
+	printf("\n");
+	printf("    %s copy [dirIzquierda] [dirDerecha]\n",exeFilename);
+	printf("    %s recopy [dirIzquierda] [dirDerecha]\n",exeFilename);
+	printf("    %s copytest [dirIzquierda] [dirDerecha]\n",exeFilename);
+	printf("    %s recopytest [dirIzquierda] [dirDerecha]\n",exeFilename);
 }
 
 
-int sync(char *pathIzquierda,char *pathDerecha,int dryrun);
+FileNode *checkDir(char *path,int recheck);
+int sync(char *pathIzquierda,char *pathDerecha,int recheck,int dryrun);
 
 
 int main(int argc,char *argv[]){
@@ -29,6 +39,11 @@ int main(int argc,char *argv[]){
 	unsigned long crc=0;
 	FileTime ft;
 	int i;
+
+	if(argc<2){
+		help(argv[0]);
+		return 0;
+	}
 
 	if(!strcmp(argv[1],"info") && argc>=3){
 		// Informacion de ficheros
@@ -75,34 +90,61 @@ int main(int argc,char *argv[]){
 		char dirNodesFile[MaxPath];
 		FileNode *fn;
 
-		printf("Checking Directory.. %s\n",path);
-		if(File_ExistePath(path) && File_EsDirectorio(path)){
-			// Get the FileNode from the dir
-			snprintf(dirNodesFile,MaxPath,"%s/"FileNode_Filename,path);
-			fn=FileNode_Load(dirNodesFile);
-			if(fn){
-				fn=FileNode_Refresh(fn,path);
-			}else{
-				fn=FileNode_Build(path);
-			}
-			if(fn){
-				FileNode_Print(fn);
-				FileNode_Save(fn,dirNodesFile);
-			}
+		fn=checkDir(path,1);
+		if(fn){
+			FileNode_Print(fn);
 		}
 	}else
 	if(!strcmp(argv[1],"sync") && argc==4){
 		// Sincronizar dos directorios
 		char *pathIzquierda=argv[2];
 		char *pathDerecha=argv[3];
-		sync(pathIzquierda,pathDerecha,0);
-
+		sync(pathIzquierda,pathDerecha,1,0);
+	}else
+	if(!strcmp(argv[1],"resync") && argc==4){
+		// Sincronizar dos directorios
+		char *pathIzquierda=argv[2];
+		char *pathDerecha=argv[3];
+		sync(pathIzquierda,pathDerecha,1,0);
 	}else
 	if(!strcmp(argv[1],"synctest") && argc==4){
 		// Sincronizar dos directorios
 		char *pathIzquierda=argv[2];
 		char *pathDerecha=argv[3];
-		sync(pathIzquierda,pathDerecha,1);
+		sync(pathIzquierda,pathDerecha,1,1);
+	}else
+	if(!strcmp(argv[1],"resynctest") && argc==4){
+		// Sincronizar dos directorios
+		char *pathIzquierda=argv[2];
+		char *pathDerecha=argv[3];
+		sync(pathIzquierda,pathDerecha,0,1);
+
+
+	}else
+	if(!strcmp(argv[1],"copy") && argc==4){
+		// Sincronizar dos directorios
+		char *pathIzquierda=argv[2];
+		char *pathDerecha=argv[3];
+		copy(pathIzquierda,pathDerecha,1,0);
+	}else
+	if(!strcmp(argv[1],"recopy") && argc==4){
+		// Sincronizar dos directorios
+		char *pathIzquierda=argv[2];
+		char *pathDerecha=argv[3];
+		copy(pathIzquierda,pathDerecha,1,0);
+	}else
+	if(!strcmp(argv[1],"copytest") && argc==4){
+		// Sincronizar dos directorios
+		char *pathIzquierda=argv[2];
+		char *pathDerecha=argv[3];
+		copy(pathIzquierda,pathDerecha,1,1);
+	}else
+	if(!strcmp(argv[1],"recopytest") && argc==4){
+		// Sincronizar dos directorios
+		char *pathIzquierda=argv[2];
+		char *pathDerecha=argv[3];
+		copy(pathIzquierda,pathDerecha,0,1);
+
 
 	}else{
 		help(argv[0]);
@@ -112,11 +154,38 @@ int main(int argc,char *argv[]){
 }
 
 
-int sync(char *pathIzquierda,char *pathDerecha,int dryrun){
+
+FileNode *checkDir(char *path,int recheck){
+	char dirNodesFile[MaxPath];
+	FileNode *fn;
+	// Comprobar directorio
+	snprintf(dirNodesFile,MaxPath,"%s/"FileNode_Filename,path);
+	if(recheck){
+		printf("Checking Directory.. %s\n",path);
+		fn=FileNode_Load(dirNodesFile);
+		if(fn){
+			fn=FileNode_Refresh(fn,path);
+		}else{
+			fn=FileNode_Build(path);
+		}
+		FileNode_Save(fn,dirNodesFile);
+	}else{
+		printf("Loading Directory.. %s\n",path);
+		fn=FileNode_Load(dirNodesFile);
+		if(!fn){
+			printf("Error, no nodesFile.fs\n");
+			return NULL;
+		}
+	}
+	return fn;
+}
+
+int sync(char *pathIzquierda,char *pathDerecha,int recheck,int dryrun){
 	char dirNodesFileIzq[MaxPath];
 	char dirNodesFileDer[MaxPath];
 	FileNode *fnIzquierda,*fnDerecha;
 
+	// Comprobar y cargar directorios
 	if(!File_ExistePath(pathIzquierda) || !File_EsDirectorio(pathIzquierda)){
 		printf("Error, directory does not exist: %s\n",pathIzquierda);
 		return 0;
@@ -125,35 +194,16 @@ int sync(char *pathIzquierda,char *pathDerecha,int dryrun){
 		printf("Error, directory does not exist: %s\n",pathDerecha);
 		return 0;
 	}
+	fnIzquierda=checkDir(pathIzquierda,recheck);
+	if(!fnIzquierda){return 0;}
+	fnDerecha=checkDir(pathDerecha,recheck);
+	if(!fnDerecha){return 0;}
 
-	// Comprobar directorio izquierdo
-	printf("Checking Directory.. %s\n",pathIzquierda);
-	snprintf(dirNodesFileIzq,MaxPath,"%s/"FileNode_Filename,
-		pathIzquierda);
-	fnIzquierda=FileNode_Load(dirNodesFileIzq);
-	if(fnIzquierda){
-		fnIzquierda=FileNode_Refresh(fnIzquierda,pathIzquierda);
-	}else{
-		fnIzquierda=FileNode_Build(pathIzquierda);
-	}
-	FileNode_Save(fnIzquierda,dirNodesFileIzq);
-
-	// Comprobar directorui derecho
-	printf("Checking Directory.. %s\n",pathDerecha);
-	snprintf(dirNodesFileDer,MaxPath,"%s/"FileNode_Filename,
-		pathDerecha);
-	fnDerecha=FileNode_Load(dirNodesFileDer);
-	if(fnDerecha){
-		fnDerecha=FileNode_Refresh(fnDerecha,pathDerecha);
-	}else{
-		fnDerecha=FileNode_Build(pathDerecha);
-	}
-	FileNode_Save(fnDerecha,dirNodesFileDer);
 
 	// Construir acciones
 	printf("Building action list.. \n");
 	AccionFileNode *afn=NULL;
-	afn=AccionFileNode_Build(fnIzquierda,fnDerecha);
+	afn=AccionFileNode_BuildSync(fnIzquierda,fnDerecha);
 
 	if(dryrun){
 		// Mostrar lista de acciones
@@ -166,3 +216,38 @@ int sync(char *pathIzquierda,char *pathDerecha,int dryrun){
 	return(1);
 }
 
+int copy(char *pathIzquierda,char *pathDerecha,int recheck,int dryrun){
+	char dirNodesFileIzq[MaxPath];
+	char dirNodesFileDer[MaxPath];
+	FileNode *fnIzquierda,*fnDerecha;
+
+	// Comprobar y cargar directorios
+	if(!File_ExistePath(pathIzquierda) || !File_EsDirectorio(pathIzquierda)){
+		printf("Error, directory does not exist: %s\n",pathIzquierda);
+		return 0;
+	}
+	if(!File_ExistePath(pathDerecha) || !File_EsDirectorio(pathDerecha)){
+		printf("Error, directory does not exist: %s\n",pathDerecha);
+		return 0;
+	}
+	fnIzquierda=checkDir(pathIzquierda,recheck);
+	if(!fnIzquierda){return 0;}
+	fnDerecha=checkDir(pathDerecha,recheck);
+	if(!fnDerecha){return 0;}
+
+
+	// Construir acciones
+	printf("Building action list.. \n");
+	AccionFileNode *afn=NULL;
+	afn=AccionFileNode_BuildCopy(fnIzquierda,fnDerecha);
+
+	if(dryrun){
+		// Mostrar lista de acciones
+		AccionFileNode_Print(afn);
+	}else{
+		// Ejecutar lista de acciones
+		AccionFileNode_RunList(afn,pathIzquierda,pathDerecha);
+	}
+
+	return(1);
+}
