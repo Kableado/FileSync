@@ -105,7 +105,7 @@ int main(int argc,char *argv[]){
 		// Sincronizar dos directorios
 		char *pathIzquierda=argv[2];
 		char *pathDerecha=argv[3];
-		sync(pathIzquierda,pathDerecha,1,0);
+		sync(pathIzquierda,pathDerecha,0,0);
 	}else
 	if(!strcmp(argv[1],"synctest") && argc==4){
 		// Sincronizar dos directorios
@@ -131,7 +131,7 @@ int main(int argc,char *argv[]){
 		// Sincronizar dos directorios
 		char *pathIzquierda=argv[2];
 		char *pathDerecha=argv[3];
-		copy(pathIzquierda,pathDerecha,1,0);
+		copy(pathIzquierda,pathDerecha,0,0);
 	}else
 	if(!strcmp(argv[1],"copytest") && argc==4){
 		// Sincronizar dos directorios

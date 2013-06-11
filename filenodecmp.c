@@ -474,11 +474,7 @@ void AccionFileNode_Copy(
 				AccionFileNode_CompareChilds(afnNew,afnCola,
 					AccionFileNode_Copy);
 				afnNew=AccionFileNode_CrearNormal(fnIzq,fnDer);
-				if(abs(fnIzq->ft-fnDer->ft)<=1){ // appox. equal
-					afnNew->accion=AccionFileCmp_Nada;
-				}else{
-					afnNew->accion=AccionFileCmp_FechaIzquierdaADerecha;
-				}
+				afnNew->accion=AccionFileCmp_FechaIzquierdaADerecha;
 			}else{
 				afnNew->accion=AccionFileCmp_IzquierdaADerecha;
 			}
