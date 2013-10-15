@@ -4,12 +4,12 @@
 
 #include "util.h"
 
-char *String_Copy(char *str){
+char *String_Copy(char *str) {
 	char *strnew;
 	int len;
-	len=strlen(str);
-	strnew=malloc(len+1);
-	strcpy(strnew,str);
-	return(strnew);
+	len = strlen(str);
+	strnew = malloc(len + 1);
+	strcpy(strnew, str);
+	return (strnew);
 }
 

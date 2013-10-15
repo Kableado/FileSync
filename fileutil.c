@@ -7,19 +7,19 @@
 #include <utime.h>
 #include <time.h>
 #ifdef WIN32
-	#define _WIN32_WINNT 0x0501
-	#include <signal.h>
-	#include <windows.h>
-	#include <fcntl.h>
-	#include <io.h>
+#define _WIN32_WINNT 0x0501
+#include <signal.h>
+#include <windows.h>
+#include <fcntl.h>
+#include <io.h>
 #else
-	#include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include "fileutil.h"
 
 #ifdef WIN32
-long long FileTime_to_POSIX(FILETIME ft){
+long long FileTime_to_POSIX(FILETIME ft) {
 	LARGE_INTEGER date, adjust;
 
 	// takes the last modified date
@@ -36,7 +36,7 @@ long long FileTime_to_POSIX(FILETIME ft){
 	return date.QuadPart / 10000000ll;
 }
 
-FILETIME POSIX_to_FileTime(FileTime ft){
+FILETIME POSIX_to_FileTime(FileTime ft) {
 	LARGE_INTEGER date, adjust;
 	FILETIME filetime;
 
@@ -55,7 +55,7 @@ FILETIME POSIX_to_FileTime(FileTime ft){
 	return filetime;
 }
 
-FileTime FileTime_Get(char *filename){
+FileTime FileTime_Get(char *filename) {
 	HANDLE hFile;
 	FILETIME ftCreate, ftAccess, ftWrite;
 	hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, NULL,
@@ -65,11 +65,11 @@ FileTime FileTime_Get(char *filename){
 	return(FileTime_to_POSIX(ftWrite));
 }
 
-void FileTime_Set(char *filename,FileTime t){
+void FileTime_Set(char *filename,FileTime t) {
 	HANDLE hFile;
 	FILETIME ftWrite;
 	hFile = CreateFile(filename, GENERIC_WRITE, FILE_SHARE_WRITE,
-		NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+			NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	ftWrite=POSIX_to_FileTime(t);
 	SetFileTime(hFile, NULL, NULL, &ftWrite);
 	CloseHandle(hFile);
@@ -77,169 +77,152 @@ void FileTime_Set(char *filename,FileTime t){
 
 #else
 
-FileTime FileTime_Get(char *filename){
+FileTime FileTime_Get(char *filename) {
 	struct stat fs;
-	lstat(filename,&fs);
-	return(fs.st_mtime);
+	lstat(filename, &fs);
+	return (fs.st_mtime);
 }
 
-void FileTime_Set(char *filename,FileTime t){
+void FileTime_Set(char *filename, FileTime t) {
 	struct utimbuf utb;
 
-	utb.actime=t;
-	utb.modtime=t;
-	utime(filename,&utb);
+	utb.actime = t;
+	utb.modtime = t;
+	utime(filename, &utb);
 }
 
 #endif
 
-
-void FileTime_Print(FileTime t){
+void FileTime_Print(FileTime t) {
 	struct tm *tms;
 
-	tms=localtime((time_t *)&t);
-	printf("%04d-%02d-%02d %02d:%02d:%02d",
-		tms->tm_year+1900,
-		tms->tm_mon+1,
-		tms->tm_mday,
-		tms->tm_hour,
-		tms->tm_min,
-		tms->tm_sec);
+	tms = localtime((time_t *) &t);
+	printf("%04d-%02d-%02d %02d:%02d:%02d", tms->tm_year + 1900,
+			tms->tm_mon + 1, tms->tm_mday, tms->tm_hour, tms->tm_min,
+			tms->tm_sec);
 }
 
+void File_GetName(char *path, char *name) {
+	int i, j;
 
-
-
-
-void File_GetName(char *path,char *name){
-	int i,j;
-
-	i=strlen(path)-1;
-	while(i>=0 ){
-		if(path[i]=='/' || path[i]=='\\'){
+	i = strlen(path) - 1;
+	while (i >= 0) {
+		if (path[i] == '/' || path[i] == '\\') {
 			i++;
 			break;
-		}else{
+		} else {
 			i--;
 		}
 	}
-	if(i<0)
+	if (i < 0)
 		i++;
 
-	j=0;
-	while(path[i]){
-		name[j]=path[i];
-		i++;j++;
+	j = 0;
+	while (path[i]) {
+		name[j] = path[i];
+		i++;
+		j++;
 	}
-	name[j]=0;
+	name[j] = 0;
 }
-
-
-
 
 #ifdef WIN32
 
-int File_ExistePath(char *path){
+int File_ExistePath(char *path) {
 	unsigned rc;
 	rc=GetFileAttributes(path);
 
-	if(rc==INVALID_FILE_ATTRIBUTES){
+	if(rc==INVALID_FILE_ATTRIBUTES) {
 		return(0);
 	}
 	return(1);
 }
-int File_EsDirectorio(char *dir){
+int File_EsDirectorio(char *dir) {
 	unsigned rc;
 	rc=GetFileAttributes(dir);
 
-	if(rc==INVALID_FILE_ATTRIBUTES){
+	if(rc==INVALID_FILE_ATTRIBUTES) {
 		return(0);
 	}
-	if(rc&FILE_ATTRIBUTE_DIRECTORY){
+	if(rc&FILE_ATTRIBUTE_DIRECTORY) {
 		return(1);
 	}
 	return(0);
 }
-int File_EsFichero(char *fichero){
+int File_EsFichero(char *fichero) {
 	unsigned rc;
 	rc=GetFileAttributes(fichero);
 
-	if(rc==INVALID_FILE_ATTRIBUTES){
+	if(rc==INVALID_FILE_ATTRIBUTES) {
 		return(0);
 	}
-	if(rc&FILE_ATTRIBUTE_DIRECTORY){
+	if(rc&FILE_ATTRIBUTE_DIRECTORY) {
 		return(0);
 	}
 	return(1);
 }
 
 #else
-int File_ExistePath(char *path){
+int File_ExistePath(char *path) {
 	struct stat info;
 
-	if(lstat(path,&info)==-1){
-		return(0);
+	if (lstat(path, &info) == -1) {
+		return (0);
 	}
-	return(1);
+	return (1);
 }
-int File_EsDirectorio(char *dir){
+int File_EsDirectorio(char *dir) {
 	struct stat info;
 
-	if(lstat(dir,&info)==-1){
-		return(0);
+	if (lstat(dir, &info) == -1) {
+		return (0);
 	}
-	if(S_ISDIR(info.st_mode)){
-		return(1);
+	if (S_ISDIR(info.st_mode)) {
+		return (1);
 	}
-	return(0);
+	return (0);
 }
-int File_EsFichero(char *fichero){
+int File_EsFichero(char *fichero) {
 	struct stat info;
 
-	if(lstat(fichero,&info)==-1){
-		return(0);
+	if (lstat(fichero, &info) == -1) {
+		return (0);
 	}
-	if(S_ISDIR(info.st_mode)){
-		return(0);
+	if (S_ISDIR(info.st_mode)) {
+		return (0);
 	}
-	return(1);
+	return (1);
 }
 #endif
 
-
-
-long long File_TamanhoFichero(char *fichero){
+long long File_TamanhoFichero(char *fichero) {
 	FILE *f;
 	long long tamanho;
 
-	f=fopen(fichero,"rb");
-	if(!f)
-		return(-1);
+	f = fopen(fichero, "rb");
+	if (!f)
+		return (-1);
 
-	fseek(f,0,SEEK_END);
-	tamanho=ftell(f);
+	fseek(f, 0, SEEK_END);
+	tamanho = ftell(f);
 	fclose(f);
-	return(tamanho);
+	return (tamanho);
 }
 
-
 #ifdef WIN32
-int File_CrearDir(char *path){
+int File_CrearDir(char *path) {
 	return(_mkdir(path));
 }
 #else
-int File_CrearDir(char *path){
-	return(mkdir(path,0777));
+int File_CrearDir(char *path) {
+	return (mkdir(path, 0777));
 }
 #endif
-
-
-
 
 #ifdef WIN32
 
 void File_IterateDir(char *path,
-	int (*func)(char *path,char *name,void *data),void *data)
+		int (*func)(char *path,char *name,void *data),void *data)
 {
 	int handle;
 	struct _finddata_t fileinfo;
@@ -250,20 +233,20 @@ void File_IterateDir(char *path,
 	char *ptr;
 
 	snprintf(path_aux,MaxPath,
-	   "%s/*",path);
+			"%s/*",path);
 	handle=_findfirst(path_aux,&fileinfo);
 	if(handle==-1)
-		return;
+	return;
 
 	// Recorrer el directorio
-	do{
+	do {
 		if(strcmp(fileinfo.name,".") &&
-		   strcmp(fileinfo.name,".."))
+				strcmp(fileinfo.name,".."))
 		{
 			// A partir de aqui hay un fichero
 			// (o directorio)
 			snprintf(f_path,512,
-			   "%s/%s",path,fileinfo.name);
+					"%s/%s",path,fileinfo.name);
 			fin=func(f_path,fileinfo.name,data);
 		}
 		findnext_rc=_findnext(handle,&fileinfo);
@@ -274,80 +257,72 @@ void File_IterateDir(char *path,
 #else
 
 void File_IterateDir(char *path,
-	int (*func)(char *path,char *name,void *data),void *data)
-{
+		int (*func)(char *path, char *name, void *data), void *data) {
 	DIR *directorio;
 	struct dirent *entidad_dir;
 	char f_path[MaxPath];
-	int fin=0;
+	int fin = 0;
 	char *ptr;
 
-	directorio=opendir(path);
-	if(directorio==NULL)
+	directorio = opendir(path);
+	if (directorio == NULL )
 		return;
 
 	// Recorrer el directorio
-	do{
-		entidad_dir=readdir(directorio);
-		if(entidad_dir!=NULL){
-			if(strcmp(entidad_dir->d_name,".") &&
-			   strcmp(entidad_dir->d_name,".."))
-			{
+	do {
+		entidad_dir = readdir(directorio);
+		if (entidad_dir != NULL ) {
+			if (strcmp(entidad_dir->d_name, ".")
+					&& strcmp(entidad_dir->d_name, "..")) {
 				// A partir de aqui hay un fichero
 				// (o directorio)
-				snprintf(f_path,MaxPath,
-				   "%s/%s",path,entidad_dir->d_name);
-				fin=func(f_path,
-				   entidad_dir->d_name,
-				   data);
+				snprintf(f_path, MaxPath, "%s/%s", path, entidad_dir->d_name);
+				fin = func(f_path, entidad_dir->d_name, data);
 			}
 		}
-	}while(entidad_dir!=NULL && !fin);
+	} while (entidad_dir != NULL && !fin);
 	closedir(directorio);
 }
 #endif
 
-
-
-void File_Borrar(char *path){
+void File_Borrar(char *path) {
 	unlink(path);
 }
 
-void File_BorrarDirectorio(char *path){
+void File_BorrarDirectorio(char *path) {
 	rmdir(path);
 }
 
-
 #define MaxBuffer 16384
-int File_Copiar( const char *pathOrig,const char *pathDest){
-	FILE *fOrig,*fDest;
-    char buffer[MaxBuffer];
-	int readLen=0;
-	int writeLen=0;
-	int ok=0;
+int File_Copiar(const char *pathOrig, const char *pathDest) {
+	FILE *fOrig, *fDest;
+	char buffer[MaxBuffer];
+	int readLen = 0;
+	int writeLen = 0;
+	int ok = 0;
 
-	if((fOrig=fopen(pathOrig,"rb"))==NULL){
+	if ((fOrig = fopen(pathOrig, "rb")) == NULL ) {
 		return 0;
 	}
-	if((fDest=fopen(pathDest,"wb"))==NULL){
+	if ((fDest = fopen(pathDest, "wb")) == NULL ) {
 		return 0;
 	}
 
-	do{
-		readLen=fread(&buffer,1,MaxBuffer,fOrig);
-		if(readLen>0){
-			writeLen=fwrite(&buffer,1,readLen,fDest);
-			if(writeLen!=readLen){
+	do {
+		readLen = fread(&buffer, 1, MaxBuffer, fOrig);
+		if (readLen > 0) {
+			writeLen = fwrite(&buffer, 1, readLen, fDest);
+			if (writeLen != readLen) {
 				// Error
 				fclose(fOrig);
 				fclose(fDest);
 				return 0;
 			}
 		}
-	}while(readLen==MaxBuffer);
+	} while (readLen == MaxBuffer);
 
-	if(feof(fOrig)){
-		ok=1;
+	if (feof(fOrig)) {
+		ok = 1;
 	}
 
 	fclose(fOrig);

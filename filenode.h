@@ -20,7 +20,7 @@ typedef enum {
 	EstadoFichero_Borrado
 } EstadoFichero;
 
-typedef struct FileNode_Tag{
+typedef struct FileNode_Tag {
 	char name[MaxFilename];
 
 	int flags;
@@ -42,24 +42,22 @@ typedef struct FileNode_Tag{
 
 FileNode *FileNode_New();
 void FileNode_Delete(FileNode *fn);
-void FileNode_AddChild(FileNode *file,FileNode *file2);
+void FileNode_AddChild(FileNode *file, FileNode *file2);
 
-char *FileNode_GetFullPath(FileNode *fn,char *basePath,char *path);
+char *FileNode_GetFullPath(FileNode *fn, char *basePath, char *path);
 
-void FileNode_GetTamanho(FileNode *fn,char *file);
-void FileNode_GetFecha(FileNode *fn,char *file);
-void FileNode_GetCRC(FileNode *fn,char *file);
+void FileNode_GetTamanho(FileNode *fn, char *file);
+void FileNode_GetFecha(FileNode *fn, char *file);
+void FileNode_GetCRC(FileNode *fn, char *file);
 
-void FileNode_Save(FileNode *fn,char *fichero);
+void FileNode_Save(FileNode *fn, char *fichero);
 FileNode *FileNode_Load(char *fichero);
 
 void FileNode_PrintNode(FileNode *fn);
 void FileNode_Print(FileNode *fn);
 
-
 FileNode *FileNode_Build(char *path);
 
-FileNode *FileNode_Refresh(FileNode *file,char *path);
-
+FileNode *FileNode_Refresh(FileNode *file, char *path);
 
 #endif
