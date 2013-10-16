@@ -1,19 +1,19 @@
 #include <stdio.h>
 
-unsigned long CRCTable[256];
-int CRCTable_initialized = 0;
+unsigned long _crcTable[256];
+int _crcTableInitialized = 0;
 
-#define CRC32_POLYNOMIAL     0xEDB88320L
+#define CRC32_POLYNOMIAL	0xEDB88320L
 
 void CRCTable_Init() {
 	int i;
 	int j;
 	unsigned long crc;
 
-	if (CRCTable_initialized) {
+	if (_crcTableInitialized) {
 		return;
 	}
-	CRCTable_initialized = 1;
+	_crcTableInitialized = 1;
 
 	for (i = 0; i < 256; i++) {
 		crc = i;
@@ -23,45 +23,45 @@ void CRCTable_Init() {
 			else
 				crc >>= 1;
 		}
-		CRCTable[i] = crc;
+		_crcTable[i] = crc;
 	}
 }
 
-unsigned long CRC_Buffer(unsigned char *buffer, int len, unsigned long crc) {
+unsigned long CRC_BufferInternal(unsigned char *buffer, int len,
+		unsigned long crc) {
 	unsigned char *p;
-	unsigned long temp1;
-	unsigned long temp2;
 
 	// Calcular CRC del buffer
 	p = (unsigned char*) buffer;
 	while (len-- != 0) {
-		temp1 = (crc >> 8) & 0x00FFFFFFL;
-		temp2 = CRCTable[((int) crc ^ *p++) & 0xff];
-		crc = temp1 ^ temp2;
+		unsigned long termA = (crc >> 8) & 0x00FFFFFFL;
+		unsigned long termB = _crcTable[((int) crc ^ *p++) & 0xff];
+		crc = termA ^ termB;
 	}
 
 	return (crc);
 }
 
+unsigned long CRC_Buffer(unsigned char *buffer, int len, unsigned long crc) {
+	CRCTable_Init();
+	return (CRC_BufferInternal(buffer, len, crc));
+}
+
 unsigned long CRC_File(FILE *file) {
 	unsigned long crc;
-	int count;
 	unsigned char buffer[512];
-	unsigned char *p;
-	unsigned long temp1;
-	unsigned long temp2;
 
 	CRCTable_Init();
 
 	crc = 0xFFFFFFFFL;
 	for (;;) {
 		// Llenar el buffer
-		count = fread(buffer, 1, 512, file);
+		int count = fread(buffer, 1, 512, file);
 		if (count == 0)
 			break;
 
 		// Calcular CRC del buffer
-		crc = CRC_Buffer(buffer, count, crc);
+		crc = CRC_BufferInternal(buffer, count, crc);
 	}
 	return (crc ^= 0xFFFFFFFFL);
 }

@@ -4,36 +4,37 @@
 #include "filenode.h"
 
 typedef enum {
-	AccionFileCmp_Nada,
-	AccionFileCmp_IzquierdaADerecha,
-	AccionFileCmp_DerechaAIzquierda,
-	AccionFileCmp_BorrarIzquierda,
-	AccionFileCmp_BorrarDerecha,
-	AccionFileCmp_FechaIzquierdaADerecha,
-	AccionFileCmp_FechaDerechaAIzquierda,
-	AccionFileCmp_CrearDirDerecha,
-	AccionFileCmp_CrearDirIzquierda
+	AccionFileCmp_Nothing,
+	AccionFileCmp_LeftToRight,
+	AccionFileCmp_RightToLeft,
+	AccionFileCmp_DeleteLeft,
+	AccionFileCmp_DeleteRight,
+	AccionFileCmp_DateLeftToRight,
+	AccionFileCmp_DateRightToLeft,
+	AccionFileCmp_MakeRightDirectory,
+	AccionFileCmp_MakeLeftDirectory
 } AccionFileCmp;
 
-typedef struct Tag_AccionFileNode {
-	AccionFileCmp accion;
-	FileNode *izquierda;
-	FileNode *derecha;
-	struct Tag_AccionFileNode *sig;
+typedef struct SAccionFileNode {
+	AccionFileCmp action;
+	FileNode *left;
+	FileNode *right;
+	struct SAccionFileNode *next;
 } AccionFileNode;
 
-AccionFileNode *AccionFileNode_Crear();
-void AccionFileNode_Destruir(AccionFileNode *afn);
-AccionFileNode *AccionFileNode_CrearNormal(FileNode *fnIzq, FileNode *fnDer);
+AccionFileNode *AccionFileNode_Create();
+void AccionFileNode_Destroy(AccionFileNode *actionFileNode);
+AccionFileNode *AccionFileNode_CreateNormal(FileNode *fileNodeLeft,
+		FileNode *fileNodeRight);
 
-AccionFileNode *AccionFileNode_BuildSync(FileNode *izquierda,
-		FileNode *derecha);
-AccionFileNode *AccionFileNode_BuildCopy(FileNode *izquierda,
-		FileNode *derecha);
+AccionFileNode *AccionFileNode_BuildSync(FileNode *fileNodeLeft,
+		FileNode *fileNodeRight);
+AccionFileNode *AccionFileNode_BuildCopy(FileNode *fileNodeLeft,
+		FileNode *fileNodeRight);
 
-void AccionFileNode_Print(AccionFileNode *afn);
+void AccionFileNode_Print(AccionFileNode *actionFileNode);
 
-void AccionFileNode_RunList(AccionFileNode *afn, char *pathIzquierda,
-		char *pathDerecha);
+void AccionFileNode_RunList(AccionFileNode *actionFileNode, char *pathLeft,
+		char *pathRight);
 
 #endif

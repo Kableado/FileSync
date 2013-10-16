@@ -5,56 +5,52 @@
 
 #define FileNode_Version 4
 
-#define FileFlag_Raiz 1
+#define FileFlag_Root 1
 #define FileFlag_Normal 2
-#define FileFlag_Directorio 4
-#define FileFlag_TieneTamanho 8
-#define FileFlag_TieneFecha 16
-#define FileFlag_TieneCRC 32
-#define FileFlag_MarcaRevision 1024
+#define FileFlag_Directory 4
+#define FileFlag_HasSize 8
+#define FileFlag_HastTime 16
+#define FileFlag_HasCRC 32
+#define FileFlag_MarkerForReview 1024
 
 typedef enum {
-	EstadoFichero_Nada,
-	EstadoFichero_Nuevo,
-	EstadoFichero_Modificado,
-	EstadoFichero_Borrado
-} EstadoFichero;
+	FileStatus_None,
+	FileStatus_New,
+	FileStatus_Modified,
+	FileStatus_Deleted
+} FileStatus;
 
-typedef struct FileNode_Tag {
+typedef struct SFileNode {
 	char name[MaxFilename];
-
 	int flags;
-
-	EstadoFichero estado;
+	FileStatus estado;
 
 	long long size;
-
 	unsigned long crc;
+	FileTime fileTime;
 
-	FileTime ft;
+	struct SFileNode *child;
+	int childCount;
 
-	struct FileNode_Tag *child;
-	int n_childs;
-
-	struct FileNode_Tag *sig;
-	struct FileNode_Tag *padre;
+	struct SFileNode *next;
+	struct SFileNode *parent;
 } FileNode;
 
-FileNode *FileNode_New();
-void FileNode_Delete(FileNode *fn);
+FileNode *FileNode_Create();
+void FileNode_Delete(FileNode *fileNode);
 void FileNode_AddChild(FileNode *file, FileNode *file2);
 
-char *FileNode_GetFullPath(FileNode *fn, char *basePath, char *path);
+char *FileNode_GetFullPath(FileNode *fileNode, char *basePath, char *path);
 
-void FileNode_GetTamanho(FileNode *fn, char *file);
-void FileNode_GetFecha(FileNode *fn, char *file);
-void FileNode_GetCRC(FileNode *fn, char *file);
+void FileNode_GetSize(FileNode *fileNode, char *file);
+void FileNode_GetFecha(FileNode *fileNode, char *file);
+void FileNode_GetCRC(FileNode *fileNode, char *file);
 
-void FileNode_Save(FileNode *fn, char *fichero);
+void FileNode_Save(FileNode *fileNode, char *fichero);
 FileNode *FileNode_Load(char *fichero);
 
-void FileNode_PrintNode(FileNode *fn);
-void FileNode_Print(FileNode *fn);
+void FileNode_PrintNode(FileNode *fileNode);
+void FileNode_Print(FileNode *fileNode);
 
 FileNode *FileNode_Build(char *path);
 

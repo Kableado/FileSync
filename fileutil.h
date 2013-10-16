@@ -17,20 +17,22 @@ void FileTime_Print(FileTime t);
 
 void File_GetName(char *path, char *name);
 
-int File_ExistePath(char *path);
+int File_ExistsPath(char *path);
 
-int File_EsDirectorio(char *path);
+int File_IsDirectory(char *path);
 
-int File_EsFichero(char *path);
+int File_IsFile(char *path);
 
-long long File_TamanhoFichero(char *ficheros);
+long long File_GetSize(char *ficheros);
 
-int File_CrearDir(char *path);
+int File_MakeDirectory(char *path);
 
 void File_IterateDir(char *path,
 		int (*func)(char *path, char *name, void *data), void *data);
 
-void File_Borrar(char *path);
-void File_BorrarDirectorio(char *path);
+void File_Delete(char *path);
+void File_DeleteDirectory(char *path);
+
+int File_Copy(const char *pathOrig, const char *pathDest);
 
 #endif
