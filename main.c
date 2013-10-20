@@ -144,6 +144,22 @@ FileNode *CheckDir(char *path, int recheck) {
 	return fileNode;
 }
 
+void PrintStatistics(AccionFileNode *actionFileNode) {
+	ActionQueueStatistics statistics;
+	AccionFileNode_Statistics(actionFileNode, &statistics);
+	printf("Statistics\n");
+	printf("       % 12s % 12s % 12s\n", "Read", "Write", "Delete");
+	printf("Left : % 12lld % 12lld % 12lld\n", statistics.readLeft,
+			statistics.writeLeft, statistics.deleteLeft);
+	printf("Right: % 12lld % 12lld % 12lld\n", statistics.readRight,
+			statistics.writeRight, statistics.deleteRight);
+	printf("\n");
+	printf("Copy count     : % 10d\n", statistics.fullCopyCount);
+	printf("Date copy count: % 10d\n", statistics.dateCopyCount);
+	printf("Directory count: % 10d\n", statistics.directoryCount);
+	printf("Delete count   : % 10d\n", statistics.deleteCount);
+}
+
 int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 	FileNode *fileNodeLeft, *fileNodeRight;
 
@@ -173,6 +189,7 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 	if (dryRun) {
 		// Mostrar lista de acciones
 		AccionFileNode_Print(actionFileNode);
+		PrintStatistics(actionFileNode);
 	} else {
 		// Ejecutar lista de acciones
 		AccionFileNode_RunList(actionFileNode, pathLeft, pathRight);
@@ -210,6 +227,7 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	if (dryRun) {
 		// Mostrar lista de acciones
 		AccionFileNode_Print(actionFileNode);
+		PrintStatistics(actionFileNode);
 	} else {
 		// Ejecutar lista de acciones
 		AccionFileNode_RunList(actionFileNode, pathLeft, pathRight);

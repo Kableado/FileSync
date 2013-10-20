@@ -32,6 +32,22 @@ AccionFileNode *AccionFileNode_BuildSync(FileNode *fileNodeLeft,
 AccionFileNode *AccionFileNode_BuildCopy(FileNode *fileNodeLeft,
 		FileNode *fileNodeRight);
 
+typedef struct SActionQueueStatistics {
+	long long readLeft;
+	long long writeLeft;
+	long long readRight;
+	long long writeRight;
+	int fullCopyCount;
+	int dateCopyCount;
+	int directoryCount;
+	int deleteCount;
+	long long deleteLeft;
+	long long deleteRight;
+} ActionQueueStatistics;
+
+void AccionFileNode_Statistics(AccionFileNode *actionFileNode,
+		ActionQueueStatistics *statistics);
+
 void AccionFileNode_Print(AccionFileNode *actionFileNode);
 
 void AccionFileNode_RunList(AccionFileNode *actionFileNode, char *pathLeft,
