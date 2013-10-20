@@ -8,6 +8,8 @@
 #include "filenode.h"
 #include "filenodecmp.h"
 
+#define QueueNode(queue,node) (queue)->next = node; (queue) = node;
+
 AccionFileNode *_actionFileNodeFree = NULL;
 int _actionFileNodeFreeCount = 0;
 #define AccionFileNode_Tocho 1024
@@ -138,43 +140,41 @@ void AccionFileNode_CompareChilds(AccionFileNode *actionFileNodeRoot,
 
 void AccionFileNode_DeletePair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 		AccionFileNode **actionFileNodeQueue) {
-	AccionFileNode *afnNew = AccionFileNode_CreateNormal(fileNodeLeft,
-			fileNodeRight);
+	AccionFileNode *actionFileNodeNew = AccionFileNode_CreateNormal(
+			fileNodeLeft, fileNodeRight);
 
 	if (!fileNodeLeft && !fileNodeRight) {
-		AccionFileNode_Destroy(afnNew);
+		AccionFileNode_Destroy(actionFileNodeNew);
 		return;
 	}
 	if (!fileNodeLeft && fileNodeRight) {
 		if (fileNodeRight->flags & FileFlag_Directory) {
 			// Iterar hijos para borrarlos
-			AccionFileNode_CompareChilds(afnNew, actionFileNodeQueue,
+			AccionFileNode_CompareChilds(actionFileNodeNew, actionFileNodeQueue,
 					AccionFileNode_DeletePair);
 		}
 
 		if (fileNodeRight->estado != FileStatus_Deleted) {
 			// Accion de borrado para el nodo
-			afnNew->action = AccionFileCmp_DeleteRight;
-			(*actionFileNodeQueue)->next = afnNew;
-			(*actionFileNodeQueue) = afnNew;
+			actionFileNodeNew->action = AccionFileCmp_DeleteRight;
+			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 		} else {
-			AccionFileNode_Destroy(afnNew);
+			AccionFileNode_Destroy(actionFileNodeNew);
 		}
 	}
 	if (fileNodeLeft && !fileNodeRight) {
 		if (fileNodeLeft->flags & FileFlag_Directory) {
 			// Iterar hijos para borrarlos
-			AccionFileNode_CompareChilds(afnNew, actionFileNodeQueue,
+			AccionFileNode_CompareChilds(actionFileNodeNew, actionFileNodeQueue,
 					AccionFileNode_DeletePair);
 		}
 
 		if (fileNodeLeft->estado != FileStatus_Deleted) {
 			// Accion de borrado para el nodo
-			afnNew->action = AccionFileCmp_DeleteLeft;
-			(*actionFileNodeQueue)->next = afnNew;
-			(*actionFileNodeQueue) = afnNew;
+			actionFileNodeNew->action = AccionFileCmp_DeleteLeft;
+			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 		} else {
-			AccionFileNode_Destroy(afnNew);
+			AccionFileNode_Destroy(actionFileNodeNew);
 		}
 	}
 	if (fileNodeLeft && fileNodeRight) {
@@ -183,30 +183,28 @@ void AccionFileNode_DeletePair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 			// Alguno es directorio
 
 			// Iterar hijos para borrarlos
-			AccionFileNode_CompareChilds(afnNew, actionFileNodeQueue,
+			AccionFileNode_CompareChilds(actionFileNodeNew, actionFileNodeQueue,
 					AccionFileNode_DeletePair);
 		}
 
 		if (fileNodeLeft->estado != FileStatus_Deleted) {
 			// Accion de borrado para el nodo izquierdo
-			afnNew->action = AccionFileCmp_DeleteLeft;
-			(*actionFileNodeQueue)->next = afnNew;
-			(*actionFileNodeQueue) = afnNew;
-			afnNew = NULL;
+			actionFileNodeNew->action = AccionFileCmp_DeleteLeft;
+			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
+			actionFileNodeNew = NULL;
 		}
 		if (fileNodeRight->estado != FileStatus_Deleted) {
-			if (!afnNew) {
-				afnNew = AccionFileNode_CreateNormal(fileNodeLeft,
+			if (!actionFileNodeNew) {
+				actionFileNodeNew = AccionFileNode_CreateNormal(fileNodeLeft,
 						fileNodeRight);
 			}
 			// Accion de borrado para el nodo derecho
-			afnNew->action = AccionFileCmp_DeleteRight;
-			(*actionFileNodeQueue)->next = afnNew;
-			(*actionFileNodeQueue) = afnNew;
-			afnNew = NULL;
+			actionFileNodeNew->action = AccionFileCmp_DeleteRight;
+			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
+			actionFileNodeNew = NULL;
 		}
-		if (afnNew) {
-			AccionFileNode_Destroy(afnNew);
+		if (actionFileNodeNew) {
+			AccionFileNode_Destroy(actionFileNodeNew);
 		}
 	}
 }
@@ -225,17 +223,10 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 			// Directory
 			if (fileNodeRight->estado == FileStatus_Deleted) {
 				actionFileNodeNew->action = AccionFileCmp_Nothing;
-
-				// Anhadir a la lista de acciones
-				(*actionFileNodeQueue)->next = actionFileNodeNew;
-				(*actionFileNodeQueue) = actionFileNodeNew;
-
+				QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 			} else {
 				actionFileNodeNew->action = AccionFileCmp_MakeLeftDirectory;
-
-				// Anhadir a la lista de acciones
-				(*actionFileNodeQueue)->next = actionFileNodeNew;
-				(*actionFileNodeQueue) = actionFileNodeNew;
+				QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 
 				// Iterar hijos
 				AccionFileNode_CompareChilds(actionFileNodeNew,
@@ -245,8 +236,7 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 				actionFileNodeNew = AccionFileNode_CreateNormal(fileNodeLeft,
 						fileNodeRight);
 				actionFileNodeNew->action = AccionFileCmp_DateRightToLeft;
-				(*actionFileNodeQueue)->next = actionFileNodeNew;
-				(*actionFileNodeQueue) = actionFileNodeNew;
+				QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 			}
 		} else {
 			// File
@@ -255,8 +245,7 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 			} else {
 				actionFileNodeNew->action = AccionFileCmp_RightToLeft;
 			}
-			(*actionFileNodeQueue)->next = actionFileNodeNew;
-			(*actionFileNodeQueue) = actionFileNodeNew;
+			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 		}
 	}
 	if (fileNodeLeft && !fileNodeRight) {
@@ -264,17 +253,10 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 			// Directory
 			if (fileNodeLeft->estado == FileStatus_Deleted) {
 				actionFileNodeNew->action = AccionFileCmp_Nothing;
-
-				// Anhadir a la lista de acciones
-				(*actionFileNodeQueue)->next = actionFileNodeNew;
-				(*actionFileNodeQueue) = actionFileNodeNew;
-
+				QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 			} else {
 				actionFileNodeNew->action = AccionFileCmp_MakeRightDirectory;
-
-				// Anhadir a la lista de acciones
-				(*actionFileNodeQueue)->next = actionFileNodeNew;
-				(*actionFileNodeQueue) = actionFileNodeNew;
+				QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 
 				// Iterar hijos
 				AccionFileNode_CompareChilds(actionFileNodeNew,
@@ -284,8 +266,7 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 				actionFileNodeNew = AccionFileNode_CreateNormal(fileNodeLeft,
 						fileNodeRight);
 				actionFileNodeNew->action = AccionFileCmp_DateLeftToRight;
-				(*actionFileNodeQueue)->next = actionFileNodeNew;
-				(*actionFileNodeQueue) = actionFileNodeNew;
+				QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 			}
 		} else {
 			// File
@@ -294,8 +275,7 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 			} else {
 				actionFileNodeNew->action = AccionFileCmp_LeftToRight;
 			}
-			(*actionFileNodeQueue)->next = actionFileNodeNew;
-			(*actionFileNodeQueue) = actionFileNodeNew;
+			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 		}
 	}
 	if (fileNodeLeft && fileNodeRight) {
@@ -351,11 +331,7 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 				AccionFileNode_CompareChilds(actionFileNodeNew,
 						actionFileNodeQueue, AccionFileNode_CheckPair);
 			}
-
-			// Encolar accion para el directorio padre
-			(*actionFileNodeQueue)->next = actionFileNodeNew;
-			(*actionFileNodeQueue) = actionFileNodeNew;
-
+			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 		} else if ((fileNodeLeft->flags & FileFlag_Normal)
 				&& (fileNodeRight->flags & FileFlag_Normal)) {
 			// Ficheros
@@ -397,11 +373,7 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 					}
 				}
 			}
-
-			// Encolar accion para el fichero
-			(*actionFileNodeQueue)->next = actionFileNodeNew;
-			(*actionFileNodeQueue) = actionFileNodeNew;
-
+			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 		} else {
 			// FIXME: !!!!!
 			// Directory vs File
@@ -411,86 +383,89 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 }
 
 AccionFileNode *AccionFileNode_BuildSync(FileNode *izquierda, FileNode *derecha) {
-	AccionFileNode *afnRaiz = AccionFileNode_CreateNormal(izquierda, derecha);
-	AccionFileNode *afnCola = afnRaiz;
-
-	AccionFileNode_CompareChilds(afnRaiz, &afnCola, AccionFileNode_CheckPair);
-
-	return afnRaiz;
+	AccionFileNode *actionFileNodeRoot = AccionFileNode_CreateNormal(izquierda,
+			derecha);
+	AccionFileNode *actionFileNodeQueue = actionFileNodeRoot;
+	AccionFileNode_CompareChilds(actionFileNodeRoot, &actionFileNodeQueue,
+			AccionFileNode_CheckPair);
+	return actionFileNodeRoot;
 }
 
-void AccionFileNode_Copy(FileNode *fnIzq, FileNode *fnDer,
-		AccionFileNode **afnCola) {
-	AccionFileNode *afnNew = AccionFileNode_CreateNormal(fnIzq, fnDer);
+void AccionFileNode_Copy(FileNode *fileNodeLeft, FileNode *fileNodeRight,
+		AccionFileNode **actionFileNodeQueue) {
+	AccionFileNode *actionFileNodeNew = AccionFileNode_CreateNormal(
+			fileNodeLeft, fileNodeRight);
 
-	if (!fnIzq && !fnDer) {
-		AccionFileNode_Destroy(afnNew);
+	if (!fileNodeLeft && !fileNodeRight) {
+		AccionFileNode_Destroy(actionFileNodeNew);
 		return;
 	}
-	if (!fnIzq && fnDer) {
-		if (fnDer->flags & FileFlag_Directory) {
-			AccionFileNode_CompareChilds(afnNew, afnCola,
+	if (!fileNodeLeft && fileNodeRight) {
+		if (fileNodeRight->flags & FileFlag_Directory) {
+			AccionFileNode_CompareChilds(actionFileNodeNew, actionFileNodeQueue,
 					AccionFileNode_DeletePair);
 		}
 
-		if (fnDer->estado != FileStatus_Deleted) {
-			afnNew->action = AccionFileCmp_DeleteRight;
+		if (fileNodeRight->estado != FileStatus_Deleted) {
+			actionFileNodeNew->action = AccionFileCmp_DeleteRight;
 		} else {
-			afnNew->action = AccionFileCmp_Nothing;
+			actionFileNodeNew->action = AccionFileCmp_Nothing;
 		}
-		(*afnCola)->next = afnNew;
-		(*afnCola) = afnNew;
+		QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 	}
-	if (fnIzq && !fnDer) {
-		if (fnIzq->estado != FileStatus_Deleted) {
-			if (fnIzq->flags & FileFlag_Directory) {
-				afnNew->action = AccionFileCmp_MakeRightDirectory;
-				(*afnCola)->next = afnNew;
-				(*afnCola) = afnNew;
-				AccionFileNode_CompareChilds(afnNew, afnCola,
-						AccionFileNode_Copy);
-				afnNew = AccionFileNode_CreateNormal(fnIzq, fnDer);
-				afnNew->action = AccionFileCmp_DateLeftToRight;
+	if (fileNodeLeft && !fileNodeRight) {
+		if (fileNodeLeft->estado != FileStatus_Deleted) {
+			if (fileNodeLeft->flags & FileFlag_Directory) {
+				actionFileNodeNew->action = AccionFileCmp_MakeRightDirectory;
+				(*actionFileNodeQueue)->next = actionFileNodeNew;
+				(*actionFileNodeQueue) = actionFileNodeNew;
+				AccionFileNode_CompareChilds(actionFileNodeNew,
+						actionFileNodeQueue, AccionFileNode_Copy);
+				actionFileNodeNew = AccionFileNode_CreateNormal(fileNodeLeft,
+						fileNodeRight);
+				actionFileNodeNew->action = AccionFileCmp_DateLeftToRight;
 			} else {
-				afnNew->action = AccionFileCmp_LeftToRight;
+				actionFileNodeNew->action = AccionFileCmp_LeftToRight;
 			}
 		} else {
-			afnNew->action = AccionFileCmp_Nothing;
+			actionFileNodeNew->action = AccionFileCmp_Nothing;
 		}
-		(*afnCola)->next = afnNew;
-		(*afnCola) = afnNew;
+		QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 	}
-	if (fnIzq && fnDer) {
-		if ((fnIzq->flags & FileFlag_Directory)
-				|| (fnDer->flags & FileFlag_Directory)) {
-			if (fnIzq->estado != FileStatus_Deleted) {
-				AccionFileNode_CompareChilds(afnNew, afnCola,
-						AccionFileNode_Copy);
-				if (abs(fnIzq->fileTime - fnDer->fileTime) <= 1) { // appox. equal
-					afnNew->action = AccionFileCmp_Nothing;
+	if (fileNodeLeft && fileNodeRight) {
+		if ((fileNodeLeft->flags & FileFlag_Directory)
+				|| (fileNodeRight->flags & FileFlag_Directory)) {
+			if (fileNodeLeft->estado != FileStatus_Deleted) {
+				AccionFileNode_CompareChilds(actionFileNodeNew,
+						actionFileNodeQueue, AccionFileNode_Copy);
+				if (abs(fileNodeLeft->fileTime - fileNodeRight->fileTime)
+						<= 1) { // appox. equal
+					actionFileNodeNew->action = AccionFileCmp_Nothing;
 				} else {
-					afnNew->action = AccionFileCmp_DateLeftToRight;
+					actionFileNodeNew->action = AccionFileCmp_DateLeftToRight;
 				}
 			} else {
-				AccionFileNode_CompareChilds(afnNew, afnCola,
-						AccionFileNode_DeletePair);
-				afnNew->action = AccionFileCmp_DeleteRight;
+				AccionFileNode_CompareChilds(actionFileNodeNew,
+						actionFileNodeQueue, AccionFileNode_DeletePair);
+				if (fileNodeRight->estado != FileStatus_Deleted) {
+					actionFileNodeNew->action = AccionFileCmp_DeleteRight;
+				}
 			}
 		} else {
-			if (fnIzq->estado != FileStatus_Deleted) {
-				if (abs(fnIzq->fileTime - fnDer->fileTime) <= 1) { // appox. equal
-					afnNew->action = AccionFileCmp_Nothing;
+			if (fileNodeLeft->estado != FileStatus_Deleted) {
+				if (abs(fileNodeLeft->fileTime - fileNodeRight->fileTime)
+						<= 1) { // appox. equal
+					actionFileNodeNew->action = AccionFileCmp_Nothing;
 				} else {
-					afnNew->action = AccionFileCmp_LeftToRight;
+					actionFileNodeNew->action = AccionFileCmp_LeftToRight;
 				}
 			} else {
-				if (fnDer->estado != FileStatus_Deleted) {
-					afnNew->action = AccionFileCmp_DeleteRight;
+				if (fileNodeRight->estado != FileStatus_Deleted) {
+					actionFileNodeNew->action = AccionFileCmp_DeleteRight;
 				}
 			}
 		}
-		(*afnCola)->next = afnNew;
-		(*afnCola) = afnNew;
+		QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 	}
 }
 
@@ -499,10 +474,8 @@ AccionFileNode *AccionFileNode_BuildCopy(FileNode *fileNodeLeft,
 	AccionFileNode *actionFileNodeRoot = AccionFileNode_CreateNormal(
 			fileNodeLeft, fileNodeRight);
 	AccionFileNode *actionFileNodeQueue = actionFileNodeRoot;
-
 	AccionFileNode_CompareChilds(actionFileNodeRoot, &actionFileNodeQueue,
 			AccionFileNode_Copy);
-
 	return actionFileNodeRoot;
 }
 
