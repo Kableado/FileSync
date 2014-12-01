@@ -13,7 +13,6 @@ int maxDeltaTime=4000;
 #define QueueNode(queue,node) (queue)->next = node; (queue) = node;
 
 AccionFileNode *_actionFileNodeFree = NULL;
-int _actionFileNodeFreeCount = 0;
 #define AccionFileNode_Tocho 1024
 AccionFileNode *AccionFileNode_Create() {
 	AccionFileNode *actionFileNode;
@@ -34,7 +33,6 @@ AccionFileNode *AccionFileNode_Create() {
 	// Obtener el primero libre
 	actionFileNode = _actionFileNodeFree;
 	_actionFileNodeFree = actionFileNode->next;
-	_actionFileNodeFreeCount++;
 
 	// Iniciar
 	actionFileNode->action = AccionFileCmp_Nothing;
@@ -48,7 +46,6 @@ AccionFileNode *AccionFileNode_Create() {
 void AccionFileNode_Destroy(AccionFileNode *actionFileNode) {
 	actionFileNode->next = _actionFileNodeFree;
 	_actionFileNodeFree = actionFileNode;
-	_actionFileNodeFreeCount--;
 }
 
 AccionFileNode *AccionFileNode_CreateNormal(FileNode *fileNodeLeft,
