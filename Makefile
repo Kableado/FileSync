@@ -1,26 +1,31 @@
 
-CC=gcc
-RM=rm -f
-ECHO=echo
-MKDIR=mkdir
+CC    = gcc
+RM    = rm -f
+ECHO  = echo
+MKDIR = mkdir
 
-HEADS = util.h crc.h fileutil.h filenode.h
+HEADS = \
+		src/util.h \
+		src/crc.h \
+		src/fileutil.h \
+		src/filenode.h
+
 OBJS_BASE =  \
 		$(BUILDDIR)/util.o \
 		$(BUILDDIR)/crc.o \
 		$(BUILDDIR)/fileutil.o \
 		$(BUILDDIR)/filenode.o \
 		$(BUILDDIR)/filenodecmp.o
+
 OBJS_APP = \
 		$(OBJS_BASE) \
 		$(BUILDDIR)/main.o
 
-RES_APP=filesync
+RES_APP = filesync.exe
 
-CFLAGS = -g
-LIBS =  -lm
+CFLAGS   = -g
+LIBS     = -lm
 BUILDDIR = build
-
 
 
 DO_CC=@$(ECHO) "CC: $@" ;\
@@ -30,7 +35,7 @@ all: $(RES_APP)
 
 
 clean:
-	$(RM) $(OBJS_BASE)
+	$(RM) $(RES_APP)
 	$(RM) $(OBJS_APP)
 
 $(BUILDDIR):
@@ -38,23 +43,23 @@ $(BUILDDIR):
 
 
 
-$(BUILDDIR)/util.o: util.c $(HEADS)
+$(BUILDDIR)/util.o: src/util.c $(HEADS)
 	$(DO_CC)
 
-$(BUILDDIR)/crc.o: crc.c $(HEADS)
+$(BUILDDIR)/crc.o: src/crc.c $(HEADS)
 	$(DO_CC)
 
-$(BUILDDIR)/fileutil.o: fileutil.c $(HEADS)
+$(BUILDDIR)/fileutil.o: src/fileutil.c $(HEADS)
 	$(DO_CC)
 
-$(BUILDDIR)/filenode.o: filenode.c $(HEADS)
+$(BUILDDIR)/filenode.o: src/filenode.c $(HEADS)
 	$(DO_CC)
 
-$(BUILDDIR)/filenodecmp.o: filenodecmp.c $(HEADS)
+$(BUILDDIR)/filenodecmp.o: src/filenodecmp.c $(HEADS)
 	$(DO_CC)
 
 
-$(BUILDDIR)/main.o: main.c $(HEADS)
+$(BUILDDIR)/main.o: src/main.c $(HEADS)
 	$(DO_CC)
 
 
