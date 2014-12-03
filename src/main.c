@@ -60,10 +60,13 @@ int main(int argc, char *argv[]) {
 		}
 	} else if (!strcmp(argv[1], "scan") && argc == 4) {
 		// Scanear informacion de directorio y guardar arbol
+		long long tScan=Time_GetTime();
 		FileNode *fileNode;
 		printf("Building FileNode..\n");
 		fileNode = FileNode_Build(argv[2]);
 		FileNode_Save(fileNode, argv[3]);
+		tScan=Time_GetTime()-tScan;
+		printf("tScan: %9lldus\n",tScan);
 	} else if (!strcmp(argv[1], "rescan") && argc == 4) {
 		// Scanear informacion de directorio y guardar arbol
 		FileNode *fileNode;
@@ -71,7 +74,10 @@ int main(int argc, char *argv[]) {
 		fileNode = FileNode_Load(argv[3]);
 		if (fileNode) {
 			printf("Rebuilding FileNode..\n");
+			long long tScan=Time_GetTime();
 			fileNode = FileNode_Refresh(fileNode, argv[2]);
+			tScan=Time_GetTime()-tScan;
+			printf("tScan: %9lldus\n",tScan);
 			FileNode_Save(fileNode, argv[3]);
 		}
 	} else if (!strcmp(argv[1], "read") && argc == 3) {
@@ -126,12 +132,15 @@ FileNode *CheckDir(char *path, int recheck) {
 	snprintf(dirNodesFile, MaxPath, "%s/"FileNode_Filename, path);
 	if (recheck) {
 		printf("Checking Directory.. %s\n", path);
+		long long tScan=Time_GetTime();
 		fileNode = FileNode_Load(dirNodesFile);
 		if (fileNode) {
 			fileNode = FileNode_Refresh(fileNode, path);
 		} else {
 			fileNode = FileNode_Build(path);
 		}
+		tScan=Time_GetTime()-tScan;
+		printf("tScan: %9lldus\n",tScan);
 		FileNode_Save(fileNode, dirNodesFile);
 	} else {
 		printf("Loading Directory.. %s\n", path);
@@ -182,9 +191,12 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 	}
 
 	// Construir acciones
+	long long tBuild=Time_GetTime();
 	printf("Building action list.. \n");
 	AccionFileNode *actionFileNode = NULL;
 	actionFileNode = AccionFileNode_BuildSync(fileNodeLeft, fileNodeRight);
+	tBuild=Time_GetTime()-tBuild;
+	printf("tBuild: %9lldus\n",tBuild);
 
 	if (dryRun) {
 		// Mostrar lista de acciones
@@ -220,9 +232,12 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	}
 
 	// Construir acciones
+	long long tBuild=Time_GetTime();
 	printf("Building action list.. \n");
 	AccionFileNode *actionFileNode = NULL;
 	actionFileNode = AccionFileNode_BuildCopy(fileNodeLeft, fileNodeRight);
+	tBuild=Time_GetTime()-tBuild;
+	printf("tBuild: %9lldus\n",tBuild);
 
 	if (dryRun) {
 		// Mostrar lista de acciones
