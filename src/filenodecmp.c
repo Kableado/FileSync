@@ -58,82 +58,90 @@ AccionFileNode *AccionFileNode_CreateNormal(FileNode *fileNodeLeft,
 	return actionFileNode;
 }
 
+
 void AccionFileNode_CompareChilds(AccionFileNode *actionFileNodeRoot,
 		AccionFileNode **actionFileNodeQueue,
 		void (*CheckPair)(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 				AccionFileNode **actionFileNodeQueue)) {
-	FileNode *fileNodeLeft, *fileNodeRight;
-	AccionFileNode *actionFileNodeQueueStart = (*actionFileNodeQueue);
+	FileNode *fileNodeLeft;
+	FileNode *fileNodeRight;
+	FileNode *fileNodeRightQueue;
+	FileNode *fileNodeRightProcessed;
+	FileNode *fileNodeRightPrevious;
 
-	// Comprobar si hay algo que comparar
+	// Check if there is something to do
 	if (!actionFileNodeRoot->left && !actionFileNodeRoot->right) {
-		// Nada que hacer
 		return;
 	}
 
-	// Iterar todos los nodos de la izquierda
-	if (actionFileNodeRoot->left) {
-		fileNodeLeft = actionFileNodeRoot->left->child;
-		while (fileNodeLeft) {
-			if (actionFileNodeRoot->right) {
-				fileNodeRight = actionFileNodeRoot->right->child;
-				while (fileNodeRight) {
-					if (!strcmp(fileNodeLeft->name, fileNodeRight->name)) {
-						break;
-					} else {
-						fileNodeRight = fileNodeRight->next;
-					}
-				}
-			} else {
-				fileNodeRight = NULL;
-			}
-
-			CheckPair(fileNodeLeft, fileNodeRight, actionFileNodeQueue);
-
-			fileNodeLeft = fileNodeLeft->next;
-		}
-	}
-
-	// Iterar todos los nodos de la derecha,
-	//   ignorando las comparaciones ya realizadas
-	if (actionFileNodeRoot->right) {
+	// There is no left part
+	if (!actionFileNodeRoot->left) {
 		fileNodeRight = actionFileNodeRoot->right->child;
 		while (fileNodeRight) {
-			int doCheck = 1;
-			if (actionFileNodeRoot->left) {
-				fileNodeLeft = actionFileNodeRoot->left->child;
-				while (fileNodeLeft) {
-					AccionFileNode *afnCheck = actionFileNodeQueueStart;
-					while (afnCheck) {
-						if (afnCheck->left == fileNodeLeft
-								&& afnCheck->right == fileNodeRight) {
-							break;
-						} else {
-							afnCheck = afnCheck->next;
-						}
-					}
-					if (afnCheck) {
-						doCheck = 0;
-						break;
-					}
 
-					if (!strcmp(fileNodeLeft->name, fileNodeRight->name)) {
-						break;
-					} else {
-						fileNodeLeft = fileNodeLeft->next;
-					}
-				}
-			} else {
-				fileNodeLeft = NULL;
-			}
-
-			if (doCheck) {
-				CheckPair(fileNodeLeft, fileNodeRight, actionFileNodeQueue);
-			}
+			CheckPair(NULL, fileNodeRight, actionFileNodeQueue);
 
 			fileNodeRight = fileNodeRight->next;
 		}
+		return;
 	}
+
+	// There is no right part
+	if (!actionFileNodeRoot->right) {
+		fileNodeLeft = actionFileNodeRoot->left->child;
+		while (fileNodeLeft) {
+
+			CheckPair(fileNodeLeft, NULL, actionFileNodeQueue);
+
+			fileNodeLeft = fileNodeLeft->next;
+		}
+		return;
+	}
+
+	// Prepare chains
+	fileNodeRightQueue = actionFileNodeRoot->right->child;
+	fileNodeRightProcessed = NULL;
+
+	// Iterate left child FileNodes
+	fileNodeLeft = actionFileNodeRoot->left->child;
+	while (fileNodeLeft) {
+		fileNodeRightPrevious = NULL;
+		fileNodeRight = fileNodeRightQueue;
+		while (fileNodeRight) {
+			if(!strcmp(fileNodeLeft->name, fileNodeRight->name)){
+				// Match, extract right child FileNode to the processed chain
+				if(fileNodeRightPrevious) {
+					fileNodeRightPrevious->next = fileNodeRight->next;
+				}else{
+					fileNodeRightQueue = fileNodeRight->next;
+				}
+				fileNodeRight->next = fileNodeRightProcessed;
+				fileNodeRightProcessed = fileNodeRight;
+
+				CheckPair(fileNodeLeft, fileNodeRight, actionFileNodeQueue);
+				break;
+			}else{
+				// Next right child
+				fileNodeRightPrevious = fileNodeRight;
+				fileNodeRight = fileNodeRight->next;
+			}
+		}
+		if(!fileNodeRight){
+			CheckPair(fileNodeLeft, NULL, actionFileNodeQueue);
+		}
+		fileNodeLeft = fileNodeLeft->next;
+	}
+
+	// Iterate unprocessed right childs
+	fileNodeRight = fileNodeRightQueue;
+	while (fileNodeRight) {
+		CheckPair(NULL, fileNodeRight, actionFileNodeQueue);
+		fileNodeRightPrevious = fileNodeRight;
+		fileNodeRight = fileNodeRight->next;
+		fileNodeRightPrevious->next = fileNodeRightProcessed;
+		fileNodeRightProcessed = fileNodeRightPrevious;
+	}
+	actionFileNodeRoot->right->child = fileNodeRightProcessed;
 
 }
 
