@@ -77,18 +77,18 @@ void FileTime_Set(char *fileName, FileTime fileTime) {
 
 #else
 
-FileTime FileTime_Get(char *filename) {
+FileTime FileTime_Get(char *fileName) {
 	struct stat fs;
-	lstat(filename, &fs);
+	lstat(fileName, &fs);
 	return (fs.st_mtime);
 }
 
-void FileTime_Set(char *filename, FileTime t) {
+void FileTime_Set(char *fileName, FileTime t) {
 	struct utimbuf utb;
 
 	utb.actime = t;
 	utb.modtime = t;
-	utime(filename, &utb);
+	utime(fileName, &utb);
 }
 
 #endif
@@ -137,9 +137,9 @@ int File_ExistsPath(char *path) {
 	}
 	return (1);
 }
-int File_IsDirectory(char *dir) {
+int File_IsDirectory(char *fileName) {
 	unsigned rc;
-	rc = GetFileAttributes(dir);
+	rc = GetFileAttributes(fileName);
 
 	if (rc == INVALID_FILE_ATTRIBUTES ) {
 		return (0);
@@ -149,9 +149,9 @@ int File_IsDirectory(char *dir) {
 	}
 	return (0);
 }
-int File_IsFile(char *fichero) {
+int File_IsFile(char *fileName) {
 	unsigned rc;
-	rc = GetFileAttributes(fichero);
+	rc = GetFileAttributes(fileName);
 
 	if (rc == INVALID_FILE_ATTRIBUTES ) {
 		return (0);
@@ -171,10 +171,10 @@ int File_ExistsPath(char *path) {
 	}
 	return (1);
 }
-int File_IsDirectory(char *dir) {
+int File_IsDirectory(char *fileName) {
 	struct stat info;
 
-	if (lstat(dir, &info) == -1) {
+	if (lstat(fileName, &info) == -1) {
 		return (0);
 	}
 	if (S_ISDIR(info.st_mode)) {
@@ -182,10 +182,10 @@ int File_IsDirectory(char *dir) {
 	}
 	return (0);
 }
-int File_IsFile(char *fichero) {
+int File_IsFile(char *fileName) {
 	struct stat info;
 
-	if (lstat(fichero, &info) == -1) {
+	if (lstat(fileName, &info) == -1) {
 		return (0);
 	}
 	if (S_ISDIR(info.st_mode)) {
@@ -195,19 +195,50 @@ int File_IsFile(char *fichero) {
 }
 #endif
 
-long long File_GetSize(char *file) {
-	FILE *f;
-	long long tamanho;
 
-	f = fopen(file, "rb");
-	if (!f)
-		return (-1);
-
-	fseek(f, 0, SEEK_END);
-	tamanho = ftell(f);
-	fclose(f);
-	return (tamanho);
+#ifdef WIN32
+long long File_GetSize(char *fileName) {
+	HANDLE hFile;
+	DWORD fSize;
+	hFile = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, NULL,
+			OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL );
+	GetFileSize(hFile, &fSize);
+	CloseHandle(hFile);
+	return (fSize);
 }
+#else
+long long File_GetSize(char *fileName) {
+	struct stat fs;
+	lstat(fileName, &fs);
+	return (fs.st_size);
+}
+#endif
+
+
+#ifdef WIN32
+void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
+	HANDLE hFile;
+	DWORD fSize;
+	FILETIME ftCreate, ftAccess, ftWrite;
+	hFile = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, NULL,
+			OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL );
+	GetFileSize(hFile, &fSize);
+	GetFileTime(hFile, &ftCreate, &ftAccess, &ftWrite);
+	CloseHandle(hFile);
+	*size = fSize;
+	*time = FileTime_to_POSIX(ftWrite);
+}
+#else
+void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
+	struct stat fs;
+	lstat(fileName, &fs);
+	*size = fs.st_size;
+	*time = fs.st_mtime
+}
+#endif
+
+
+
 
 #ifdef WIN32
 int File_MakeDirectory(char *path) {

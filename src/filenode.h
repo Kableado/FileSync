@@ -43,7 +43,8 @@ void FileNode_AddChild(FileNode *file, FileNode *file2);
 char *FileNode_GetFullPath(FileNode *fileNode, char *basePath, char *path);
 
 void FileNode_GetSize(FileNode *fileNode, char *file);
-void FileNode_GetFecha(FileNode *fileNode, char *file);
+void FileNode_GetTime(FileNode *fileNode, char *file);
+void FileNode_GetSizeAndTime(FileNode *fileNode, char *file);
 void FileNode_GetCRC(FileNode *fileNode, char *file);
 
 void FileNode_Save(FileNode *fileNode, char *fichero);

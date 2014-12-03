@@ -25,6 +25,8 @@ int File_IsFile(char *path);
 
 long long File_GetSize(char *ficheros);
 
+void File_GetSizeAndTime(char *ficheros, long long *size, FileTime *time);
+
 int File_MakeDirectory(char *path);
 
 void File_IterateDir(char *path,

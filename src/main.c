@@ -33,11 +33,6 @@ FileNode *CheckDir(char *path, int recheck);
 int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun);
 
 int main(int argc, char *argv[]) {
-	FILE *file;
-	unsigned long crc = 0;
-	FileTime fileTime;
-	int i;
-
 	if (argc < 2) {
 		Help(argv[0]);
 		return 0;
@@ -45,17 +40,12 @@ int main(int argc, char *argv[]) {
 
 	if (!strcmp(argv[1], "info") && argc >= 3) {
 		// Informacion de ficheros
+		int i;
 		for (i = 2; i < argc; i++) {
 			if (File_ExistsPath(argv[i])) {
-				file = fopen(argv[i], "rb");
-				if (file) {
-					crc = CRC_File(file);
-					fclose(file);
-				}
-				fileTime = FileTime_Get(argv[i]);
-				printf("%s:\t[%08X]\t", argv[i], crc);
-				FileTime_Print(fileTime);
-				printf("\n");
+				FileNode *fileNode = FileNode_Build(argv[i]);
+				FileNode_GetCRC(fileNode, argv[i]);
+				FileNode_PrintNode(fileNode);
 			}
 		}
 	} else if (!strcmp(argv[1], "scan") && argc == 4) {
@@ -64,9 +54,9 @@ int main(int argc, char *argv[]) {
 		FileNode *fileNode;
 		printf("Building FileNode..\n");
 		fileNode = FileNode_Build(argv[2]);
-		FileNode_Save(fileNode, argv[3]);
 		tScan=Time_GetTime()-tScan;
 		printf("tScan: %9lldus\n",tScan);
+		FileNode_Save(fileNode, argv[3]);
 	} else if (!strcmp(argv[1], "rescan") && argc == 4) {
 		// Scanear informacion de directorio y guardar arbol
 		FileNode *fileNode;
@@ -76,6 +66,13 @@ int main(int argc, char *argv[]) {
 			printf("Rebuilding FileNode..\n");
 			long long tScan=Time_GetTime();
 			fileNode = FileNode_Refresh(fileNode, argv[2]);
+			tScan=Time_GetTime()-tScan;
+			printf("tScan: %9lldus\n",tScan);
+			FileNode_Save(fileNode, argv[3]);
+		}else{
+			printf("Building FileNode..\n");
+			long long tScan=Time_GetTime();
+			fileNode = FileNode_Build(argv[2]);
 			tScan=Time_GetTime()-tScan;
 			printf("tScan: %9lldus\n",tScan);
 			FileNode_Save(fileNode, argv[3]);

@@ -121,14 +121,19 @@ char *FileNode_GetFullPath(FileNode *fileNode, char *basePath, char *path) {
 	return temppath;
 }
 
-void FileNode_GetSize(FileNode *fileNode, char *filePath) {
+void FileNode_GetSize(FileNode *fileNode, char *file) {
 	fileNode->flags |= FileFlag_HasSize;
-	fileNode->size = File_GetSize(filePath);
+	fileNode->size = File_GetSize(file);
 }
 
-void FileNode_GetFecha(FileNode *fileNode, char *filePath) {
+void FileNode_GetTime(FileNode *fileNode, char *file) {
 	fileNode->flags |= FileFlag_HastTime;
-	fileNode->fileTime = FileTime_Get(filePath);
+	fileNode->fileTime = FileTime_Get(file);
+}
+
+void FileNode_GetSizeAndTime(FileNode *fileNode, char *file) {
+	fileNode->flags |= FileFlag_HasSize | FileFlag_HastTime;
+	File_GetSizeAndTime(file, &fileNode->size, &fileNode->fileTime);
 }
 
 void FileNode_GetCRC(FileNode *fileNode, char *filePath) {
@@ -306,22 +311,16 @@ void FileNode_PrintNode(FileNode *fileNode) {
 	}
 	printf("\n");
 
-	/*
-	 // Tamanho
-	 if(fn->flags&FileFlag_TieneTamanho){
-	 printf("\\-Tamanho: %lld\n",fn->size);
-	 }
+	if(fileNode->flags&FileFlag_HasSize){
+		printf("\\-Tamanho: %lld\n",fileNode->size);
+	}
+	if(fileNode->flags&FileFlag_HastTime){
+		printf("\\-Fecha  : ");FileTime_Print(fileNode->fileTime);printf("\n");
+	}
+	if(fileNode->flags&FileFlag_HasCRC){
+		printf("\\-CRC    : [%08X]\n",fileNode->crc);
+	}
 
-	 // Fecha
-	 if(fn->flags&FileFlag_TieneFecha){
-	 printf("\\-Fecha  : ");FileTime_Print(fn->ft);printf("\n");
-	 }
-
-	 // CRC
-	 if(fn->flags&FileFlag_TieneCRC){
-	 printf("\\-CRC    : [%08X]\n",fn->crc);
-	 }
-	 */
 }
 
 void FileNode_Print(FileNode *fileNode) {
@@ -368,13 +367,12 @@ FileNode *FileNode_Build(char *path) {
 	if (File_IsDirectory(path)) {
 		// Obtener datos para los directorios
 		fileNode->flags |= FileFlag_Directory;
-		FileNode_GetFecha(fileNode, path);
+		FileNode_GetTime(fileNode, path);
 		File_IterateDir(path, FileNode_Build_Iterate, fileNode);
 	} else {
 		// Obtener datos para los ficheros
 		fileNode->flags |= FileFlag_Normal;
-		FileNode_GetSize(fileNode, path);
-		FileNode_GetFecha(fileNode, path);
+		FileNode_GetSizeAndTime(fileNode, path);
 	}
 
 	return (fileNode);
@@ -462,12 +460,11 @@ FileNode *FileNode_Refresh(FileNode *fileNode, char *filePath) {
 				fileNode->flags |= FileFlag_Normal;
 				fileNode->flags &= ~FileFlag_Directory;
 			}
-			size = File_GetSize(filePath);
+			File_GetSizeAndTime(filePath, &size, &fileTime);
 			if (size != fileNode->size) {
 				fileNode->estado = FileStatus_Modified;
 				fileNode->size = size;
 			}
-			fileTime = FileTime_Get(filePath);
 			if (fileTime != fileNode->fileTime) {
 				fileNode->estado = FileStatus_Modified;
 				fileNode->fileTime = fileTime;
