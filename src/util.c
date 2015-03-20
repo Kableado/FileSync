@@ -66,3 +66,18 @@ void Time_Pause(int pausa){
 	select(0, NULL, NULL, NULL, &tv);
 }
 #endif // if WIN32
+
+
+int printff(char *fmt, ...){
+	va_list ap;
+	int n;
+
+	// Print
+	va_start(ap,fmt);
+	n=vprintf(fmt,ap);
+	va_end(ap);
+
+	// Flush
+	fflush(stdout);
+	return(n);
+}

@@ -97,7 +97,7 @@ void FileTime_Print(FileTime fileTime) {
 	struct tm *tms;
 
 	tms = localtime((time_t *) &fileTime);
-	printf("%04d-%02d-%02d %02d:%02d:%02d", tms->tm_year + 1900,
+	printff("%04d-%02d-%02d %02d:%02d:%02d", tms->tm_year + 1900,
 			tms->tm_mon + 1, tms->tm_mday, tms->tm_hour, tms->tm_min,
 			tms->tm_sec);
 }
@@ -302,7 +302,7 @@ void File_IterateDir(char *path,
 					&& strcmp(entidad_dir->d_name, "..")) {
 				// A partir de aqui hay un fichero
 				// (o directorio)
-				snprintf(f_path, MaxPath, "%s/%s", path, entidad_dir->d_name);
+				snprintff(f_path, MaxPath, "%s/%s", path, entidad_dir->d_name);
 				fin = func(f_path, entidad_dir->d_name, data);
 			}
 		}

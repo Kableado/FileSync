@@ -293,32 +293,32 @@ FileNode *FileNode_Load(char *filePath) {
 }
 
 void FileNode_PrintNode(FileNode *fileNode) {
-	printf(FileNode_GetPath(fileNode, NULL ));
+	printff(FileNode_GetPath(fileNode, NULL ));
 	if (fileNode->flags & FileFlag_Normal) {
-		printf(" File");
+		printff(" File");
 	} else {
-		printf(" Dir");
+		printff(" Dir");
 	}
-	printf(" %d", fileNode->estado);
+	printff(" %d", fileNode->estado);
 	if (fileNode->estado == FileStatus_New) {
-		printf(" Nuevo");
+		printff(" Nuevo");
 	}
 	if (fileNode->estado == FileStatus_Modified) {
-		printf(" Modificado");
+		printff(" Modificado");
 	}
 	if (fileNode->estado == FileStatus_Deleted) {
-		printf(" Borrado!!!");
+		printff(" Borrado!!!");
 	}
-	printf("\n");
+	printff("\n");
 
 	if(fileNode->flags&FileFlag_HasSize){
-		printf("\\-Tamanho: %lld\n",fileNode->size);
+		printff("\\-Tamanho: %lld\n",fileNode->size);
 	}
 	if(fileNode->flags&FileFlag_HastTime){
-		printf("\\-Fecha  : ");FileTime_Print(fileNode->fileTime);printf("\n");
+		printff("\\-Fecha  : ");FileTime_Print(fileNode->fileTime);printff("\n");
 	}
 	if(fileNode->flags&FileFlag_HasCRC){
-		printf("\\-CRC    : [%08X]\n",fileNode->crc);
+		printff("\\-CRC    : [%08X]\n",fileNode->crc);
 	}
 
 }
@@ -339,7 +339,7 @@ void FileNode_Print(FileNode *fileNode) {
 			while (fileNodeAux->next == NULL ) {
 				fileNodeAux = fileNodeAux->parent;
 				if (fileNodeAux == fileNode || fileNodeAux == NULL ) {
-					printf("End\n");
+					printff("End\n");
 					end = 1;
 					break;
 				}

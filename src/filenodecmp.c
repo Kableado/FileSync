@@ -551,37 +551,37 @@ void AccionFileNode_Print(AccionFileNode *actionFileNode) {
 
 		switch (actionFileNode->action) {
 		case AccionFileCmp_Nothing:
-			//printf("%s == %s\n",pathIzq,pathDer);
+			//printff("%s == %s\n",pathIzq,pathDer);
 			break;
 		case AccionFileCmp_LeftToRight:
-			printf(" => %s\n", showPath);
+			printff(" => %s\n", showPath);
 			break;
 		case AccionFileCmp_RightToLeft:
-			printf(" <= %s\n", showPath);
+			printff(" <= %s\n", showPath);
 			break;
 		case AccionFileCmp_DeleteLeft:
-			printf(" *- %s\n", showPath);
+			printff(" *- %s\n", showPath);
 			break;
 		case AccionFileCmp_DeleteRight:
-			printf(" -* %s\n", showPath);
+			printff(" -* %s\n", showPath);
 			break;
 		case AccionFileCmp_DateLeftToRight:
-			printf(" -> %s\n", showPath);
+			printff(" -> %s\n", showPath);
 			break;
 		case AccionFileCmp_DateRightToLeft:
-			printf(" <- %s\n", showPath);
+			printff(" <- %s\n", showPath);
 			break;
 		case AccionFileCmp_MakeRightDirectory:
-			printf(" -D %s\n", showPath);
+			printff(" -D %s\n", showPath);
 			break;
 		case AccionFileCmp_MakeLeftDirectory:
-			printf(" D- %s\n", showPath);
+			printff(" D- %s\n", showPath);
 			break;
 		}
 
 		actionFileNode = actionFileNode->next;
 	}
-	printf("End\n");
+	printff("End\n");
 }
 
 void AccionFileNodeAux_CopyDate(char *pathOrig, char *pathDest) {
@@ -631,43 +631,43 @@ void AccionFileNode_RunList(AccionFileNode *actionFileNode, char *pathLeft,
 
 		switch (actionFileNode->action) {
 		case AccionFileCmp_Nothing:
-			//printf("%s == %s\n",pathIzq,pathDer);
+			//printff("%s == %s\n",pathIzq,pathDer);
 			break;
 		case AccionFileCmp_LeftToRight:
-			printf(" => %s\n", showPath);
+			printff(" => %s\n", showPath);
 			AccionFileNodeAux_Copy(fullPathLeft, fullPathRight);
 			break;
 		case AccionFileCmp_RightToLeft:
-			printf(" <= %s\n", showPath);
+			printff(" <= %s\n", showPath);
 			AccionFileNodeAux_Copy(fullPathRight, fullPathLeft);
 			break;
 		case AccionFileCmp_DeleteLeft:
-			printf(" *- %s\n", showPath);
+			printff(" *- %s\n", showPath);
 			AccionFileNodeAux_Delete(fullPathRight, fullPathLeft);
 			break;
 		case AccionFileCmp_DeleteRight:
-			printf(" -* %s\n", showPath);
+			printff(" -* %s\n", showPath);
 			AccionFileNodeAux_Delete(fullPathLeft, fullPathRight);
 			break;
 		case AccionFileCmp_DateLeftToRight:
-			printf(" -> %s\n", showPath);
+			printff(" -> %s\n", showPath);
 			AccionFileNodeAux_CopyDate(fullPathLeft, fullPathRight);
 			break;
 		case AccionFileCmp_DateRightToLeft:
-			printf(" <- %s\n", showPath);
+			printff(" <- %s\n", showPath);
 			AccionFileNodeAux_CopyDate(fullPathRight, fullPathLeft);
 			break;
 		case AccionFileCmp_MakeRightDirectory:
-			printf(" -D %s\n", showPath);
+			printff(" -D %s\n", showPath);
 			AccionFileNodeAux_MakeDir(fullPathLeft, fullPathRight);
 			break;
 		case AccionFileCmp_MakeLeftDirectory:
-			printf(" D- %s\n", showPath);
+			printff(" D- %s\n", showPath);
 			AccionFileNodeAux_MakeDir(fullPathRight, fullPathLeft);
 			break;
 		}
 
 		actionFileNode = actionFileNode->next;
 	}
-	printf("End\n");
+	printff("End\n");
 }
