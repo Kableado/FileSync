@@ -3,6 +3,7 @@ POR HACER
 =========
 * Demonio
 * GUI
+* Testeos unitarios
 
 
 HECHO
