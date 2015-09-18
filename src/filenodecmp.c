@@ -8,7 +8,7 @@
 #include "filenode.h"
 #include "filenodecmp.h"
 
-int maxDeltaTime=4000;
+int maxDeltaTime = 4000;
 
 #define QueueNode(queue,node) (queue)->next = node; (queue) = node;
 
@@ -291,7 +291,7 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 			// Directorios
 
 			// Preparar accion para el par de directorios
-			if (abs(fileNodeLeft->fileTime - fileNodeRight->fileTime) <= maxDeltaTime) { // appoximadamente iguales
+			if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime)) <= maxDeltaTime) { // appoximadamente iguales
 				if (fileNodeRight->estado == FileStatus_Deleted
 						&& fileNodeLeft->estado == FileStatus_Deleted) {
 					actionFileNodeNew->action = AccionFileCmp_Nothing;
@@ -344,7 +344,7 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 			// Ficheros
 
 			// Preparar accion para el par de ficheros
-			if (abs(fileNodeLeft->fileTime - fileNodeRight->fileTime) <= maxDeltaTime) { // appoximadamente iguales
+			if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime)) <= maxDeltaTime) { // appoximadamente iguales
 				if (fileNodeRight->estado == FileStatus_Deleted
 						&& fileNodeLeft->estado == FileStatus_Deleted) {
 					actionFileNodeNew->action = AccionFileCmp_Nothing;
@@ -445,7 +445,7 @@ void AccionFileNode_Copy(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 			if (fileNodeLeft->estado != FileStatus_Deleted) {
 				AccionFileNode_CompareChilds(actionFileNodeNew,
 						actionFileNodeQueue, AccionFileNode_Copy);
-				if (abs(fileNodeLeft->fileTime - fileNodeRight->fileTime)
+				if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime))
 						<= maxDeltaTime) { // appox. equal
 					actionFileNodeNew->action = AccionFileCmp_Nothing;
 				} else {
@@ -460,7 +460,7 @@ void AccionFileNode_Copy(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 			}
 		} else {
 			if (fileNodeLeft->estado != FileStatus_Deleted) {
-				if (abs(fileNodeLeft->fileTime - fileNodeRight->fileTime)
+				if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime))
 						<= maxDeltaTime) { // appox. equal
 					actionFileNodeNew->action = AccionFileCmp_Nothing;
 				} else {

@@ -2,3 +2,9 @@
 *.exe
 build
 
+*/.vs/*
+*.opensdf
+*.sdf
+VisualStudio/filesync/Debug
+*.user
+VisualStudio/Debug/*

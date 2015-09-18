@@ -31,6 +31,7 @@ void Help(char *exe) {
 
 FileNode *CheckDir(char *path, int recheck);
 int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun);
+int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun);
 
 int main(int argc, char *argv[]) {
 	if (argc < 2) {
@@ -86,7 +87,6 @@ int main(int argc, char *argv[]) {
 	} else if (!strcmp(argv[1], "dir") && argc == 3) {
 		// Leer informacion de dir
 		char *path = argv[2];
-		char dirNodesFile[MaxPath];
 		FileNode *fileNode;
 
 		fileNode = CheckDir(path, 1);

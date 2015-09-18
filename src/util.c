@@ -43,7 +43,7 @@ void Time_Pause(int pausa){
 	do{
 		diff=tend-t;
 		if(diff>1000){
-			Sleep(diff/1000);
+			Sleep((int)diff/1000);
 		}else{
 			Sleep(0);
 		}

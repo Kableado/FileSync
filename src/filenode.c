@@ -148,7 +148,7 @@ void FileNode_GetCRC(FileNode *fileNode, char *filePath) {
 }
 
 void FileNode_SaveNode(FileNode *fileNode, FILE *file) {
-	short name_len;
+	int name_len;
 
 	// Escribir nombre
 	name_len = strlen(fileNode->name);
@@ -412,7 +412,6 @@ FileNode *FileNode_Refresh(FileNode *fileNode, char *filePath) {
 		// Comprobar si ha sido modificado
 		FileTime fileTime;
 		long long size;
-		int crc;
 
 		// Marcar normal
 		fileNode->estado = FileStatus_None;

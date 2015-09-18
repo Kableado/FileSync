@@ -1,21 +1,21 @@
 #include <stdio.h>
-#include <dirent.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
-#include <utime.h>
 #include <time.h>
 #ifdef WIN32
-#define _WIN32_WINNT 0x0501
-#include <signal.h>
-#include <windows.h>
-#include <fcntl.h>
-#include <io.h>
+#    include <direct.h>
+#	 define _WIN32_WINNT 0x0501
+#	 include <windows.h>
+#	 include <io.h>
+#    include <stdio.h>
+#    include <signal.h>
+#    include <fcntl.h>
 #else
 #include <unistd.h>
 #endif
 
+#include "util.h"
 #include "fileutil.h"
 
 #ifdef WIN32
@@ -242,7 +242,7 @@ void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
 
 #ifdef WIN32
 int File_MakeDirectory(char *path) {
-	return (_mkdir(path));
+	return (CreateDirectory(path, NULL));
 }
 #else
 int File_MakeDirectory(char *path) {
@@ -260,7 +260,6 @@ void File_IterateDir(char *path,
 	int fin = 0;
 	int findnext_rc;
 	char path_aux[MaxPath];
-	char *ptr;
 
 	snprintf(path_aux, MaxPath, "%s/*", path);
 	handle = _findfirst(path_aux, &fileinfo);
@@ -312,11 +311,19 @@ void File_IterateDir(char *path,
 #endif
 
 void File_Delete(char *path) {
+#ifdef WIN32
+	remove(path);
+#else
 	unlink(path);
+#endif
 }
 
 void File_DeleteDirectory(char *path) {
+#ifndef WIN32
 	rmdir(path);
+#else
+	_rmdir(path);
+#endif
 }
 
 #define MaxBuffer 16384
