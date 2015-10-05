@@ -49,43 +49,48 @@ int main(int argc, char *argv[]) {
 				FileNode_PrintNode(fileNode);
 			}
 		}
-	} else if (!strcmp(argv[1], "scan") && argc == 4) {
-		// Scanear informacion de directorio y guardar arbol
-		long long tScan=Time_GetTime();
+	}
+	else if (!strcmp(argv[1], "scan") && argc == 4) {
+		// Scan directory information tree and save
+		long long tScan = Time_GetTime();
 		FileNode *fileNode;
 		printff("Building FileNode..\n");
 		fileNode = FileNode_Build(argv[2]);
-		tScan=Time_GetTime()-tScan;
-		printff("tScan: %9lldus\n",tScan);
+		tScan = Time_GetTime() - tScan;
+		printff("tScan: %9lldus\n", tScan);
 		FileNode_Save(fileNode, argv[3]);
-	} else if (!strcmp(argv[1], "rescan") && argc == 4) {
-		// Scanear informacion de directorio y guardar arbol
+	}
+	else if (!strcmp(argv[1], "rescan") && argc == 4) {
+		// Scan directory information and save tree
 		FileNode *fileNode;
 		printff("Loading FileNode..\n");
 		fileNode = FileNode_Load(argv[3]);
 		if (fileNode) {
 			printff("Rebuilding FileNode..\n");
-			long long tScan=Time_GetTime();
+			long long tScan = Time_GetTime();
 			fileNode = FileNode_Refresh(fileNode, argv[2]);
-			tScan=Time_GetTime()-tScan;
-			printff("tScan: %9lldus\n",tScan);
-			FileNode_Save(fileNode, argv[3]);
-		}else{
-			printff("Building FileNode..\n");
-			long long tScan=Time_GetTime();
-			fileNode = FileNode_Build(argv[2]);
-			tScan=Time_GetTime()-tScan;
-			printff("tScan: %9lldus\n",tScan);
+			tScan = Time_GetTime() - tScan;
+			printff("tScan: %9lldus\n", tScan);
 			FileNode_Save(fileNode, argv[3]);
 		}
-	} else if (!strcmp(argv[1], "read") && argc == 3) {
-		// Leer informacion de arbol
+		else {
+			printff("Building FileNode..\n");
+			long long tScan = Time_GetTime();
+			fileNode = FileNode_Build(argv[2]);
+			tScan = Time_GetTime() - tScan;
+			printff("tScan: %9lldus\n", tScan);
+			FileNode_Save(fileNode, argv[3]);
+		}
+	}
+	else if (!strcmp(argv[1], "read") && argc == 3) {
+		// Read information tree from file
 		FileNode *fileNode;
 		fileNode = FileNode_Load(argv[2]);
 		if (fileNode)
 			FileNode_Print(fileNode);
-	} else if (!strcmp(argv[1], "dir") && argc == 3) {
-		// Leer informacion de dir
+	}
+	else if (!strcmp(argv[1], "dir") && argc == 3) {
+		// Read directory information tree
 		char *path = argv[2];
 		FileNode *fileNode;
 
@@ -93,28 +98,37 @@ int main(int argc, char *argv[]) {
 		if (fileNode) {
 			FileNode_Print(fileNode);
 		}
-	} else if (argc == 4) {
+	}
+	else if (argc == 4) {
 		char *cmd = argv[1];
 		char *pathLeft = argv[2];
 		char *pathRight = argv[3];
 		if (!strcmp(cmd, "sync")) {
 			Sync(pathLeft, pathRight, 1, 0);
-		} else if (!strcmp(cmd, "resync")) {
+		}
+		else if (!strcmp(cmd, "resync")) {
 			Sync(pathLeft, pathRight, 0, 0);
-		} else if (!strcmp(cmd, "synctest")) {
+		}
+		else if (!strcmp(cmd, "synctest")) {
 			Sync(pathLeft, pathRight, 1, 1);
-		} else if (!strcmp(cmd, "resynctest")) {
+		}
+		else if (!strcmp(cmd, "resynctest")) {
 			Sync(pathLeft, pathRight, 0, 1);
-		} else if (!strcmp(cmd, "copy")) {
+		}
+		else if (!strcmp(cmd, "copy")) {
 			Copy(pathLeft, pathRight, 1, 0);
-		} else if (!strcmp(cmd, "recopy")) {
+		}
+		else if (!strcmp(cmd, "recopy")) {
 			Copy(pathLeft, pathRight, 0, 0);
-		} else if (!strcmp(cmd, "copytest")) {
+		}
+		else if (!strcmp(cmd, "copytest")) {
 			Copy(pathLeft, pathRight, 1, 1);
-		} else if (!strcmp(cmd, "recopytest")) {
+		}
+		else if (!strcmp(cmd, "recopytest")) {
 			Copy(pathLeft, pathRight, 0, 1);
 		}
-	} else {
+	}
+	else {
 		Help(argv[0]);
 	}
 
@@ -125,40 +139,42 @@ FileNode *CheckDir(char *path, int recheck) {
 	char dirNodesFile[MaxPath];
 	FileNode *fileNode;
 
-	// Comprobar directorio
+	// Check directory
 	snprintf(dirNodesFile, MaxPath, "%s/"FileNode_Filename, path);
 	if (recheck) {
 		printff("Checking Directory.. %s\n", path);
-		long long tScan=Time_GetTime();
+		long long tScan = Time_GetTime();
 		fileNode = FileNode_Load(dirNodesFile);
 		if (fileNode) {
 			fileNode = FileNode_Refresh(fileNode, path);
-		} else {
+		}
+		else {
 			fileNode = FileNode_Build(path);
 		}
-		tScan=Time_GetTime()-tScan;
-		printff("tScan: %9lldus\n",tScan);
+		tScan = Time_GetTime() - tScan;
+		printff("tScan: %9lldus\n", tScan);
 		FileNode_Save(fileNode, dirNodesFile);
-	} else {
+	}
+	else {
 		printff("Loading Directory.. %s\n", path);
 		fileNode = FileNode_Load(dirNodesFile);
 		if (!fileNode) {
 			printff("Error, no nodesFile.fs\n");
-			return NULL ;
+			return NULL;
 		}
 	}
 	return fileNode;
 }
 
-void PrintStatistics(AccionFileNode *actionFileNode) {
+void PrintStatistics(ActionFileNode *actionFileNode) {
 	ActionQueueStatistics statistics;
-	AccionFileNode_Statistics(actionFileNode, &statistics);
+	ActionFileNode_Statistics(actionFileNode, &statistics);
 	printff("Statistics\n");
 	printff("       % 12s % 12s % 12s\n", "Read", "Write", "Delete");
 	printff("Left : % 12lld % 12lld % 12lld\n", statistics.readLeft,
-			statistics.writeLeft, statistics.deleteLeft);
+		statistics.writeLeft, statistics.deleteLeft);
 	printff("Right: % 12lld % 12lld % 12lld\n", statistics.readRight,
-			statistics.writeRight, statistics.deleteRight);
+		statistics.writeRight, statistics.deleteRight);
 	printff("\n");
 	printff("Copy count     : % 10d\n", statistics.fullCopyCount);
 	printff("Date copy count: % 10d\n", statistics.dateCopyCount);
@@ -169,7 +185,7 @@ void PrintStatistics(AccionFileNode *actionFileNode) {
 int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 	FileNode *fileNodeLeft, *fileNodeRight;
 
-	// Comprobar y cargar directorios
+	// Check and load directories
 	if (!File_ExistsPath(pathLeft) || !File_IsDirectory(pathLeft)) {
 		printff("Error, directory does not exist: %s\n", pathLeft);
 		return 0;
@@ -187,21 +203,22 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 		return 0;
 	}
 
-	// Construir acciones
-	long long tBuild=Time_GetTime();
+	// Build actions
+	long long tBuild = Time_GetTime();
 	printff("Building action list.. \n");
-	AccionFileNode *actionFileNode = NULL;
-	actionFileNode = AccionFileNode_BuildSync(fileNodeLeft, fileNodeRight);
-	tBuild=Time_GetTime()-tBuild;
-	printff("tBuild: %9lldus\n",tBuild);
+	ActionFileNode *actionFileNode = NULL;
+	actionFileNode = ActionFileNode_BuildSync(fileNodeLeft, fileNodeRight);
+	tBuild = Time_GetTime() - tBuild;
+	printff("tBuild: %9lldus\n", tBuild);
 
 	if (dryRun) {
-		// Mostrar lista de acciones
-		AccionFileNode_Print(actionFileNode);
+		// Show action list
+		ActionFileNode_Print(actionFileNode);
 		PrintStatistics(actionFileNode);
-	} else {
-		// Ejecutar lista de acciones
-		AccionFileNode_RunList(actionFileNode, pathLeft, pathRight);
+	}
+	else {
+		// Run action list
+		ActionFileNode_RunList(actionFileNode, pathLeft, pathRight);
 	}
 
 	return (1);
@@ -210,7 +227,7 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	FileNode *fileNodeLeft, *fileNodeRight;
 
-	// Comprobar y cargar directorios
+	// Check and load directories
 	if (!File_ExistsPath(pathLeft) || !File_IsDirectory(pathLeft)) {
 		printff("Error, directory does not exist: %s\n", pathLeft);
 		return 0;
@@ -228,21 +245,22 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 		return 0;
 	}
 
-	// Construir acciones
-	long long tBuild=Time_GetTime();
+	// Build actions
+	long long tBuild = Time_GetTime();
 	printff("Building action list.. \n");
-	AccionFileNode *actionFileNode = NULL;
-	actionFileNode = AccionFileNode_BuildCopy(fileNodeLeft, fileNodeRight);
-	tBuild=Time_GetTime()-tBuild;
-	printff("tBuild: %9lldus\n",tBuild);
+	ActionFileNode *actionFileNode = NULL;
+	actionFileNode = ActionFileNode_BuildCopy(fileNodeLeft, fileNodeRight);
+	tBuild = Time_GetTime() - tBuild;
+	printff("tBuild: %9lldus\n", tBuild);
 
 	if (dryRun) {
-		// Mostrar lista de acciones
-		AccionFileNode_Print(actionFileNode);
+		// Show action list
+		ActionFileNode_Print(actionFileNode);
 		PrintStatistics(actionFileNode);
-	} else {
-		// Ejecutar lista de acciones
-		AccionFileNode_RunList(actionFileNode, pathLeft, pathRight);
+	}
+	else {
+		// Run action list
+		ActionFileNode_RunList(actionFileNode, pathLeft, pathRight);
 	}
 
 	return (1);

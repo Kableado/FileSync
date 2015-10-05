@@ -4,33 +4,33 @@
 #include "filenode.h"
 
 typedef enum {
-	AccionFileCmp_Nothing,
-	AccionFileCmp_LeftToRight,
-	AccionFileCmp_RightToLeft,
-	AccionFileCmp_DeleteLeft,
-	AccionFileCmp_DeleteRight,
-	AccionFileCmp_DateLeftToRight,
-	AccionFileCmp_DateRightToLeft,
-	AccionFileCmp_MakeRightDirectory,
-	AccionFileCmp_MakeLeftDirectory
-} AccionFileCmp;
+	ActionFileCmp_Nothing,
+	ActionFileCmp_LeftToRight,
+	ActionFileCmp_RightToLeft,
+	ActionFileCmp_DeleteLeft,
+	ActionFileCmp_DeleteRight,
+	ActionFileCmp_DateLeftToRight,
+	ActionFileCmp_DateRightToLeft,
+	ActionFileCmp_MakeRightDirectory,
+	ActionFileCmp_MakeLeftDirectory
+} ActionFileCmp;
 
-typedef struct SAccionFileNode {
-	AccionFileCmp action;
+typedef struct SActionFileNode {
+	ActionFileCmp action;
 	FileNode *left;
 	FileNode *right;
-	struct SAccionFileNode *next;
-} AccionFileNode;
+	struct SActionFileNode *next;
+} ActionFileNode;
 
-AccionFileNode *AccionFileNode_Create();
-void AccionFileNode_Destroy(AccionFileNode *actionFileNode);
-AccionFileNode *AccionFileNode_CreateNormal(FileNode *fileNodeLeft,
-		FileNode *fileNodeRight);
+ActionFileNode *ActionFileNode_Create();
+void AccionFileNode_Destroy(ActionFileNode *actionFileNode);
+ActionFileNode *ActionFileNode_CreateNormal(FileNode *fileNodeLeft,
+	FileNode *fileNodeRight);
 
-AccionFileNode *AccionFileNode_BuildSync(FileNode *fileNodeLeft,
-		FileNode *fileNodeRight);
-AccionFileNode *AccionFileNode_BuildCopy(FileNode *fileNodeLeft,
-		FileNode *fileNodeRight);
+ActionFileNode *ActionFileNode_BuildSync(FileNode *fileNodeLeft,
+	FileNode *fileNodeRight);
+ActionFileNode *ActionFileNode_BuildCopy(FileNode *fileNodeLeft,
+	FileNode *fileNodeRight);
 
 typedef struct SActionQueueStatistics {
 	long long readLeft;
@@ -45,12 +45,12 @@ typedef struct SActionQueueStatistics {
 	long long deleteRight;
 } ActionQueueStatistics;
 
-void AccionFileNode_Statistics(AccionFileNode *actionFileNode,
-		ActionQueueStatistics *statistics);
+void ActionFileNode_Statistics(ActionFileNode *actionFileNode,
+	ActionQueueStatistics *statistics);
 
-void AccionFileNode_Print(AccionFileNode *actionFileNode);
+void ActionFileNode_Print(ActionFileNode *actionFileNode);
 
-void AccionFileNode_RunList(AccionFileNode *actionFileNode, char *pathLeft,
-		char *pathRight);
+void ActionFileNode_RunList(ActionFileNode *actionFileNode, char *pathLeft,
+	char *pathRight);
 
 #endif

@@ -9,7 +9,7 @@
 #define FileFlag_Normal 2
 #define FileFlag_Directory 4
 #define FileFlag_HasSize 8
-#define FileFlag_HastTime 16
+#define FileFlag_HasTime 16
 #define FileFlag_HasCRC 32
 #define FileFlag_MarkerForReview 1024
 
@@ -23,7 +23,7 @@ typedef enum {
 typedef struct SFileNode {
 	char name[MaxFilename];
 	int flags;
-	FileStatus estado;
+	FileStatus status;
 
 	long long size;
 	unsigned long crc;

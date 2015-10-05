@@ -28,14 +28,14 @@ void CRCTable_Init() {
 }
 
 unsigned long CRC_BufferInternal(unsigned char *buffer, int len,
-		unsigned long crc) {
+	unsigned long crc) {
 	unsigned char *p;
 
-	// Calcular CRC del buffer
-	p = (unsigned char*) buffer;
+	// Calculate CRC from buffer
+	p = (unsigned char*)buffer;
 	while (len-- != 0) {
 		unsigned long termA = (crc >> 8) & 0x00FFFFFFL;
-		unsigned long termB = _crcTable[((int) crc ^ *p++) & 0xff];
+		unsigned long termB = _crcTable[((int)crc ^ *p++) & 0xff];
 		crc = termA ^ termB;
 	}
 
@@ -55,12 +55,11 @@ unsigned long CRC_File(FILE *file) {
 
 	crc = 0xFFFFFFFFL;
 	for (;;) {
-		// Llenar el buffer
+		// Fill buffer
 		int count = fread(buffer, 1, 512, file);
 		if (count == 0)
 			break;
 
-		// Calcular CRC del buffer
 		crc = CRC_BufferInternal(buffer, count, crc);
 	}
 	return (crc ^= 0xFFFFFFFFL);

@@ -9,22 +9,20 @@ char *String_Copy(char *str) {
 	int len;
 	len = strlen(str);
 	strnew = malloc(len + 1);
-	strcpy(strnew, str);
+	if (strnew != NULL) {
+		strcpy(strnew, str);
+	}
 	return (strnew);
 }
 
 
-/////////////////////////////
-// Time_GetTime
-//
-// Gets the current time in usecs.
-/////////////////////////////
-// Time_Pause
-//
-// Pauses the execution for t usecs.
 #if WIN32
 #include <windows.h>
 // WIN32
+/////////////////////////////
+// Time_GetTime
+//
+// Gets the current time in usecs. WIN32 version.
 long long Time_GetTime(){
 	LARGE_INTEGER freq;
 	LARGE_INTEGER tim;
@@ -35,6 +33,11 @@ long long Time_GetTime(){
 	microt=(tim.QuadPart*1000000)/freq.QuadPart;
 	return(microt);
 }
+
+/////////////////////////////
+// Time_Pause
+//
+// Pauses the execution for t usecs. WIN32 version.
 void Time_Pause(int pausa){
 	long long tend,t,diff;
 
@@ -51,7 +54,10 @@ void Time_Pause(int pausa){
 	}while(tend>=t);
 }
 #else
-// UNIX
+/////////////////////////////
+// Time_GetTime
+//
+// Gets the current time in usecs. UNIX version.
 long long Time_GetTime(){
 	struct timeval t;
 	long long usecs;
@@ -59,6 +65,11 @@ long long Time_GetTime(){
 	usecs=(t.tv_sec*1000000ll)+(t.tv_usec);
 	return(usecs);
 }
+
+/////////////////////////////
+// Time_Pause
+//
+// Pauses the execution for t usecs. UNIX version.
 void Time_Pause(int pausa){
 	struct timeval tv;
 	tv.tv_sec=(long long)pausa/1000000;
