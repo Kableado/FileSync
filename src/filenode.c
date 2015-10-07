@@ -86,7 +86,7 @@ void FileNode_GetPath_Rec(FileNode *fileNode, char **pathnode) {
 }
 char temppath[MaxPath];
 char *FileNode_GetPath(FileNode *fileNode, char *path) {
-	char *pathnodes[128];
+	char *pathnodes[MaxPath];
 	int levels, i;
 	char *pathptr = temppath;
 	if (path) { pathptr = path; }
@@ -106,7 +106,7 @@ char *FileNode_GetPath(FileNode *fileNode, char *path) {
 }
 
 char *FileNode_GetFullPath(FileNode *fileNode, char *basePath, char *path) {
-	char *pathnodes[128];
+	char *pathnodes[MaxPath];
 	int levels, i;
 	char *pathptr = temppath;
 	if (path)
@@ -271,7 +271,7 @@ FileNode *FileNode_LoadNode(FILE *file) {
 		for (i = 0; i < fileNode->childCount; i++) {
 			fileNodeChild = FileNode_LoadNode(file);
 			if (fileNodeChild == NULL) {
-				// FIXME: Clean memory (fileNode, fileNodeChild etc)
+				FileNode_Delete(fileNode);
 				return NULL;
 			}
 			fileNodeChild->parent = fileNode;
@@ -424,7 +424,7 @@ int FileNode_Refresh_Iterate(char *path, char *name, void *d);
 
 FileNode *FileNode_Refresh(FileNode *fileNode, char *filePath) {
 	if (!File_ExistsPath(filePath)) {
-		// El fichero/directorio ha sido borrado
+		// The file/directory has been deleted
 		if (!fileNode) {
 			fileNode = FileNode_Create();
 			File_GetName(filePath, fileNode->name);
@@ -433,24 +433,23 @@ FileNode *FileNode_Refresh(FileNode *fileNode, char *filePath) {
 		return (fileNode);
 	}
 	if (!fileNode) {
-		// El fichero ha sido creado
+		// The file has been created
 		fileNode = FileNode_Build(filePath);
 		FileNode_SetStatusRec(fileNode, FileStatus_New);
 	}
 	else {
-		// Comprobar si ha sido modificado
+		// Check modification
 		FileTime fileTime;
 		long long size;
 
-		// Marcar normal
+		// Mark
 		fileNode->status = FileStatus_None;
 		fileNode->flags &= ~FileFlag_MarkerForReview;
 
-		// Determinar si es un fichero o directorio
 		if (File_IsDirectory(filePath)) {
 			FileNode *fileNodeChild;
 
-			// Comparar datos de los directorios
+			// Check directory data
 			if (!(fileNode->flags & FileFlag_Directory)) {
 				fileNode->status = FileStatus_Modified;
 				fileNode->flags |= FileFlag_Directory;
@@ -462,17 +461,17 @@ FileNode *FileNode_Refresh(FileNode *fileNode, char *filePath) {
 				fileNode->fileTime = fileTime;
 			}
 
-			// Marcar hijos para determinar cual es actualizado
+			// Mark childs for review
 			fileNodeChild = fileNode->child;
 			while (fileNodeChild) {
 				fileNodeChild->flags |= FileFlag_MarkerForReview;
 				fileNodeChild = fileNodeChild->next;
 			}
 
-			// Escanear subdirectorios
+			// Scan subdirectories
 			File_IterateDir(filePath, FileNode_Refresh_Iterate, fileNode);
 
-			// Buscar que sigan marcados (borrados)
+			// Mark as deleted remaining files marked for review  
 			fileNodeChild = fileNode->child;
 			while (fileNodeChild) {
 				if (fileNodeChild->flags & FileFlag_MarkerForReview) {
@@ -514,7 +513,7 @@ int FileNode_Refresh_Iterate(char *path, char *name, void *d) {
 		return (0);
 	}
 
-	// Buscar el fichero entre los del arbol
+	// Searcg the file on childs
 	fileNodeChild = fileNode->child;
 	while (fileNodeChild) {
 		if (!strcmp(fileNodeChild->name, name)) {
@@ -523,11 +522,11 @@ int FileNode_Refresh_Iterate(char *path, char *name, void *d) {
 		fileNodeChild = fileNodeChild->next;
 	}
 	if (fileNodeChild) {
-		// Existe, refrescar
+		// Exists, Refresh
 		FileNode_Refresh(fileNodeChild, path);
 	}
 	else {
-		// Nuevo, construir
+		// New, Build
 		fileNodeChild = FileNode_Refresh(NULL, path);
 		FileNode_AddChild(fileNode, fileNodeChild);
 	}
