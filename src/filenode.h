@@ -1,4 +1,4 @@
-#ifndef _FILENODE_H_
+﻿#ifndef _FILENODE_H_
 #define _FILENODE_H_
 
 #define FileNode_Filename "nodesFile.fs"

@@ -1,4 +1,4 @@
-#ifndef _CRC_
+﻿#ifndef _CRC_
 #define _CRC_
 
 #include <stdio.h>

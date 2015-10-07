@@ -1,4 +1,4 @@
-#ifndef _UTIL_
+﻿#ifndef _UTIL_
 #define _UTIL_
 
 #include <stdlib.h>

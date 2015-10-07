@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 
 unsigned long _crcTable[256];
 int _crcTableInitialized = 0;

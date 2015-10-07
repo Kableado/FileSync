@@ -1,4 +1,4 @@
-#ifndef _FILENODECMP_H_
+﻿#ifndef _FILENODECMP_H_
 #define _FILENODECMP_H_
 
 #include "filenode.h"

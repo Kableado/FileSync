@@ -1,4 +1,4 @@
-#ifndef _FILEUTIL_
+﻿#ifndef _FILEUTIL_
 #define _FILEUTIL_
 
 ////////////////////////////////////////////////
