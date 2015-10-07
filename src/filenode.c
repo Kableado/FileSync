@@ -157,7 +157,7 @@ void FileNode_SaveNode(FileNode *fileNode, FILE *file) {
 	short nameLen;
 
 	// Write name
-	nameLen = strlen(fileNode->name);
+	nameLen = (short)strlen(fileNode->name);
 	fwrite((void *)&nameLen, sizeof(nameLen), 1, file);
 	if (nameLen>0 && nameLen<MaxFilename) {
 		fputs(fileNode->name, file);
