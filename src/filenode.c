@@ -50,10 +50,23 @@ FileNode *FileNode_Create() {
 }
 
 void FileNode_Delete(FileNode *fn) {
+
+	FileNode *fileNodeChildAux = fn->child;
+	FileNode *fileNodeChild = fn->child;
+	while (fileNodeChild) {
+		fn->childCount--;
+		fileNodeChildAux = fileNodeChild;
+		fileNodeChild = fileNodeChild->next;
+		fileNodeChildAux->next = NULL;
+		if (fileNodeChildAux->parent == fn) {
+			fileNodeChildAux->parent = NULL;
+			FileNode_Delete(fileNodeChildAux);
+		}
+	}
+
 	fn->next = _free_filenode;
 	_free_filenode = fn;
 	_n_filenode--;
-	// FIXME: delete childs
 }
 
 void FileNode_AddChild(FileNode *fileNode, FileNode *file2) {
