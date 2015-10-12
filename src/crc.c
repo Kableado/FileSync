@@ -28,7 +28,8 @@ void CRCTable_Init() {
 }
 
 unsigned long CRC_BufferInternal(unsigned char *buffer, int len,
-	unsigned long crc) {
+	unsigned long crc)
+{
 	unsigned char *p;
 
 	// Calculate CRC from buffer

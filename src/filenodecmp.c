@@ -52,7 +52,8 @@ void AccionFileNode_Destroy(ActionFileNode *actionFileNode) {
 }
 
 ActionFileNode *ActionFileNode_CreateNormal(FileNode *fileNodeLeft,
-	FileNode *fileNodeRight) {
+	FileNode *fileNodeRight)
+{
 	ActionFileNode *actionFileNode;
 	actionFileNode = ActionFileNode_Create();
 	actionFileNode->action = ActionFileCmp_Nothing;
@@ -65,7 +66,8 @@ ActionFileNode *ActionFileNode_CreateNormal(FileNode *fileNodeLeft,
 void AccionFileNode_CompareChilds(ActionFileNode *actionFileNodeRoot,
 	ActionFileNode **actionFileNodeQueue,
 	void(*CheckPair)(FileNode *fileNodeLeft, FileNode *fileNodeRight,
-		ActionFileNode **actionFileNodeQueue)) {
+		ActionFileNode **actionFileNodeQueue))
+{
 	FileNode *fileNodeLeft;
 	FileNode *fileNodeRight;
 	FileNode *fileNodeRightQueue;
@@ -151,7 +153,8 @@ void AccionFileNode_CompareChilds(ActionFileNode *actionFileNodeRoot,
 }
 
 void AccionFileNode_DeletePair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
-	ActionFileNode **actionFileNodeQueue) {
+	ActionFileNode **actionFileNodeQueue)
+{
 	ActionFileNode *actionFileNodeNew = ActionFileNode_CreateNormal(
 		fileNodeLeft, fileNodeRight);
 
@@ -224,7 +227,8 @@ void AccionFileNode_DeletePair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 }
 
 void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
-	ActionFileNode **actionFileNodeQueue) {
+	ActionFileNode **actionFileNodeQueue)
+{
 	ActionFileNode *actionFileNodeNew = ActionFileNode_CreateNormal(
 		fileNodeLeft, fileNodeRight);
 
@@ -300,11 +304,12 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 	}
 	if (fileNodeLeft && fileNodeRight) {
 		if ((fileNodeLeft->flags & FileFlag_Directory)
-			&& (fileNodeRight->flags & FileFlag_Directory)) {
+			&& (fileNodeRight->flags & FileFlag_Directory))
+		{
 			// Directory
 
 			// Prepare action for directory pair
-			if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime)) <= maxDeltaTime) { // appoximadamente iguales
+			if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime)) <= maxDeltaTime) { // aprox. equal
 				if (fileNodeRight->status == FileStatus_Deleted
 					&& fileNodeLeft->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_Nothing;
@@ -360,7 +365,8 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 		}
 		else if ((fileNodeLeft->flags & FileFlag_Normal)
-			&& (fileNodeRight->flags & FileFlag_Normal)) {
+			&& (fileNodeRight->flags & FileFlag_Normal))
+		{
 			// Files
 
 			// Prepare action for file pair
@@ -425,7 +431,8 @@ ActionFileNode *ActionFileNode_BuildSync(FileNode *izquierda, FileNode *derecha)
 }
 
 void AccionFileNode_Copy(FileNode *fileNodeLeft, FileNode *fileNodeRight,
-	ActionFileNode **actionFileNodeQueue) {
+	ActionFileNode **actionFileNodeQueue) 
+{
 	ActionFileNode *actionFileNodeNew = ActionFileNode_CreateNormal(
 		fileNodeLeft, fileNodeRight);
 
@@ -470,7 +477,8 @@ void AccionFileNode_Copy(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 	}
 	if (fileNodeLeft && fileNodeRight) {
 		if ((fileNodeLeft->flags & FileFlag_Directory)
-			|| (fileNodeRight->flags & FileFlag_Directory)) {
+			|| (fileNodeRight->flags & FileFlag_Directory)) 
+		{
 			if (fileNodeLeft->status != FileStatus_Deleted) {
 				AccionFileNode_CompareChilds(actionFileNodeNew,
 					actionFileNodeQueue, AccionFileNode_Copy);
@@ -493,7 +501,8 @@ void AccionFileNode_Copy(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 		else {
 			if (fileNodeLeft->status != FileStatus_Deleted) {
 				if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime))
-					<= maxDeltaTime) { // appox. equal
+					<= maxDeltaTime) 
+				{
 					actionFileNodeNew->action = ActionFileCmp_Nothing;
 				}
 				else {
@@ -521,7 +530,8 @@ ActionFileNode *ActionFileNode_BuildCopy(FileNode *fileNodeLeft,
 }
 
 void ActionFileNode_Statistics(ActionFileNode *actionFileNode,
-	ActionQueueStatistics *statistics) {
+	ActionQueueStatistics *statistics) 
+{
 	statistics->readLeft = 0;
 	statistics->writeLeft = 0;
 	statistics->readRight = 0;
@@ -645,7 +655,8 @@ void AccionFileNodeAux_MakeDir(char *pathOrig, char *pathDest) {
 }
 
 void ActionFileNode_RunList(ActionFileNode *actionFileNode, char *pathLeft,
-	char *pathRight) {
+	char *pathRight) 
+{
 	char fullPathLeft[MaxPath], fullPathRight[MaxPath], showPath[MaxPath];
 	while (actionFileNode != NULL) {
 		if (actionFileNode->left) {

@@ -7,30 +7,30 @@
 #include "fileutil.h"
 #include "filenode.h"
 
-FileNode *_free_filenode = NULL;
+FileNode *_freeFileNode = NULL;
 int _n_filenode = 0;
 #define FileNode_Block 1024
 FileNode *FileNode_Create() {
 	FileNode *fileNode;
 
-	if (_free_filenode == NULL) {
-		FileNode *nodos;
+	if (_freeFileNode == NULL) {
+		FileNode *nodes;
 		int i;
 		// Allocate a block
-		nodos = malloc(sizeof(FileNode) * FileNode_Block);
-		if (nodos == NULL) {
+		nodes = malloc(sizeof(FileNode) * FileNode_Block);
+		if (nodes == NULL) {
 			return NULL;
 		}
 		for (i = 0; i < FileNode_Block - 1; i++) {
-			nodos[i].next = &nodos[i + 1];
+			nodes[i].next = &nodes[i + 1];
 		}
-		nodos[FileNode_Block - 1].next = NULL;
-		_free_filenode = &nodos[0];
+		nodes[FileNode_Block - 1].next = NULL;
+		_freeFileNode = &nodes[0];
 	}
 
 	// Get first free
-	fileNode = _free_filenode;
-	_free_filenode = fileNode->next;
+	fileNode = _freeFileNode;
+	_freeFileNode = fileNode->next;
 	fileNode->next = NULL;
 	_n_filenode++;
 
@@ -50,7 +50,7 @@ FileNode *FileNode_Create() {
 }
 
 void FileNode_Delete(FileNode *fn) {
-
+	// Delete childs
 	FileNode *fileNodeChildAux = fn->child;
 	FileNode *fileNodeChild = fn->child;
 	while (fileNodeChild) {
@@ -64,98 +64,99 @@ void FileNode_Delete(FileNode *fn) {
 		}
 	}
 
-	fn->next = _free_filenode;
-	_free_filenode = fn;
+	// Queue freed node
+	fn->next = _freeFileNode;
+	_freeFileNode = fn;
 	_n_filenode--;
 }
 
-void FileNode_AddChild(FileNode *fileNode, FileNode *file2) {
-	if (!file2 || !fileNode)
+void FileNode_AddChild(FileNode *fileNode, FileNode *fileNodeChild) {
+	if (!fileNodeChild || !fileNode)
 		return;
-	file2->next = fileNode->child;
-	fileNode->child = file2;
+	fileNodeChild->next = fileNode->child;
+	fileNode->child = fileNodeChild;
 	fileNode->childCount++;
-	file2->parent = fileNode;
+	fileNodeChild->parent = fileNode;
 }
 
 void FileNode_SetStatusRec(FileNode *fileNode, FileStatus status) {
-	FileNode *fn_child;
+	FileNode *fileNodeChild;
 	fileNode->status = status;
-	fn_child = fileNode->child;
-	while (fn_child != NULL) {
-		FileNode_SetStatusRec(fn_child, status);
-		fn_child = fn_child->next;
+	fileNodeChild = fileNode->child;
+	while (fileNodeChild != NULL) {
+		FileNode_SetStatusRec(fileNodeChild, status);
+		fileNodeChild = fileNodeChild->next;
 	}
 }
 
-void FileNode_GetPath_Rec(FileNode *fileNode, char **pathnode) {
+void FileNode_GetPath_Rec(FileNode *fileNode, char **pathNode) {
 	if (fileNode->parent) {
-		pathnode[0] = fileNode->parent->name;
-		FileNode_GetPath_Rec(fileNode->parent, pathnode + 1);
+		pathNode[0] = fileNode->parent->name;
+		FileNode_GetPath_Rec(fileNode->parent, pathNode + 1);
 	}
 	else {
-		pathnode[0] = NULL;
+		pathNode[0] = NULL;
 	}
 }
-char temppath[MaxPath];
+char tempPath[MaxPath];
 char *FileNode_GetPath(FileNode *fileNode, char *path) {
-	char *pathnodes[MaxPath];
+	char *pathNodes[MaxPathNodes];
 	int levels, i;
-	char *pathptr = temppath;
-	if (path) { pathptr = path; }
+	char *pathPtr = tempPath;
+	if (path) { pathPtr = path; }
 
-	FileNode_GetPath_Rec(fileNode, pathnodes);
+	FileNode_GetPath_Rec(fileNode, pathNodes);
 	levels = 0;
-	while (pathnodes[levels]) {
+	while (pathNodes[levels]) {
 		levels++;
 	}
-	strcpy(pathptr, "");
+	strcpy(pathPtr, "");
 	for (i = levels - 1; i >= 0; i--) {
-		strcat(pathptr, pathnodes[i]);
-		strcat(pathptr, "/");
+		strcat(pathPtr, pathNodes[i]);
+		strcat(pathPtr, "/");
 	}
-	strcat(pathptr, fileNode->name);
-	return temppath;
+	strcat(pathPtr, fileNode->name);
+	return tempPath;
 }
 
 char *FileNode_GetFullPath(FileNode *fileNode, char *basePath, char *path) {
-	char *pathnodes[MaxPath];
+	char *pathNodes[MaxPath];
 	int levels, i;
-	char *pathptr = temppath;
+	char *pathPtr = tempPath;
 	if (path)
-		pathptr = path;
+		pathPtr = path;
 
-	FileNode_GetPath_Rec(fileNode, pathnodes);
+	FileNode_GetPath_Rec(fileNode, pathNodes);
 	levels = 0;
-	while (pathnodes[levels]) {
+	while (pathNodes[levels]) {
 		levels++;
 	}
-	strcpy(pathptr, basePath);
-	strcat(pathptr, "/");
+	strcpy(pathPtr, basePath);
+	strcat(pathPtr, "/");
 	for (i = levels - 2; i >= 0; i--) {
-		strcat(pathptr, pathnodes[i]);
-		strcat(pathptr, "/");
+		strcat(pathPtr, pathNodes[i]);
+		strcat(pathPtr, "/");
 	}
-	strcat(pathptr, fileNode->name);
-	return temppath;
+	strcat(pathPtr, fileNode->name);
+	return tempPath;
 }
 
-void FileNode_GetSize(FileNode *fileNode, char *file) {
+void FileNode_LoadSize(FileNode *fileNode, char *file) {
 	fileNode->flags |= FileFlag_HasSize;
 	fileNode->size = File_GetSize(file);
 }
 
-void FileNode_GetTime(FileNode *fileNode, char *file) {
+void FileNode_LoadTime(FileNode *fileNode, char *file) {
 	fileNode->flags |= FileFlag_HasTime;
 	fileNode->fileTime = FileTime_Get(file);
 }
 
-void FileNode_GetSizeAndTime(FileNode *fileNode, char *file) {
+void FileNode_LoadSizeAndTime(FileNode *fileNode, char *file) {
 	fileNode->flags |= FileFlag_HasSize | FileFlag_HasTime;
 	File_GetSizeAndTime(file, &fileNode->size, &fileNode->fileTime);
 }
 
-void FileNode_GetCRC(FileNode *fileNode, char *filePath) {
+void FileNode_LoadCRC(FileNode *fileNode, char *filePath) {
 	FILE *file;
 	file = fopen(filePath, "rb");
 	if (!file) {
@@ -172,9 +173,10 @@ void FileNode_SaveNode(FileNode *fileNode, FILE *file) {
 	// Write name
 	nameLen = (short)strlen(fileNode->name);
 	fwrite((void *)&nameLen, sizeof(nameLen), 1, file);
-	if (nameLen>0 && nameLen<MaxFilename) {
+	if (nameLen > 0 && nameLen < MaxFilename) {
 		fputs(fileNode->name, file);
-	} else {
+	}
+	else {
 		return;
 	}
 
@@ -408,13 +410,13 @@ FileNode *FileNode_Build(char *path) {
 	if (File_IsDirectory(path)) {
 		// Get information data from directories, and child files
 		fileNode->flags |= FileFlag_Directory;
-		FileNode_GetTime(fileNode, path);
+		FileNode_LoadTime(fileNode, path);
 		File_IterateDir(path, FileNode_Build_Iterate, fileNode);
 	}
 	else {
 		// Get information data from files
 		fileNode->flags |= FileFlag_Normal;
-		FileNode_GetSizeAndTime(fileNode, path);
+		FileNode_LoadSizeAndTime(fileNode, path);
 	}
 
 	return (fileNode);

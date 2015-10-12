@@ -11,6 +11,7 @@
 #define FileFlag_HasSize 8
 #define FileFlag_HasTime 16
 #define FileFlag_HasCRC 32
+#define FileFlag_PlaceHolder 512
 #define FileFlag_MarkerForReview 1024
 
 typedef enum {
@@ -42,10 +43,10 @@ void FileNode_AddChild(FileNode *file, FileNode *file2);
 
 char *FileNode_GetFullPath(FileNode *fileNode, char *basePath, char *path);
 
-void FileNode_GetSize(FileNode *fileNode, char *file);
-void FileNode_GetTime(FileNode *fileNode, char *file);
-void FileNode_GetSizeAndTime(FileNode *fileNode, char *file);
-void FileNode_GetCRC(FileNode *fileNode, char *file);
+void FileNode_LoadSize(FileNode *fileNode, char *file);
+void FileNode_LoadTime(FileNode *fileNode, char *file);
+void FileNode_LoadSizeAndTime(FileNode *fileNode, char *file);
+void FileNode_LoadCRC(FileNode *fileNode, char *file);
 
 void FileNode_Save(FileNode *fileNode, char *fichero);
 FileNode *FileNode_Load(char *fichero);

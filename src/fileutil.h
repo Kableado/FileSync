@@ -12,8 +12,9 @@ void FileTime_Print(FileTime t);
 
 ///////////////////////////////////////////////
 // File
-#define MaxPath 4096
 #define MaxFilename 2048
+#define MaxPath 4096
+#define MaxPathNodes 512
 
 void File_GetName(char *path, char *name);
 

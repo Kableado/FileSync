@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 		for (i = 2; i < argc; i++) {
 			if (File_ExistsPath(argv[i])) {
 				FileNode *fileNode = FileNode_Build(argv[i]);
-				FileNode_GetCRC(fileNode, argv[i]);
+				FileNode_LoadCRC(fileNode, argv[i]);
 				FileNode_PrintNode(fileNode);
 			}
 		}
