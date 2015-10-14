@@ -19,15 +19,15 @@ void Help(char *exe) {
 	printff("    %s dir [dir]\n", exeFilename);
 	printff("    %s check [dir]\n", exeFilename);
 	printff("\n");
-	printff("    %s sync [dirIzquierda] [dirDerecha]\n", exeFilename);
-	printff("    %s resync [dirIzquierda] [dirDerecha]\n", exeFilename);
-	printff("    %s synctest [dirIzquierda] [dirDerecha]\n", exeFilename);
-	printff("    %s resynctest [dirIzquierda] [dirDerecha]\n", exeFilename);
+	printff("    %s sync [dirA] [dirB]\n", exeFilename);
+	printff("    %s resync [dirA] [dirB]\n", exeFilename);
+	printff("    %s synctest [dirA] [dirB]\n", exeFilename);
+	printff("    %s resynctest [dirA] [dirB]\n", exeFilename);
 	printff("\n");
-	printff("    %s copy [dirIzquierda] [dirDerecha]\n", exeFilename);
-	printff("    %s recopy [dirIzquierda] [dirDerecha]\n", exeFilename);
-	printff("    %s copytest [dirIzquierda] [dirDerecha]\n", exeFilename);
-	printff("    %s recopytest [dirIzquierda] [dirDerecha]\n", exeFilename);
+	printff("    %s copy [dirA] [dirB]\n", exeFilename);
+	printff("    %s recopy [dirA] [dirB]\n", exeFilename);
+	printff("    %s copytest [dirA] [dirB]\n", exeFilename);
+	printff("    %s recopytest [dirA] [dirB]\n", exeFilename);
 }
 
 FileNode CheckDir(char *path, int recheck);
