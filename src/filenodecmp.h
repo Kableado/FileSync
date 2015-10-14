@@ -15,22 +15,23 @@ typedef enum {
 	ActionFileCmp_MakeLeftDirectory
 } ActionFileCmp;
 
-typedef struct SActionFileNode {
+typedef struct TActionFileNode TActionFileNode, *ActionFileNode;
+struct TActionFileNode {
 	ActionFileCmp action;
-	FileNode *left;
-	FileNode *right;
-	struct SActionFileNode *next;
-} ActionFileNode;
+	FileNode left;
+	FileNode right;
+	ActionFileNode next;
+};
 
-ActionFileNode *ActionFileNode_Create();
-void AccionFileNode_Destroy(ActionFileNode *actionFileNode);
-ActionFileNode *ActionFileNode_CreateNormal(FileNode *fileNodeLeft,
-	FileNode *fileNodeRight);
+ActionFileNode ActionFileNode_Create();
+void AccionFileNode_Destroy(ActionFileNode actionFileNode);
+ActionFileNode ActionFileNode_CreateNormal(FileNode fileNodeLeft,
+	FileNode fileNodeRight);
 
-ActionFileNode *ActionFileNode_BuildSync(FileNode *fileNodeLeft,
-	FileNode *fileNodeRight);
-ActionFileNode *ActionFileNode_BuildCopy(FileNode *fileNodeLeft,
-	FileNode *fileNodeRight);
+ActionFileNode ActionFileNode_BuildSync(FileNode fileNodeLeft,
+	FileNode fileNodeRight);
+ActionFileNode ActionFileNode_BuildCopy(FileNode fileNodeLeft,
+	FileNode fileNodeRight);
 
 typedef struct SActionQueueStatistics {
 	long long readLeft;
@@ -45,12 +46,12 @@ typedef struct SActionQueueStatistics {
 	long long deleteRight;
 } ActionQueueStatistics;
 
-void ActionFileNode_Statistics(ActionFileNode *actionFileNode,
+void ActionFileNode_Statistics(ActionFileNode actionFileNode,
 	ActionQueueStatistics *statistics);
 
-void ActionFileNode_Print(ActionFileNode *actionFileNode);
+void ActionFileNode_Print(ActionFileNode actionFileNode);
 
-void ActionFileNode_RunList(ActionFileNode *actionFileNode, char *pathLeft,
+void ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 	char *pathRight);
 
 #endif

@@ -21,7 +21,8 @@ typedef enum {
 	FileStatus_Deleted
 } FileStatus;
 
-typedef struct SFileNode {
+typedef struct TFileNode TFileNode, *FileNode;
+struct TFileNode {
 	char name[MaxFilename];
 	int flags;
 	FileStatus status;
@@ -30,33 +31,33 @@ typedef struct SFileNode {
 	unsigned long crc;
 	FileTime fileTime;
 
-	struct SFileNode *child;
+	FileNode child;
 	int childCount;
 
-	struct SFileNode *next;
-	struct SFileNode *parent;
-} FileNode;
+	FileNode next;
+	FileNode parent;
+};
 
-FileNode *FileNode_Create();
-FileNode *FileNode_Copy(FileNode *fileNode);
-void FileNode_Delete(FileNode *fileNode);
-void FileNode_AddChild(FileNode *file, FileNode *file2);
+FileNode FileNode_Create();
+FileNode FileNode_Copy(FileNode fileNode);
+void FileNode_Delete(FileNode fileNode);
+void FileNode_AddChild(FileNode file, FileNode file2);
 
-char *FileNode_GetFullPath(FileNode *fileNode, char *basePath, char *path);
+char *FileNode_GetFullPath(FileNode fileNode, char *basePath, char *path);
 
-void FileNode_LoadSize(FileNode *fileNode, char *file);
-void FileNode_LoadTime(FileNode *fileNode, char *file);
-void FileNode_LoadSizeAndTime(FileNode *fileNode, char *file);
-void FileNode_LoadCRC(FileNode *fileNode, char *file);
+void FileNode_LoadSize(FileNode fileNode, char *file);
+void FileNode_LoadTime(FileNode fileNode, char *file);
+void FileNode_LoadSizeAndTime(FileNode fileNode, char *file);
+void FileNode_LoadCRC(FileNode fileNode, char *file);
 
-void FileNode_Save(FileNode *fileNode, char *fichero);
-FileNode *FileNode_Load(char *fichero);
+void FileNode_Save(FileNode fileNode, char *fichero);
+FileNode FileNode_Load(char *fichero);
 
-void FileNode_PrintNode(FileNode *fileNode);
-void FileNode_Print(FileNode *fileNode);
+void FileNode_PrintNode(FileNode fileNode);
+void FileNode_Print(FileNode fileNode);
 
-FileNode *FileNode_Build(char *path);
+FileNode FileNode_Build(char *path);
 
-FileNode *FileNode_Refresh(FileNode *file, char *path);
+FileNode FileNode_Refresh(FileNode file, char *path);
 
 #endif

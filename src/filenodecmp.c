@@ -10,19 +10,19 @@
 
 int maxDeltaTime = 4000;
 
-#define QueueNode(queue,node) (queue)->next = node; (queue) = node;
+#define QueueNode(queue,node) (queue)->next = (node); (queue) = (node);
 
-ActionFileNode *_actionFileNodeFree = NULL;
+ActionFileNode _actionFileNodeFree = NULL;
 #define AccionFileNode_Block 1024
-ActionFileNode *ActionFileNode_Create() {
-	ActionFileNode *actionFileNode;
+ActionFileNode ActionFileNode_Create() {
+	ActionFileNode actionFileNode;
 
 	if (_actionFileNodeFree == NULL) {
-		ActionFileNode *actionFileNodeFreeAux;
+		ActionFileNode actionFileNodeFreeAux;
 		int i;
 		// Allocate block
 		actionFileNodeFreeAux = malloc(
-			sizeof(ActionFileNode) * AccionFileNode_Block);
+			sizeof(TActionFileNode) * AccionFileNode_Block);
 		if (actionFileNodeFreeAux == NULL) {
 			return NULL;
 		}
@@ -46,15 +46,15 @@ ActionFileNode *ActionFileNode_Create() {
 	return (actionFileNode);
 }
 
-void AccionFileNode_Destroy(ActionFileNode *actionFileNode) {
+void AccionFileNode_Destroy(ActionFileNode actionFileNode) {
 	actionFileNode->next = _actionFileNodeFree;
 	_actionFileNodeFree = actionFileNode;
 }
 
-ActionFileNode *ActionFileNode_CreateNormal(FileNode *fileNodeLeft,
-	FileNode *fileNodeRight)
+ActionFileNode ActionFileNode_CreateNormal(FileNode fileNodeLeft,
+	FileNode fileNodeRight)
 {
-	ActionFileNode *actionFileNode;
+	ActionFileNode actionFileNode;
 	actionFileNode = ActionFileNode_Create();
 	actionFileNode->action = ActionFileCmp_Nothing;
 	actionFileNode->left = fileNodeLeft;
@@ -63,16 +63,16 @@ ActionFileNode *ActionFileNode_CreateNormal(FileNode *fileNodeLeft,
 }
 
 
-void AccionFileNode_CompareChilds(ActionFileNode *actionFileNodeRoot,
-	ActionFileNode **actionFileNodeQueue,
-	void(*CheckPair)(FileNode *fileNodeLeft, FileNode *fileNodeRight,
-		ActionFileNode **actionFileNodeQueue))
+void AccionFileNode_CompareChilds(ActionFileNode actionFileNodeRoot,
+	ActionFileNode *actionFileNodeQueue,
+	void(*CheckPair)(FileNode fileNodeLeft, FileNode fileNodeRight,
+		ActionFileNode *actionFileNodeQueue))
 {
-	FileNode *fileNodeLeft;
-	FileNode *fileNodeRight;
-	FileNode *fileNodeRightQueue;
-	FileNode *fileNodeRightProcessed;
-	FileNode *fileNodeRightPrevious;
+	FileNode fileNodeLeft;
+	FileNode fileNodeRight;
+	FileNode fileNodeRightQueue;
+	FileNode fileNodeRightProcessed;
+	FileNode fileNodeRightPrevious;
 
 	// Check if there is something to do
 	if (!actionFileNodeRoot->left && !actionFileNodeRoot->right) {
@@ -152,10 +152,10 @@ void AccionFileNode_CompareChilds(ActionFileNode *actionFileNodeRoot,
 
 }
 
-void AccionFileNode_DeletePair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
-	ActionFileNode **actionFileNodeQueue)
+void AccionFileNode_DeletePair(FileNode fileNodeLeft, FileNode fileNodeRight,
+	ActionFileNode *actionFileNodeQueue)
 {
-	ActionFileNode *actionFileNodeNew = ActionFileNode_CreateNormal(
+	ActionFileNode actionFileNodeNew = ActionFileNode_CreateNormal(
 		fileNodeLeft, fileNodeRight);
 
 	if (!fileNodeLeft && !fileNodeRight) {
@@ -226,10 +226,10 @@ void AccionFileNode_DeletePair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 	}
 }
 
-void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
-	ActionFileNode **actionFileNodeQueue)
+void AccionFileNode_CheckPair(FileNode fileNodeLeft, FileNode fileNodeRight,
+	ActionFileNode *actionFileNodeQueue)
 {
-	ActionFileNode *actionFileNodeNew = ActionFileNode_CreateNormal(
+	ActionFileNode actionFileNodeNew = ActionFileNode_CreateNormal(
 		fileNodeLeft, fileNodeRight);
 
 	if (!fileNodeLeft && !fileNodeRight) {
@@ -421,19 +421,19 @@ void AccionFileNode_CheckPair(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 	}
 }
 
-ActionFileNode *ActionFileNode_BuildSync(FileNode *izquierda, FileNode *derecha) {
-	ActionFileNode *actionFileNodeRoot = ActionFileNode_CreateNormal(izquierda,
+ActionFileNode ActionFileNode_BuildSync(FileNode izquierda, FileNode derecha) {
+	ActionFileNode actionFileNodeRoot = ActionFileNode_CreateNormal(izquierda,
 		derecha);
-	ActionFileNode *actionFileNodeQueue = actionFileNodeRoot;
+	ActionFileNode actionFileNodeQueue = actionFileNodeRoot;
 	AccionFileNode_CompareChilds(actionFileNodeRoot, &actionFileNodeQueue,
 		AccionFileNode_CheckPair);
 	return actionFileNodeRoot;
 }
 
-void AccionFileNode_Copy(FileNode *fileNodeLeft, FileNode *fileNodeRight,
-	ActionFileNode **actionFileNodeQueue) 
+void AccionFileNode_Copy(FileNode fileNodeLeft, FileNode fileNodeRight,
+	ActionFileNode *actionFileNodeQueue) 
 {
-	ActionFileNode *actionFileNodeNew = ActionFileNode_CreateNormal(
+	ActionFileNode actionFileNodeNew = ActionFileNode_CreateNormal(
 		fileNodeLeft, fileNodeRight);
 
 	if (!fileNodeLeft && !fileNodeRight) {
@@ -519,17 +519,17 @@ void AccionFileNode_Copy(FileNode *fileNodeLeft, FileNode *fileNodeRight,
 	}
 }
 
-ActionFileNode *ActionFileNode_BuildCopy(FileNode *fileNodeLeft,
-	FileNode *fileNodeRight) {
-	ActionFileNode *actionFileNodeRoot = ActionFileNode_CreateNormal(
+ActionFileNode ActionFileNode_BuildCopy(FileNode fileNodeLeft,
+	FileNode fileNodeRight) {
+	ActionFileNode actionFileNodeRoot = ActionFileNode_CreateNormal(
 		fileNodeLeft, fileNodeRight);
-	ActionFileNode *actionFileNodeQueue = actionFileNodeRoot;
+	ActionFileNode actionFileNodeQueue = actionFileNodeRoot;
 	AccionFileNode_CompareChilds(actionFileNodeRoot, &actionFileNodeQueue,
 		AccionFileNode_Copy);
 	return actionFileNodeRoot;
 }
 
-void ActionFileNode_Statistics(ActionFileNode *actionFileNode,
+void ActionFileNode_Statistics(ActionFileNode actionFileNode,
 	ActionQueueStatistics *statistics) 
 {
 	statistics->readLeft = 0;
@@ -584,7 +584,7 @@ void ActionFileNode_Statistics(ActionFileNode *actionFileNode,
 	}
 }
 
-void ActionFileNode_Print(ActionFileNode *actionFileNode) {
+void ActionFileNode_Print(ActionFileNode actionFileNode) {
 	char showPath[MaxPath];
 	while (actionFileNode != NULL) {
 		if (actionFileNode->left) {
@@ -654,7 +654,7 @@ void AccionFileNodeAux_MakeDir(char *pathOrig, char *pathDest) {
 	File_MakeDirectory(pathDest);
 }
 
-void ActionFileNode_RunList(ActionFileNode *actionFileNode, char *pathLeft,
+void ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 	char *pathRight) 
 {
 	char fullPathLeft[MaxPath], fullPathRight[MaxPath], showPath[MaxPath];

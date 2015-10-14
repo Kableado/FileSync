@@ -327,7 +327,8 @@ void File_DeleteDirectory(char *path) {
 
 #define MaxBuffer 16384
 int File_Copy(const char *pathOrig, const char *pathDest) {
-	FILE *fOrig, *fDest;
+	FILE *fOrig;
+	FILE *fDest;
 	char *buffer = NULL;
 	int readLen = 0;
 	int writeLen = 0;

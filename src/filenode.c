@@ -7,17 +7,17 @@
 #include "fileutil.h"
 #include "filenode.h"
 
-FileNode *_freeFileNode = NULL;
+FileNode _freeFileNode = NULL;
 int _n_filenode = 0;
 #define FileNode_Block 1024
-FileNode *FileNode_Create() {
-	FileNode *fileNode;
+FileNode FileNode_Create() {
+	FileNode fileNode;
 
 	if (_freeFileNode == NULL) {
-		FileNode *nodes;
+		FileNode nodes;
 		int i;
 		// Allocate a block
-		nodes = malloc(sizeof(FileNode) * FileNode_Block);
+		nodes = malloc(sizeof(TFileNode) * FileNode_Block);
 		if (nodes == NULL) {
 			return NULL;
 		}
@@ -49,8 +49,8 @@ FileNode *FileNode_Create() {
 	return (fileNode);
 }
 
-FileNode *FileNode_Copy(FileNode *fileNode) {
-	FileNode *fileNodeNew;
+FileNode FileNode_Copy(FileNode fileNode) {
+	FileNode fileNodeNew;
 
 	fileNodeNew = FileNode_Create();
 
@@ -65,10 +65,10 @@ FileNode *FileNode_Copy(FileNode *fileNode) {
 	return fileNodeNew;
 }
 
-void FileNode_Delete(FileNode *fn) {
+void FileNode_Delete(FileNode fn) {
 	// Delete childs
-	FileNode *fileNodeChildAux = fn->child;
-	FileNode *fileNodeChild = fn->child;
+	FileNode fileNodeChildAux = fn->child;
+	FileNode fileNodeChild = fn->child;
 	while (fileNodeChild) {
 		fn->childCount--;
 		fileNodeChildAux = fileNodeChild;
@@ -86,7 +86,7 @@ void FileNode_Delete(FileNode *fn) {
 	_n_filenode--;
 }
 
-void FileNode_AddChild(FileNode *fileNode, FileNode *fileNodeChild) {
+void FileNode_AddChild(FileNode fileNode, FileNode fileNodeChild) {
 	if (!fileNodeChild || !fileNode)
 		return;
 	fileNodeChild->next = fileNode->child;
@@ -95,8 +95,8 @@ void FileNode_AddChild(FileNode *fileNode, FileNode *fileNodeChild) {
 	fileNodeChild->parent = fileNode;
 }
 
-void FileNode_SetStatusRec(FileNode *fileNode, FileStatus status) {
-	FileNode *fileNodeChild;
+void FileNode_SetStatusRec(FileNode fileNode, FileStatus status) {
+	FileNode fileNodeChild;
 	fileNode->status = status;
 	fileNodeChild = fileNode->child;
 	while (fileNodeChild != NULL) {
@@ -105,7 +105,7 @@ void FileNode_SetStatusRec(FileNode *fileNode, FileStatus status) {
 	}
 }
 
-void FileNode_GetPath_Rec(FileNode *fileNode, char **pathNode) {
+void FileNode_GetPath_Rec(FileNode fileNode, char **pathNode) {
 	if (fileNode->parent) {
 		pathNode[0] = fileNode->parent->name;
 		FileNode_GetPath_Rec(fileNode->parent, pathNode + 1);
@@ -115,7 +115,7 @@ void FileNode_GetPath_Rec(FileNode *fileNode, char **pathNode) {
 	}
 }
 char tempPath[MaxPath];
-char *FileNode_GetPath(FileNode *fileNode, char *path) {
+char *FileNode_GetPath(FileNode fileNode, char *path) {
 	char *pathNodes[MaxPathNodes];
 	int levels, i;
 	char *pathPtr = tempPath;
@@ -135,7 +135,7 @@ char *FileNode_GetPath(FileNode *fileNode, char *path) {
 	return tempPath;
 }
 
-char *FileNode_GetFullPath(FileNode *fileNode, char *basePath, char *path) {
+char *FileNode_GetFullPath(FileNode fileNode, char *basePath, char *path) {
 	char *pathNodes[MaxPath];
 	int levels, i;
 	char *pathPtr = tempPath;
@@ -157,22 +157,22 @@ char *FileNode_GetFullPath(FileNode *fileNode, char *basePath, char *path) {
 	return tempPath;
 }
 
-void FileNode_LoadSize(FileNode *fileNode, char *file) {
+void FileNode_LoadSize(FileNode fileNode, char *file) {
 	fileNode->flags |= FileFlag_HasSize;
 	fileNode->size = File_GetSize(file);
 }
 
-void FileNode_LoadTime(FileNode *fileNode, char *file) {
+void FileNode_LoadTime(FileNode fileNode, char *file) {
 	fileNode->flags |= FileFlag_HasTime;
 	fileNode->fileTime = FileTime_Get(file);
 }
 
-void FileNode_LoadSizeAndTime(FileNode *fileNode, char *file) {
+void FileNode_LoadSizeAndTime(FileNode fileNode, char *file) {
 	fileNode->flags |= FileFlag_HasSize | FileFlag_HasTime;
 	File_GetSizeAndTime(file, &fileNode->size, &fileNode->fileTime);
 }
 
-void FileNode_LoadCRC(FileNode *fileNode, char *filePath) {
+void FileNode_LoadCRC(FileNode fileNode, char *filePath) {
 	FILE *file;
 	file = fopen(filePath, "rb");
 	if (!file) {
@@ -183,7 +183,7 @@ void FileNode_LoadCRC(FileNode *fileNode, char *filePath) {
 	fclose(file);
 }
 
-void FileNode_SaveNode(FileNode *fileNode, FILE *file) {
+void FileNode_SaveNode(FileNode fileNode, FILE *file) {
 	short nameLen;
 
 	// Write name
@@ -219,7 +219,7 @@ void FileNode_SaveNode(FileNode *fileNode, FILE *file) {
 
 	// Write files of directory
 	if (fileNode->flags & FileFlag_Directory) {
-		FileNode *fileNodeChild;
+		FileNode fileNodeChild;
 		fwrite((void *)&fileNode->childCount, sizeof(fileNode->childCount), 1, file);
 		fileNodeChild = fileNode->child;
 		int cnt = 0;
@@ -234,7 +234,7 @@ void FileNode_SaveNode(FileNode *fileNode, FILE *file) {
 	}
 }
 
-void FileNode_Save(FileNode *fileNode, char *filePath) {
+void FileNode_Save(FileNode fileNode, char *filePath) {
 	FILE *file;
 	char mark[5];
 	int version;
@@ -255,9 +255,9 @@ void FileNode_Save(FileNode *fileNode, char *filePath) {
 	fclose(file);
 }
 
-FileNode *FileNode_LoadNode(FILE *file) {
+FileNode FileNode_LoadNode(FILE *file) {
 	short nameLen;
-	FileNode *fileNode;
+	FileNode fileNode;
 	int i;
 
 	fileNode = FileNode_Create();
@@ -297,7 +297,8 @@ FileNode *FileNode_LoadNode(FILE *file) {
 
 	// Read files on directory
 	if (fileNode->flags & FileFlag_Directory) {
-		FileNode *fileNodeChildAux = NULL, *fileNodeChild;
+		FileNode fileNodeChildAux = NULL;
+		FileNode fileNodeChild;
 		fread((void *)&fileNode->childCount, sizeof(fileNode->childCount), 1, file);
 		for (i = 0; i < fileNode->childCount; i++) {
 			fileNodeChild = FileNode_LoadNode(file);
@@ -319,9 +320,9 @@ FileNode *FileNode_LoadNode(FILE *file) {
 	return (fileNode);
 }
 
-FileNode *FileNode_Load(char *filePath) {
+FileNode FileNode_Load(char *filePath) {
 	FILE *file;
-	FileNode *fileNode;
+	FileNode fileNode;
 	char mark[5];
 	int version;
 
@@ -350,7 +351,7 @@ FileNode *FileNode_Load(char *filePath) {
 	return (fileNode);
 }
 
-void FileNode_PrintNode(FileNode *fileNode) {
+void FileNode_PrintNode(FileNode fileNode) {
 	printff(FileNode_GetPath(fileNode, NULL));
 	if (fileNode->flags & FileFlag_Normal) {
 		printff(" File");
@@ -382,8 +383,8 @@ void FileNode_PrintNode(FileNode *fileNode) {
 
 }
 
-void FileNode_Print(FileNode *fileNode) {
-	FileNode *fileNodeAux = fileNode;
+void FileNode_Print(FileNode fileNode) {
+	FileNode fileNodeAux = fileNode;
 	int end = 0;
 
 	while (fileNodeAux != NULL && !end) {
@@ -413,8 +414,8 @@ void FileNode_Print(FileNode *fileNode) {
 
 int FileNode_Build_Iterate(char *path, char *name, void *d);
 
-FileNode *FileNode_Build(char *path) {
-	FileNode *fileNode;
+FileNode FileNode_Build(char *path) {
+	FileNode fileNode;
 
 	if (!File_ExistsPath(path))
 		return (NULL);
@@ -439,7 +440,8 @@ FileNode *FileNode_Build(char *path) {
 }
 
 int FileNode_Build_Iterate(char *path, char *name, void *d) {
-	FileNode *fileNode, *fileNodeParent = d;
+	FileNode fileNode;
+	FileNode fileNodeParent = d;
 
 	if (!strcmp(name, FileNode_Filename)) {
 		return (0);
@@ -453,7 +455,7 @@ int FileNode_Build_Iterate(char *path, char *name, void *d) {
 
 int FileNode_Refresh_Iterate(char *path, char *name, void *d);
 
-FileNode *FileNode_Refresh(FileNode *fileNode, char *filePath) {
+FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 	if (!File_ExistsPath(filePath)) {
 		// The file/directory has been deleted
 		if (!fileNode) {
@@ -478,7 +480,7 @@ FileNode *FileNode_Refresh(FileNode *fileNode, char *filePath) {
 		fileNode->flags &= ~FileFlag_MarkerForReview;
 
 		if (File_IsDirectory(filePath)) {
-			FileNode *fileNodeChild;
+			FileNode fileNodeChild;
 
 			// Check directory data
 			if (!(fileNode->flags & FileFlag_Directory)) {
@@ -537,8 +539,8 @@ FileNode *FileNode_Refresh(FileNode *fileNode, char *filePath) {
 }
 
 int FileNode_Refresh_Iterate(char *path, char *name, void *d) {
-	FileNode *fileNode = d;
-	FileNode *fileNodeChild;
+	FileNode fileNode = d;
+	FileNode fileNodeChild;
 
 	if (!strcmp(name, FileNode_Filename)) {
 		return (0);

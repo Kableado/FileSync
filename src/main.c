@@ -29,7 +29,7 @@ void Help(char *exe) {
 	printff("    %s recopytest [dirIzquierda] [dirDerecha]\n", exeFilename);
 }
 
-FileNode *CheckDir(char *path, int recheck);
+FileNode CheckDir(char *path, int recheck);
 int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun);
 int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun);
 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 		int i;
 		for (i = 2; i < argc; i++) {
 			if (File_ExistsPath(argv[i])) {
-				FileNode *fileNode = FileNode_Build(argv[i]);
+				FileNode fileNode = FileNode_Build(argv[i]);
 				FileNode_LoadCRC(fileNode, argv[i]);
 				FileNode_PrintNode(fileNode);
 			}
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 	else if (!strcmp(argv[1], "scan") && argc == 4) {
 		// Scan directory information tree and save
 		long long tScan = Time_GetTime();
-		FileNode *fileNode;
+		FileNode fileNode;
 		printff("Building FileNode..\n");
 		fileNode = FileNode_Build(argv[2]);
 		tScan = Time_GetTime() - tScan;
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 	}
 	else if (!strcmp(argv[1], "rescan") && argc == 4) {
 		// Scan directory information and save tree
-		FileNode *fileNode;
+		FileNode fileNode;
 		printff("Loading FileNode..\n");
 		fileNode = FileNode_Load(argv[3]);
 		if (fileNode) {
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
 	}
 	else if (!strcmp(argv[1], "read") && argc == 3) {
 		// Read information tree from file
-		FileNode *fileNode;
+		FileNode fileNode;
 		fileNode = FileNode_Load(argv[2]);
 		if (fileNode)
 			FileNode_Print(fileNode);
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
 	else if (!strcmp(argv[1], "dir") && argc == 3) {
 		// Read directory information tree
 		char *path = argv[2];
-		FileNode *fileNode;
+		FileNode fileNode;
 
 		fileNode = CheckDir(path, 1);
 		if (fileNode) {
@@ -135,9 +135,9 @@ int main(int argc, char *argv[]) {
 	return (0);
 }
 
-FileNode *CheckDir(char *path, int recheck) {
+FileNode CheckDir(char *path, int recheck) {
 	char dirNodesFile[MaxPath];
-	FileNode *fileNode;
+	FileNode fileNode;
 
 	// Check directory
 	snprintf(dirNodesFile, MaxPath, "%s/"FileNode_Filename, path);
@@ -166,7 +166,7 @@ FileNode *CheckDir(char *path, int recheck) {
 	return fileNode;
 }
 
-void PrintStatistics(ActionFileNode *actionFileNode) {
+void PrintStatistics(ActionFileNode actionFileNode) {
 	ActionQueueStatistics statistics;
 	ActionFileNode_Statistics(actionFileNode, &statistics);
 	printff("Statistics\n");
@@ -183,7 +183,8 @@ void PrintStatistics(ActionFileNode *actionFileNode) {
 }
 
 int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
-	FileNode *fileNodeLeft, *fileNodeRight;
+	FileNode fileNodeLeft;
+	FileNode fileNodeRight;
 
 	// Check and load directories
 	if (!File_ExistsPath(pathLeft) || !File_IsDirectory(pathLeft)) {
@@ -206,7 +207,7 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 	// Build actions
 	long long tBuild = Time_GetTime();
 	printff("Building action list.. \n");
-	ActionFileNode *actionFileNode = NULL;
+	ActionFileNode actionFileNode = NULL;
 	actionFileNode = ActionFileNode_BuildSync(fileNodeLeft, fileNodeRight);
 	tBuild = Time_GetTime() - tBuild;
 	printff("tBuild: %9lldus\n", tBuild);
@@ -225,7 +226,8 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 }
 
 int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
-	FileNode *fileNodeLeft, *fileNodeRight;
+	FileNode fileNodeLeft;
+	FileNode fileNodeRight;
 
 	// Check and load directories
 	if (!File_ExistsPath(pathLeft) || !File_IsDirectory(pathLeft)) {
@@ -248,7 +250,7 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	// Build actions
 	long long tBuild = Time_GetTime();
 	printff("Building action list.. \n");
-	ActionFileNode *actionFileNode = NULL;
+	ActionFileNode actionFileNode = NULL;
 	actionFileNode = ActionFileNode_BuildCopy(fileNodeLeft, fileNodeRight);
 	tBuild = Time_GetTime() - tBuild;
 	printff("tBuild: %9lldus\n", tBuild);
