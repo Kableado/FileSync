@@ -38,6 +38,7 @@ typedef struct SFileNode {
 } FileNode;
 
 FileNode *FileNode_Create();
+FileNode *FileNode_Copy(FileNode *fileNode);
 void FileNode_Delete(FileNode *fileNode);
 void FileNode_AddChild(FileNode *file, FileNode *file2);
 

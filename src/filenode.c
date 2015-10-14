@@ -49,6 +49,22 @@ FileNode *FileNode_Create() {
 	return (fileNode);
 }
 
+FileNode *FileNode_Copy(FileNode *fileNode) {
+	FileNode *fileNodeNew;
+
+	fileNodeNew = FileNode_Create();
+
+	// Copy
+	strcpy(fileNodeNew->name, fileNode->name);
+	fileNodeNew->flags = fileNode->flags;
+	fileNodeNew->status = fileNode->status;
+	fileNodeNew->size = fileNode->size;
+	fileNodeNew->crc = fileNode->crc;
+	fileNodeNew->fileTime = fileNode->fileTime;
+
+	return fileNodeNew;
+}
+
 void FileNode_Delete(FileNode *fn) {
 	// Delete childs
 	FileNode *fileNodeChildAux = fn->child;
