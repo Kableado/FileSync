@@ -17,6 +17,7 @@ void Help(char *exe) {
 	printff("    %s rescan [dir] [tree] \n", exeFilename);
 	printff("    %s read [file] [tree]\n", exeFilename);
 	printff("    %s dir [dir]\n", exeFilename);
+	printff("    %s check [dir]\n", exeFilename);
 	printff("\n");
 	printff("    %s sync [dirIzquierda] [dirDerecha]\n", exeFilename);
 	printff("    %s resync [dirIzquierda] [dirDerecha]\n", exeFilename);
@@ -98,6 +99,13 @@ int main(int argc, char *argv[]) {
 		if (fileNode) {
 			FileNode_Print(fileNode);
 		}
+	}
+	else if (!strcmp(argv[1], "check") && argc == 3) {
+		// Read directory information tree
+		char *path = argv[2];
+		FileNode fileNode;
+
+		fileNode = CheckDir(path, 1);
 	}
 	else if (argc == 4) {
 		char *cmd = argv[1];
