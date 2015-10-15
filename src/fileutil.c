@@ -349,7 +349,7 @@ int File_Copy(const char *pathOrig, const char *pathDest) {
 	do {
 		readLen = fread(buffer, 1, MaxBuffer, fOrig);
 		if (readLen > 0) {
-			writeLen = fwrite(&buffer, 1, readLen, fDest);
+			writeLen = fwrite(buffer, 1, readLen, fDest);
 			if (writeLen != readLen) {
 				// Error
 				fclose(fOrig);
