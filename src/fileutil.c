@@ -12,7 +12,9 @@
 #    include <signal.h>
 #    include <fcntl.h>
 #else
-#include <unistd.h>
+#    include <utime.h>
+#    include <dirent.h>
+#    include <unistd.h>
 #endif
 
 #include "util.h"
@@ -234,7 +236,7 @@ void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
 	struct stat fs;
 	lstat(fileName, &fs);
 	*size = fs.st_size;
-	*time = fs.st_mtime
+	*time = fs.st_mtime;
 }
 #endif
 
@@ -298,9 +300,10 @@ void File_IterateDir(char *path,
 		entidad_dir = readdir(directorio);
 		if (entidad_dir != NULL) {
 			if (strcmp(entidad_dir->d_name, ".")
-				&& strcmp(entidad_dir->d_name, "..")) {
+				&& strcmp(entidad_dir->d_name, "..")) 
+			{
 				// Each item
-				snprintff(f_path, MaxPath, "%s/%s", path, entidad_dir->d_name);
+				snprintf(f_path, MaxPath, "%s/%s", path, entidad_dir->d_name);
 				fin = func(f_path, entidad_dir->d_name, data);
 			}
 		}
