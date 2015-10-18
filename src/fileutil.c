@@ -330,23 +330,23 @@ void File_DeleteDirectory(char *path) {
 
 #define MaxBuffer 16384
 int File_Copy(const char *pathOrig, const char *pathDest) {
-	FILE *fOrig;
-	FILE *fDest;
+	FILE *fOrig = NULL;
+	FILE *fDest = NULL;
 	char *buffer = NULL;
 	int readLen = 0;
 	int writeLen = 0;
-	int ok = 0;
+	int status = 0;
 
 	if ((fOrig = fopen(pathOrig, "rb")) == NULL) {
-		return 0;
+		goto cleanup;
 	}
 	if ((fDest = fopen(pathDest, "wb")) == NULL) {
-		return 0;
+		goto cleanup;
 	}
 
 	buffer = malloc(sizeof(char)*MaxBuffer);
 	if (buffer == NULL) {
-		return 0;
+		goto cleanup;
 	}
 
 	do {
@@ -354,21 +354,20 @@ int File_Copy(const char *pathOrig, const char *pathDest) {
 		if (readLen > 0) {
 			writeLen = fwrite(buffer, 1, readLen, fDest);
 			if (writeLen != readLen) {
-				// Error
-				fclose(fOrig);
-				fclose(fDest);
-				free(buffer);
-				return 0;
+				// Write error
+				status = -1;
+				goto cleanup;
 			}
 		}
 	} while (readLen == MaxBuffer);
 
 	if (feof(fOrig)) {
-		ok = 1;
+		status = 1;
 	}
 
-	fclose(fOrig);
-	fclose(fDest);
-	free(buffer);
-	return ok;
+cleanup:
+	if (fOrig != NULL) { fclose(fOrig); }
+	if (fDest != NULL) { fclose(fDest); }
+	if (buffer != NULL) { free(buffer); }
+	return status;
 }
