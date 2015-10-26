@@ -1,4 +1,13 @@
 
+ifneq (,$(findstring MINGW,$(shell uname -s)))
+	RES_APP = filesync.exe
+	BUILDDIR = build-mingw
+else
+	RES_APP = filesync
+	BUILDDIR = build-linux
+endif
+
+
 CC    = gcc
 RM    = rm -f
 ECHO  = echo
@@ -21,11 +30,8 @@ OBJS_APP = \
 		$(OBJS_BASE) \
 		$(BUILDDIR)/main.o
 
-RES_APP = filesync.exe
-
 CFLAGS   = -g
 LIBS     = -lm
-BUILDDIR = build
 
 
 DO_CC=@$(ECHO) "CC: $@" ;\
