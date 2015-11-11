@@ -10,3 +10,4 @@ VisualStudio/filesync/Debug
 *.user
 VisualStudio/Debug/*
 */bin/*
+MonoDevelop/FileSync/bin/*
