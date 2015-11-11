@@ -98,6 +98,10 @@ void FileNode_AddChild(FileNode fileNode, FileNode fileNodeChild) {
 void FileNode_SetStatusRec(FileNode fileNode, FileStatus status) {
 	FileNode fileNodeChild;
 	fileNode->status = status;
+	if (status == FileStatus_Deleted) {
+		fileNode->fileTime = Time_GetTime();
+		fileNode->flags |= FileFlag_HasTime;
+	}
 	fileNodeChild = fileNode->child;
 	while (fileNodeChild != NULL) {
 		FileNode_SetStatusRec(fileNodeChild, status);

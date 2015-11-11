@@ -316,15 +316,9 @@ void AccionFileNode_SyncPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 				}
 				else if (fileNodeRight->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_DeleteLeft;
-					if (fileNodeLeft->status == FileStatus_Deleted) {
-						actionFileNodeNew->action = ActionFileCmp_Nothing;
-					}
 				}
 				else if (fileNodeLeft->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_DeleteRight;
-					if (fileNodeRight->status == FileStatus_Deleted) {
-						actionFileNodeNew->action = ActionFileCmp_Nothing;
-					}
 				}
 				else {
 					actionFileNodeNew->action = ActionFileCmp_Nothing;
@@ -377,15 +371,9 @@ void AccionFileNode_SyncPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 				}
 				else if (fileNodeRight->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_DeleteLeft;
-					if (fileNodeLeft->status == FileStatus_Deleted) {
-						actionFileNodeNew->action = ActionFileCmp_Nothing;
-					}
 				}
 				else if (fileNodeLeft->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_DeleteRight;
-					if (fileNodeRight->status == FileStatus_Deleted) {
-						actionFileNodeNew->action = ActionFileCmp_Nothing;
-					}
 				}
 				else {
 					actionFileNodeNew->action = ActionFileCmp_Nothing;
