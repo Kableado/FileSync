@@ -60,7 +60,7 @@ FILETIME POSIX_to_FileTime(FileTime fileTime) {
 FileTime FileTime_Get(char *fileName) {
 	HANDLE hFile;
 	FILETIME ftCreate, ftAccess, ftWrite;
-	hFile = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, NULL,
+	hFile = CreateFile(fileName, READ_CONTROL, FILE_SHARE_READ, NULL,
 		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	GetFileTime(hFile, &ftCreate, &ftAccess, &ftWrite);
 	CloseHandle(hFile);
@@ -94,6 +94,50 @@ void FileTime_Set(char *fileName, FileTime t) {
 }
 
 #endif
+
+
+#ifdef WIN32
+long long File_GetSize(char *fileName) {
+	HANDLE hFile;
+	DWORD fSize;
+	hFile = CreateFile(fileName, READ_CONTROL, FILE_SHARE_READ, NULL,
+		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	fSize = GetFileSize(hFile, NULL);
+	CloseHandle(hFile);
+	return (fSize);
+}
+#else
+long long File_GetSize(char *fileName) {
+	struct stat fs;
+	lstat(fileName, &fs);
+	return (fs.st_size);
+}
+#endif
+
+
+#ifdef WIN32
+void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
+	HANDLE hFile;
+	DWORD fSize;
+	FILETIME ftCreate, ftAccess, ftWrite;
+	hFile = CreateFile(fileName, READ_CONTROL, FILE_SHARE_READ, NULL,
+		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	fSize = GetFileSize(hFile, NULL);
+	GetFileTime(hFile, &ftCreate, &ftAccess, &ftWrite);
+	CloseHandle(hFile);
+	*size = fSize;
+	*time = FileTime_to_POSIX(ftWrite);
+}
+#else
+void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
+	struct stat fs;
+	lstat(fileName, &fs);
+	*size = fs.st_size;
+	*time = fs.st_mtime;
+}
+#endif
+
+
 
 void FileTime_Print(FileTime fileTime) {
 	struct tm *tms;
@@ -198,47 +242,6 @@ int File_IsFile(char *fileName) {
 }
 #endif
 
-
-#ifdef WIN32
-long long File_GetSize(char *fileName) {
-	HANDLE hFile;
-	DWORD fSize;
-	hFile = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	GetFileSize(hFile, &fSize);
-	CloseHandle(hFile);
-	return (fSize);
-}
-#else
-long long File_GetSize(char *fileName) {
-	struct stat fs;
-	lstat(fileName, &fs);
-	return (fs.st_size);
-}
-#endif
-
-
-#ifdef WIN32
-void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
-	HANDLE hFile;
-	DWORD fSize;
-	FILETIME ftCreate, ftAccess, ftWrite;
-	hFile = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	GetFileSize(hFile, &fSize);
-	GetFileTime(hFile, &ftCreate, &ftAccess, &ftWrite);
-	CloseHandle(hFile);
-	*size = fSize;
-	*time = FileTime_to_POSIX(ftWrite);
-}
-#else
-void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
-	struct stat fs;
-	lstat(fileName, &fs);
-	*size = fs.st_size;
-	*time = fs.st_mtime;
-}
-#endif
 
 
 
