@@ -226,7 +226,7 @@ void AccionFileNode_DeletePair(FileNode fileNodeLeft, FileNode fileNodeRight,
 	}
 }
 
-void AccionFileNode_CheckPair(FileNode fileNodeLeft, FileNode fileNodeRight,
+void AccionFileNode_SyncPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 	ActionFileNode *actionFileNodeQueue)
 {
 	ActionFileNode actionFileNodeNew = ActionFileNode_CreateNormal(
@@ -249,7 +249,7 @@ void AccionFileNode_CheckPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 
 				// Iterate childs
 				AccionFileNode_CompareChilds(actionFileNodeNew,
-					actionFileNodeQueue, AccionFileNode_CheckPair);
+					actionFileNodeQueue, AccionFileNode_SyncPair);
 
 				// Creatre new action for date copy
 				actionFileNodeNew = ActionFileNode_CreateNormal(fileNodeLeft,
@@ -282,7 +282,7 @@ void AccionFileNode_CheckPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 
 				// Iterate childs
 				AccionFileNode_CompareChilds(actionFileNodeNew,
-					actionFileNodeQueue, AccionFileNode_CheckPair);
+					actionFileNodeQueue, AccionFileNode_SyncPair);
 
 				// Create new action for date copy
 				actionFileNodeNew = ActionFileNode_CreateNormal(fileNodeLeft,
@@ -360,7 +360,7 @@ void AccionFileNode_CheckPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 			}
 			else {
 				AccionFileNode_CompareChilds(actionFileNodeNew,
-					actionFileNodeQueue, AccionFileNode_CheckPair);
+					actionFileNodeQueue, AccionFileNode_SyncPair);
 			}
 			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
 		}
@@ -426,7 +426,7 @@ ActionFileNode ActionFileNode_BuildSync(FileNode izquierda, FileNode derecha) {
 		derecha);
 	ActionFileNode actionFileNodeQueue = actionFileNodeRoot;
 	AccionFileNode_CompareChilds(actionFileNodeRoot, &actionFileNodeQueue,
-		AccionFileNode_CheckPair);
+		AccionFileNode_SyncPair);
 	return actionFileNodeRoot;
 }
 
