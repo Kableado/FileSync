@@ -17,14 +17,19 @@ HEADS = \
 		src/util.h \
 		src/crc.h \
 		src/fileutil.h \
-		src/filenode.h
+		src/filenode.h \
+		src/actionfilenode.h \
+		src/actionfilenodesync.h \
+		src/actionfilenodecopy.h
 
 OBJS_BASE =  \
 		$(BUILDDIR)/util.o \
 		$(BUILDDIR)/crc.o \
 		$(BUILDDIR)/fileutil.o \
 		$(BUILDDIR)/filenode.o \
-		$(BUILDDIR)/filenodecmp.o
+		$(BUILDDIR)/actionfilenode.o \
+		$(BUILDDIR)/actionfilenodesync.o \
+		$(BUILDDIR)/actionfilenodecopy.o
 
 OBJS_APP = \
 		$(OBJS_BASE) \
@@ -61,9 +66,14 @@ $(BUILDDIR)/fileutil.o: src/fileutil.c $(HEADS)
 $(BUILDDIR)/filenode.o: src/filenode.c $(HEADS)
 	$(DO_CC)
 
-$(BUILDDIR)/filenodecmp.o: src/filenodecmp.c $(HEADS)
+$(BUILDDIR)/actionfilenode.o: src/actionfilenode.c $(HEADS)
 	$(DO_CC)
 
+$(BUILDDIR)/actionfilenodesync.o: src/actionfilenodesync.c $(HEADS)
+	$(DO_CC)
+
+$(BUILDDIR)/actionfilenodecopy.o: src/actionfilenodecopy.c $(HEADS)
+	$(DO_CC)
 
 $(BUILDDIR)/main.o: src/main.c $(HEADS)
 	$(DO_CC)
@@ -73,5 +83,4 @@ $(RES_APP): $(BUILDDIR) $(OBJS_APP)
 	@$(ECHO) "LINK: $@"
 	@$(CC) $(OBJS_APP) \
 		-o $(RES_APP) $(LIBS)
-
 

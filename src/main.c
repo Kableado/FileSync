@@ -6,7 +6,10 @@
 #include "crc.h"
 #include "fileutil.h"
 #include "filenode.h"
-#include "filenodecmp.h"
+#include "actionfilenode.h"
+#include "actionfilenodesync.h"
+#include "actionfilenodecopy.h"
+
 
 void Help(char *exe) {
 	char exeFilename[MaxPath];

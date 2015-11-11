@@ -121,17 +121,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\actionfilenode.c" />
+    <ClCompile Include="..\..\src\actionfilenodecopy.c" />
+    <ClCompile Include="..\..\src\actionfilenodesync.c" />
     <ClCompile Include="..\..\src\crc.c" />
     <ClCompile Include="..\..\src\filenode.c" />
-    <ClCompile Include="..\..\src\filenodecmp.c" />
     <ClCompile Include="..\..\src\fileutil.c" />
     <ClCompile Include="..\..\src\main.c" />
     <ClCompile Include="..\..\src\util.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\actionfilenode.h" />
+    <ClInclude Include="..\..\src\actionfilenodecopy.h" />
+    <ClInclude Include="..\..\src\actionfilenodesync.h" />
     <ClInclude Include="..\..\src\crc.h" />
     <ClInclude Include="..\..\src\filenode.h" />
-    <ClInclude Include="..\..\src\filenodecmp.h" />
     <ClInclude Include="..\..\src\fileutil.h" />
     <ClInclude Include="..\..\src\util.h" />
   </ItemGroup>

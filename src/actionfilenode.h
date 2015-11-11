@@ -1,5 +1,5 @@
-﻿#ifndef _FILENODECMP_H_
-#define _FILENODECMP_H_
+#ifndef _ACTIONFILENODE_H_
+#define _ACTIONFILENODE_H_
 
 #include "filenode.h"
 
@@ -28,10 +28,11 @@ void AccionFileNode_Destroy(ActionFileNode actionFileNode);
 ActionFileNode ActionFileNode_CreateNormal(FileNode fileNodeLeft,
 	FileNode fileNodeRight);
 
-ActionFileNode ActionFileNode_BuildSync(FileNode fileNodeLeft,
-	FileNode fileNodeRight);
-ActionFileNode ActionFileNode_BuildCopy(FileNode fileNodeLeft,
-	FileNode fileNodeRight);
+void AccionFileNode_CompareChilds(
+	ActionFileNode actionFileNodeRoot,
+	ActionFileNode *actionFileNodeQueue,
+	void(*CheckPair)(FileNode fileNodeLeft, FileNode fileNodeRight,
+		ActionFileNode *actionFileNodeQueue));
 
 typedef struct SActionQueueStatistics {
 	long long readLeft;
@@ -53,5 +54,11 @@ void ActionFileNode_Print(ActionFileNode actionFileNode);
 
 void ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 	char *pathRight);
+
+
+// Common utilities
+
+void AccionFileNode_DeletePair(FileNode fileNodeLeft, FileNode fileNodeRight,
+	ActionFileNode *actionFileNodeQueue);
 
 #endif
