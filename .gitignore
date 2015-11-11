@@ -9,3 +9,4 @@ build
 VisualStudio/filesync/Debug
 *.user
 VisualStudio/Debug/*
+*/bin/*
