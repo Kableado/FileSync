@@ -103,7 +103,7 @@ void FileNode_SetStatusRec(FileNode fileNode, FileStatus status) {
 		fileNode->flags |= FileFlag_HasTime;
 	}
 	fileNodeChild = fileNode->child;
-	while (fileNodeChild != NULL) {
+	while (fileNodeChild) {
 		FileNode_SetStatusRec(fileNodeChild, status);
 		fileNodeChild = fileNodeChild->next;
 	}
@@ -281,7 +281,7 @@ FileNode FileNode_LoadNode(FILE *file) {
 	// Read flags
 	fread((void *)&fileNode->flags, sizeof(fileNode->flags), 1, file);
 
-	// Leer estado
+	// Read status
 	fileNode->status = fgetc(file);
 
 	// Read status
@@ -292,6 +292,9 @@ FileNode FileNode_LoadNode(FILE *file) {
 	// Read date
 	if (fileNode->flags & FileFlag_HasTime) {
 		fread((void *)&fileNode->fileTime, sizeof(fileNode->fileTime), 1, file);
+		if (fileNode->fileTime < 0) {
+			fileNode->fileTime = Time_GetTime();
+		}
 	}
 
 	// Read CRC
@@ -496,6 +499,9 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 			if (fileTime != fileNode->fileTime) {
 				fileNode->status = FileStatus_Modified;
 				fileNode->fileTime = fileTime;
+				if (fileNode->fileTime < 0) {
+					fileNode->fileTime = Time_GetTime();
+				}
 			}
 
 			// Mark childs for review
@@ -533,6 +539,9 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 			if (fileTime != fileNode->fileTime) {
 				fileNode->status = FileStatus_Modified;
 				fileNode->fileTime = fileTime;
+				if (fileNode->fileTime < 0) {
+					fileNode->fileTime = Time_GetTime();
+				}
 			}
 			if (fileNode->status == FileStatus_Modified) {
 				fileNode->flags &= ~FileFlag_HasCRC;
@@ -550,7 +559,7 @@ int FileNode_Refresh_Iterate(char *path, char *name, void *d) {
 		return (0);
 	}
 
-	// Searcg the file on childs
+	// Search the file on childs
 	fileNodeChild = fileNode->child;
 	while (fileNodeChild) {
 		if (!strcmp(fileNodeChild->name, name)) {

@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 			FileNode_Save(fileNode, argv[3]);
 		}
 	}
-	else if (!strcmp(argv[1], "read") && argc == 3) {
+	else if (!strcmp(argv[1], "read") && argc >= 3) {
 		// Read information tree from file
 		FileNode fileNode;
 		fileNode = FileNode_Load(argv[2]);
