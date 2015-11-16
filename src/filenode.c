@@ -97,11 +97,11 @@ void FileNode_AddChild(FileNode fileNode, FileNode fileNodeChild) {
 
 void FileNode_SetStatusRec(FileNode fileNode, FileStatus status) {
 	FileNode fileNodeChild;
-	fileNode->status = status;
-	if (status == FileStatus_Deleted) {
+	if (status == FileStatus_Deleted && fileNode->status != status) {
 		fileNode->fileTime = Time_GetTime();
 		fileNode->flags |= FileFlag_HasTime;
 	}
+	fileNode->status = status;
 	fileNodeChild = fileNode->child;
 	while (fileNodeChild) {
 		FileNode_SetStatusRec(fileNodeChild, status);
@@ -483,7 +483,6 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 		long long size;
 
 		// Mark
-		fileNode->status = FileStatus_None;
 		fileNode->flags &= ~FileFlag_MarkerForReview;
 
 		if (File_IsDirectory(filePath)) {
