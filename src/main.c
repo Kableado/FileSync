@@ -231,6 +231,10 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 	else {
 		// Run action list
 		ActionFileNode_RunList(actionFileNode, pathLeft, pathRight);
+		if (recheck) {
+			CheckDir(pathLeft, recheck);
+			CheckDir(pathRight, recheck);
+		}
 	}
 
 	return (1);
