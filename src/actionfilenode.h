@@ -52,7 +52,7 @@ void ActionFileNode_Statistics(ActionFileNode actionFileNode,
 
 void ActionFileNode_Print(ActionFileNode actionFileNode);
 
-void ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
+int ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 	char *pathRight);
 
 

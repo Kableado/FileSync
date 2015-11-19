@@ -230,8 +230,7 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 	}
 	else {
 		// Run action list
-		ActionFileNode_RunList(actionFileNode, pathLeft, pathRight);
-		if (recheck) {
+		if (ActionFileNode_RunList(actionFileNode, pathLeft, pathRight)) {
 			CheckDir(pathLeft, recheck);
 			CheckDir(pathRight, recheck);
 		}

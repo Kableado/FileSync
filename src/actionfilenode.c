@@ -274,9 +274,10 @@ void AccionFileNodeAux_MakeDir(char *pathOrig, char *pathDest) {
 	File_MakeDirectory(pathDest);
 }
 
-void ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
+int ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 	char *pathRight)
 {
+	int numActions = 0;
 	char fullPathLeft[MaxPath], fullPathRight[MaxPath], showPath[MaxPath];
 	while (actionFileNode != NULL) {
 		if (actionFileNode->left) {
@@ -302,41 +303,42 @@ void ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 			break;
 		case ActionFileCmp_LeftToRight:
 			printff(" => %s\n", showPath);
-			AccionFileNodeAux_Copy(fullPathLeft, fullPathRight);
+			AccionFileNodeAux_Copy(fullPathLeft, fullPathRight); numActions++;
 			break;
 		case ActionFileCmp_RightToLeft:
 			printff(" <= %s\n", showPath);
-			AccionFileNodeAux_Copy(fullPathRight, fullPathLeft);
+			AccionFileNodeAux_Copy(fullPathRight, fullPathLeft); numActions++;
 			break;
 		case ActionFileCmp_DeleteLeft:
 			printff(" *- %s\n", showPath);
-			AccionFileNodeAux_Delete(fullPathRight, fullPathLeft);
+			AccionFileNodeAux_Delete(fullPathRight, fullPathLeft); numActions++;
 			break;
 		case ActionFileCmp_DeleteRight:
 			printff(" -* %s\n", showPath);
-			AccionFileNodeAux_Delete(fullPathLeft, fullPathRight);
+			AccionFileNodeAux_Delete(fullPathLeft, fullPathRight); numActions++;
 			break;
 		case ActionFileCmp_DateLeftToRight:
 			printff(" -> %s\n", showPath);
-			AccionFileNodeAux_CopyDate(fullPathLeft, fullPathRight);
+			AccionFileNodeAux_CopyDate(fullPathLeft, fullPathRight); numActions++;
 			break;
 		case ActionFileCmp_DateRightToLeft:
 			printff(" <- %s\n", showPath);
-			AccionFileNodeAux_CopyDate(fullPathRight, fullPathLeft);
+			AccionFileNodeAux_CopyDate(fullPathRight, fullPathLeft); numActions++;
 			break;
 		case ActionFileCmp_MakeRightDirectory:
 			printff(" -D %s\n", showPath);
-			AccionFileNodeAux_MakeDir(fullPathLeft, fullPathRight);
+			AccionFileNodeAux_MakeDir(fullPathLeft, fullPathRight); numActions++;
 			break;
 		case ActionFileCmp_MakeLeftDirectory:
 			printff(" D- %s\n", showPath);
-			AccionFileNodeAux_MakeDir(fullPathRight, fullPathLeft);
+			AccionFileNodeAux_MakeDir(fullPathRight, fullPathLeft); numActions++;
 			break;
 		}
 
 		actionFileNode = actionFileNode->next;
 	}
 	printff("End\n");
+	return  numActions;
 }
 
 
