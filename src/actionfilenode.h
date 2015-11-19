@@ -3,7 +3,7 @@
 
 #include "filenode.h"
 
-typedef enum {
+typedef enum EActionFileCmp {
 	ActionFileCmp_Nothing,
 	ActionFileCmp_LeftToRight,
 	ActionFileCmp_RightToLeft,

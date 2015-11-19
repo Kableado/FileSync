@@ -14,7 +14,7 @@
 #define FileFlag_PlaceHolder 512
 #define FileFlag_MarkerForReview 1024
 
-typedef enum {
+typedef enum EFileStatus {
 	FileStatus_None,
 	FileStatus_New,
 	FileStatus_Modified,
