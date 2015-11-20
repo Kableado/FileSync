@@ -98,7 +98,7 @@ void FileNode_AddChild(FileNode fileNode, FileNode fileNodeChild) {
 void FileNode_SetStatusRec(FileNode fileNode, FileStatus status) {
 	FileNode fileNodeChild;
 	if (status == FileStatus_Deleted && fileNode->status != status) {
-		fileNode->fileTime = Time_GetTime();
+		fileNode->fileTime = Time_GetCurrentTime();
 		fileNode->flags |= FileFlag_HasTime;
 	}
 	fileNode->status = status;
@@ -293,7 +293,7 @@ FileNode FileNode_LoadNode(FILE *file) {
 	if (fileNode->flags & FileFlag_HasTime) {
 		fread((void *)&fileNode->fileTime, sizeof(fileNode->fileTime), 1, file);
 		if (fileNode->fileTime < 0) {
-			fileNode->fileTime = Time_GetTime();
+			fileNode->fileTime = Time_GetCurrentTime();
 		}
 	}
 
@@ -499,7 +499,7 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 				fileNode->status = FileStatus_Modified;
 				fileNode->fileTime = fileTime;
 				if (fileNode->fileTime < 0) {
-					fileNode->fileTime = Time_GetTime();
+					fileNode->fileTime = Time_GetCurrentTime();
 				}
 			}
 
@@ -539,7 +539,7 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 				fileNode->status = FileStatus_Modified;
 				fileNode->fileTime = fileTime;
 				if (fileNode->fileTime < 0) {
-					fileNode->fileTime = Time_GetTime();
+					fileNode->fileTime = Time_GetCurrentTime();
 				}
 			}
 			if (fileNode->status == FileStatus_Modified) {

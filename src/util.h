@@ -19,6 +19,12 @@ long long Time_GetTime();
 // Pauses the execution for t usecs.
 void Time_Pause(int pausa);
 
+/////////////////////////////
+// Time_GetTime
+//
+// Gets the current time in POSIX.
+long long Time_GetCurrentTime();
+
 int printff(char *fmt, ...);
 
 #endif

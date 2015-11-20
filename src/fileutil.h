@@ -6,8 +6,18 @@
 
 typedef long long FileTime;
 
+/////////////////////////////
+// FileTime_Get
+//
+// Gets the current time in POSIX.
 FileTime FileTime_Get(char *filename);
+
+/////////////////////////////
+// FileTime_Set
+//
+// Sets the current time in POSIX.
 void FileTime_Set(char *filename, FileTime t);
+
 void FileTime_Print(FileTime t);
 
 ///////////////////////////////////////////////

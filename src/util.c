@@ -1,6 +1,7 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "util.h"
 
@@ -22,7 +23,7 @@ char *String_Copy(char *str) {
 /////////////////////////////
 // Time_GetTime
 //
-// Gets the current time in usecs. WIN32 version.
+// Gets the time in usecs. WIN32 version.
 long long Time_GetTime() {
 	LARGE_INTEGER freq;
 	LARGE_INTEGER tim;
@@ -58,7 +59,7 @@ void Time_Pause(int pausa) {
 /////////////////////////////
 // Time_GetTime
 //
-// Gets the current time in usecs. UNIX version.
+// Gets the time in usecs. UNIX version.
 long long Time_GetTime() {
 	struct timeval t;
 	long long usecs;
@@ -79,6 +80,14 @@ void Time_Pause(int pausa) {
 }
 #endif // if WIN32
 
+/////////////////////////////
+// Time_GetTime
+//
+// Gets the current time in POSIX.
+long long Time_GetCurrentTime() {
+	time_t t = time(0);
+	return (long long)t;
+}
 
 int printff(char *fmt, ...) {
 	va_list ap;
