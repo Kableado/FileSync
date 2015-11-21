@@ -6,8 +6,9 @@ build
 */.vs/*
 *.opensdf
 *.sdf
+VisualStudio/Debug
 VisualStudio/filesync/Debug
+VisualStudio/Release
+VisualStudio/filesync/Release
+MonoDevelop/FileSync/bin
 *.user
-VisualStudio/Debug/*
-*/bin/*
-MonoDevelop/FileSync/bin/*
