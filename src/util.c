@@ -89,6 +89,53 @@ long long Time_GetCurrentTime() {
 	return (long long)t;
 }
 
+/////////////////////////////
+// PrintElapsedTime
+//
+// Prints the elapsed time (input in microseconds (us))
+int PrintElapsedTime(long long time) {
+	if (time < 1000) {
+		return printff("%8lld us", time);
+	}
+	double msTime = (double)time / 1000;
+	if (msTime < 1000) {
+		return printff("% 8.3f ms", msTime);
+	}
+	double seconds = msTime / 1000;
+	if (seconds < 60) {
+		return printff("% 8.3f s", seconds);
+	}
+	int minutes = (int)seconds / 60;
+	seconds = seconds - (minutes * 60);
+	int hours = minutes / 60;
+	minutes = minutes % 60;
+	return printff("%02d:%02d:%06.3f", hours, minutes, seconds);
+}
+
+/////////////////////////////
+// PrintDataSize
+//
+// Prints the data size (input in bytes)
+int PrintDataSize(long long size) {
+	if (size < 1024) {
+		return printff("%8lld B  ", size);
+	}
+	double kibSize = (double)size / 1024;
+	if (kibSize < 1024) {
+		return printff("% 8.3f KiB", kibSize);
+	}
+	double mibSize = kibSize / 1024;
+	if (mibSize < 1024) {
+		return printff("% 8.3f MiB", mibSize);
+	}
+	double gibSize = mibSize / 1024;
+	if (gibSize < 1024) {
+		return printff("% 8.3f GiB", gibSize);
+	}
+	double tibSize = gibSize / 1024;
+	return printff("% 8.3f TiB", tibSize);
+}
+
 int printff(char *fmt, ...) {
 	va_list ap;
 	int n;

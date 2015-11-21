@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
+	printff("\n================================ FileSync ===================================\n");
 	if (!strcmp(argv[1], "info") && argc >= 3) {
 		// Informacion de ficheros
 		int i;
@@ -61,7 +62,7 @@ int main(int argc, char *argv[]) {
 		printff("Building FileNode..\n");
 		fileNode = FileNode_Build(argv[2]);
 		tScan = Time_GetTime() - tScan;
-		printff("tScan: %9lldus\n", tScan);
+		printff("\ttScan :"); PrintElapsedTime(tScan); printff("\n");
 		FileNode_Save(fileNode, argv[3]);
 	}
 	else if (!strcmp(argv[1], "rescan") && argc == 4) {
@@ -74,7 +75,7 @@ int main(int argc, char *argv[]) {
 			long long tScan = Time_GetTime();
 			fileNode = FileNode_Refresh(fileNode, argv[2]);
 			tScan = Time_GetTime() - tScan;
-			printff("tScan: %9lldus\n", tScan);
+			printff("\ttScan :"); PrintElapsedTime(tScan); printff("\n");
 			FileNode_Save(fileNode, argv[3]);
 		}
 		else {
@@ -82,7 +83,7 @@ int main(int argc, char *argv[]) {
 			long long tScan = Time_GetTime();
 			fileNode = FileNode_Build(argv[2]);
 			tScan = Time_GetTime() - tScan;
-			printff("tScan: %9lldus\n", tScan);
+			printff("\ttScan :"); PrintElapsedTime(tScan); printff("\n");
 			FileNode_Save(fileNode, argv[3]);
 		}
 	}
@@ -163,7 +164,7 @@ FileNode CheckDir(char *path, int recheck) {
 			fileNode = FileNode_Build(path);
 		}
 		tScan = Time_GetTime() - tScan;
-		printff("tScan: %9lldus\n", tScan);
+		printff("\ttScan :"); PrintElapsedTime(tScan); printff("\n");
 		FileNode_Save(fileNode, dirNodesFile);
 	}
 	else {
@@ -181,11 +182,16 @@ void PrintStatistics(ActionFileNode actionFileNode) {
 	ActionQueueStatistics statistics;
 	ActionFileNode_Statistics(actionFileNode, &statistics);
 	printff("Statistics\n");
-	printff("       % 12s % 12s % 12s\n", "Read", "Write", "Delete");
-	printff("Left : % 12lld % 12lld % 12lld\n", statistics.readLeft,
-		statistics.writeLeft, statistics.deleteLeft);
-	printff("Right: % 12lld % 12lld % 12lld\n", statistics.readRight,
-		statistics.writeRight, statistics.deleteRight);
+	//printff("       % 12s % 12s % 12s\n", "Read", "Write", "Delete");
+	//printff("Left : % 12lld % 12lld % 12lld\n", statistics.readLeft,
+	//	statistics.writeLeft, statistics.deleteLeft);
+	//printff("Right: % 12lld % 12lld % 12lld\n", statistics.readRight,
+	//	statistics.writeRight, statistics.deleteRight);
+
+	printff("       % 8s    % 8s    % 8s\n", "Read", "Write", "Delete");
+	printff("Left :"); PrintDataSize(statistics.readLeft); PrintDataSize(statistics.writeLeft); PrintDataSize(statistics.deleteLeft); printff("\n");
+	printff("Right:"); PrintDataSize(statistics.readRight); PrintDataSize(statistics.writeRight); PrintDataSize(statistics.deleteRight); printff("\n");
+
 	printff("\n");
 	printff("Copy count     : % 10d\n", statistics.fullCopyCount);
 	printff("Date copy count: % 10d\n", statistics.dateCopyCount);
@@ -221,7 +227,7 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 	ActionFileNode actionFileNode = NULL;
 	actionFileNode = ActionFileNode_BuildSync(fileNodeLeft, fileNodeRight);
 	tBuild = Time_GetTime() - tBuild;
-	printff("tBuild: %9lldus\n", tBuild);
+	printff("\ttBuild:"); PrintElapsedTime(tBuild); printff("\n");
 
 	if (dryRun) {
 		// Show action list
@@ -267,7 +273,7 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	ActionFileNode actionFileNode = NULL;
 	actionFileNode = ActionFileNode_BuildCopy(fileNodeLeft, fileNodeRight);
 	tBuild = Time_GetTime() - tBuild;
-	printff("tBuild: %9lldus\n", tBuild);
+	printff("\ttBuild:"); PrintElapsedTime(tBuild); printff("\n");
 
 	if (dryRun) {
 		// Show action list

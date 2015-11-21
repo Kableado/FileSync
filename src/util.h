@@ -25,6 +25,18 @@ void Time_Pause(int pausa);
 // Gets the current time in POSIX.
 long long Time_GetCurrentTime();
 
+/////////////////////////////
+// PrintElapsedTime
+//
+// Prints the elapsed time (input in microseconds (us))
+int PrintElapsedTime(long long time);
+
+/////////////////////////////
+// PrintDataSize
+//
+// Prints the data size (input in bytes)
+int PrintDataSize(long long size);
+
 int printff(char *fmt, ...);
 
 #endif
