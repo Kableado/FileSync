@@ -182,15 +182,19 @@ void PrintStatistics(ActionFileNode actionFileNode) {
 	ActionQueueStatistics statistics;
 	ActionFileNode_Statistics(actionFileNode, &statistics);
 	printff("Statistics\n");
-	//printff("       % 12s % 12s % 12s\n", "Read", "Write", "Delete");
-	//printff("Left : % 12lld % 12lld % 12lld\n", statistics.readLeft,
-	//	statistics.writeLeft, statistics.deleteLeft);
-	//printff("Right: % 12lld % 12lld % 12lld\n", statistics.readRight,
-	//	statistics.writeRight, statistics.deleteRight);
 
-	printff("       % 8s    % 8s    % 8s\n", "Read", "Write", "Delete");
-	printff("Left :"); PrintDataSize(statistics.readLeft); PrintDataSize(statistics.writeLeft); PrintDataSize(statistics.deleteLeft); printff("\n");
-	printff("Right:"); PrintDataSize(statistics.readRight); PrintDataSize(statistics.writeRight); PrintDataSize(statistics.deleteRight); printff("\n");
+	printff("       % 8s    % 8s    % 8s\n", 
+		"Read", "Write", "Delete");
+	printff("Left :"); 
+	PrintDataSize(statistics.readLeft); 
+	PrintDataSize(statistics.writeLeft); 
+	PrintDataSize(statistics.deleteLeft); 
+	printff("\n");
+	printff("Right:"); 
+	PrintDataSize(statistics.readRight); 
+	PrintDataSize(statistics.writeRight); 
+	PrintDataSize(statistics.deleteRight); 
+	printff("\n");
 
 	printff("\n");
 	printff("Copy count     : % 10d\n", statistics.fullCopyCount);
