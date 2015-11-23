@@ -57,6 +57,10 @@ FILETIME POSIX_to_FileTime(FileTime fileTime) {
 	return fileTimeOut;
 }
 
+/////////////////////////////
+// FileTime_Get
+//
+// Gets the current time in POSIX.
 FileTime FileTime_Get(char *fileName) {
 	HANDLE hFile;
 	FILETIME ftCreate, ftAccess, ftWrite;
@@ -67,6 +71,10 @@ FileTime FileTime_Get(char *fileName) {
 	return (FileTime_to_POSIX(ftWrite));
 }
 
+/////////////////////////////
+// FileTime_Set
+//
+// Sets the current time in POSIX.
 void FileTime_Set(char *fileName, FileTime fileTime) {
 	HANDLE hFile;
 	FILETIME ftWrite;
@@ -79,12 +87,20 @@ void FileTime_Set(char *fileName, FileTime fileTime) {
 
 #else
 
+/////////////////////////////
+// FileTime_Get
+//
+// Gets the current time in POSIX.
 FileTime FileTime_Get(char *fileName) {
 	struct stat fs;
 	lstat(fileName, &fs);
 	return (fs.st_mtime);
 }
 
+/////////////////////////////
+// FileTime_Set
+//
+// Sets the current time in POSIX.
 void FileTime_Set(char *fileName, FileTime t) {
 	struct utimbuf utb;
 
@@ -94,6 +110,19 @@ void FileTime_Set(char *fileName, FileTime t) {
 }
 
 #endif
+
+/////////////////////////////
+// FileTime_Print
+//
+// Prints the filetime
+void FileTime_Print(FileTime fileTime) {
+	struct tm *tms;
+
+	tms = localtime((time_t *)&fileTime);
+	Print("%04d-%02d-%02d %02d:%02d:%02d", tms->tm_year + 1900,
+		tms->tm_mon + 1, tms->tm_mday, tms->tm_hour, tms->tm_min,
+		tms->tm_sec);
+}
 
 
 #ifdef WIN32
@@ -136,17 +165,6 @@ void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
 	*time = fs.st_mtime;
 }
 #endif
-
-
-
-void FileTime_Print(FileTime fileTime) {
-	struct tm *tms;
-
-	tms = localtime((time_t *)&fileTime);
-	printff("%04d-%02d-%02d %02d:%02d:%02d", tms->tm_year + 1900,
-		tms->tm_mon + 1, tms->tm_mday, tms->tm_hour, tms->tm_min,
-		tms->tm_sec);
-}
 
 void File_GetName(char *path, char *name) {
 	int i, j;

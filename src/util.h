@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+/////////////////////////////
+// String_Copy
+//
+// Copies a string.
 char *String_Copy(char *str);
 
 /////////////////////////////
@@ -37,6 +41,10 @@ int PrintElapsedTime(long long time);
 // Prints the data size (input in bytes)
 int PrintDataSize(long long size);
 
-int printff(char *fmt, ...);
+/////////////////////////////
+// Print
+//
+// Prints the formated text screen
+int Print(char *fmt, ...);
 
 #endif

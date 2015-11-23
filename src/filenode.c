@@ -359,33 +359,33 @@ FileNode FileNode_Load(char *filePath) {
 }
 
 void FileNode_PrintNode(FileNode fileNode) {
-	printff(FileNode_GetPath(fileNode, NULL));
+	Print(FileNode_GetPath(fileNode, NULL));
 	if (fileNode->flags & FileFlag_Normal) {
-		printff(" File");
+		Print(" File");
 	}
 	else {
-		printff(" Dir");
+		Print(" Dir");
 	}
-	printff(" %d", fileNode->status);
+	Print(" %d", fileNode->status);
 	if (fileNode->status == FileStatus_New) {
-		printff(" New");
+		Print(" New");
 	}
 	if (fileNode->status == FileStatus_Modified) {
-		printff(" Modified");
+		Print(" Modified");
 	}
 	if (fileNode->status == FileStatus_Deleted) {
-		printff(" Deleted!!!");
+		Print(" Deleted!!!");
 	}
-	printff("\n");
+	Print("\n");
 
 	if (fileNode->flags&FileFlag_HasSize) {
-		printff("\\-Size : %lld\n", fileNode->size);
+		Print("\\-Size : %lld\n", fileNode->size);
 	}
 	if (fileNode->flags&FileFlag_HasTime) {
-		printff("\\-Date : "); FileTime_Print(fileNode->fileTime); printff("\n");
+		Print("\\-Date : "); FileTime_Print(fileNode->fileTime); Print("\n");
 	}
 	if (fileNode->flags&FileFlag_HasCRC) {
-		printff("\\-CRC  : [%08X]\n", fileNode->crc);
+		Print("\\-CRC  : [%08X]\n", fileNode->crc);
 	}
 
 }
@@ -407,7 +407,7 @@ void FileNode_Print(FileNode fileNode) {
 			while (fileNodeAux->next == NULL) {
 				fileNodeAux = fileNodeAux->parent;
 				if (fileNodeAux == fileNode || fileNodeAux == NULL) {
-					printff("End\n");
+					Print("End\n");
 					end = 1;
 					break;
 				}

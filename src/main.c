@@ -14,23 +14,23 @@
 void Help(char *exe) {
 	char exeFilename[MaxPath];
 	File_GetName(exe, exeFilename);
-	printff("Usage:\n");
-	printff("    %s info [file] {[file] {..}}\n", exeFilename);
-	printff("    %s scan [dir] [tree] \n", exeFilename);
-	printff("    %s rescan [dir] [tree] \n", exeFilename);
-	printff("    %s read [file] [tree]\n", exeFilename);
-	printff("    %s dir [dir]\n", exeFilename);
-	printff("    %s check [dir]\n", exeFilename);
-	printff("\n");
-	printff("    %s sync [dirA] [dirB]\n", exeFilename);
-	printff("    %s resync [dirA] [dirB]\n", exeFilename);
-	printff("    %s synctest [dirA] [dirB]\n", exeFilename);
-	printff("    %s resynctest [dirA] [dirB]\n", exeFilename);
-	printff("\n");
-	printff("    %s copy [dirA] [dirB]\n", exeFilename);
-	printff("    %s recopy [dirA] [dirB]\n", exeFilename);
-	printff("    %s copytest [dirA] [dirB]\n", exeFilename);
-	printff("    %s recopytest [dirA] [dirB]\n", exeFilename);
+	Print("Usage:\n");
+	Print("    %s info [file] {[file] {..}}\n", exeFilename);
+	Print("    %s scan [dir] [tree] \n", exeFilename);
+	Print("    %s rescan [dir] [tree] \n", exeFilename);
+	Print("    %s read [file] [tree]\n", exeFilename);
+	Print("    %s dir [dir]\n", exeFilename);
+	Print("    %s check [dir]\n", exeFilename);
+	Print("\n");
+	Print("    %s sync [dirA] [dirB]\n", exeFilename);
+	Print("    %s resync [dirA] [dirB]\n", exeFilename);
+	Print("    %s synctest [dirA] [dirB]\n", exeFilename);
+	Print("    %s resynctest [dirA] [dirB]\n", exeFilename);
+	Print("\n");
+	Print("    %s copy [dirA] [dirB]\n", exeFilename);
+	Print("    %s recopy [dirA] [dirB]\n", exeFilename);
+	Print("    %s copytest [dirA] [dirB]\n", exeFilename);
+	Print("    %s recopytest [dirA] [dirB]\n", exeFilename);
 }
 
 FileNode CheckDir(char *path, int recheck);
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	printff("\n================================ FileSync ===================================\n");
+	Print("\n================================ FileSync ===================================\n");
 	if (!strcmp(argv[1], "info") && argc >= 3) {
 		// Informacion de ficheros
 		int i;
@@ -59,31 +59,31 @@ int main(int argc, char *argv[]) {
 		// Scan directory information tree and save
 		long long tScan = Time_GetTime();
 		FileNode fileNode;
-		printff("Building FileNode..\n");
+		Print("Building FileNode..\n");
 		fileNode = FileNode_Build(argv[2]);
 		tScan = Time_GetTime() - tScan;
-		printff("\ttScan :"); PrintElapsedTime(tScan); printff("\n");
+		Print("\ttScan :"); PrintElapsedTime(tScan); Print("\n");
 		FileNode_Save(fileNode, argv[3]);
 	}
 	else if (!strcmp(argv[1], "rescan") && argc == 4) {
 		// Scan directory information and save tree
 		FileNode fileNode;
-		printff("Loading FileNode..\n");
+		Print("Loading FileNode..\n");
 		fileNode = FileNode_Load(argv[3]);
 		if (fileNode) {
-			printff("Rebuilding FileNode..\n");
+			Print("Rebuilding FileNode..\n");
 			long long tScan = Time_GetTime();
 			fileNode = FileNode_Refresh(fileNode, argv[2]);
 			tScan = Time_GetTime() - tScan;
-			printff("\ttScan :"); PrintElapsedTime(tScan); printff("\n");
+			Print("\ttScan :"); PrintElapsedTime(tScan); Print("\n");
 			FileNode_Save(fileNode, argv[3]);
 		}
 		else {
-			printff("Building FileNode..\n");
+			Print("Building FileNode..\n");
 			long long tScan = Time_GetTime();
 			fileNode = FileNode_Build(argv[2]);
 			tScan = Time_GetTime() - tScan;
-			printff("\ttScan :"); PrintElapsedTime(tScan); printff("\n");
+			Print("\ttScan :"); PrintElapsedTime(tScan); Print("\n");
 			FileNode_Save(fileNode, argv[3]);
 		}
 	}
@@ -154,7 +154,7 @@ FileNode CheckDir(char *path, int recheck) {
 	// Check directory
 	snprintf(dirNodesFile, MaxPath, "%s/"FileNode_Filename, path);
 	if (recheck) {
-		printff("Checking Directory.. %s\n", path);
+		Print("Checking Directory.. %s\n", path);
 		long long tScan = Time_GetTime();
 		fileNode = FileNode_Load(dirNodesFile);
 		if (fileNode) {
@@ -164,14 +164,14 @@ FileNode CheckDir(char *path, int recheck) {
 			fileNode = FileNode_Build(path);
 		}
 		tScan = Time_GetTime() - tScan;
-		printff("\ttScan :"); PrintElapsedTime(tScan); printff("\n");
+		Print("\ttScan :"); PrintElapsedTime(tScan); Print("\n");
 		FileNode_Save(fileNode, dirNodesFile);
 	}
 	else {
-		printff("Loading Directory.. %s\n", path);
+		Print("Loading Directory.. %s\n", path);
 		fileNode = FileNode_Load(dirNodesFile);
 		if (!fileNode) {
-			printff("Error, no nodesFile.fs\n");
+			Print("Error, no nodesFile.fs\n");
 			return NULL;
 		}
 	}
@@ -180,27 +180,30 @@ FileNode CheckDir(char *path, int recheck) {
 
 void PrintStatistics(ActionFileNode actionFileNode) {
 	ActionQueueStatistics statistics;
-	ActionFileNode_Statistics(actionFileNode, &statistics);
-	printff("Statistics\n");
+	if (ActionFileNode_Statistics(actionFileNode, &statistics) == 0) {
+		Print("Noting to do.\n");
+		return;
+	}
+	Print("Statistics\n");
 
-	printff("       % 8s    % 8s    % 8s\n", 
+	Print("       % 8s    % 8s    % 8s\n", 
 		"Read", "Write", "Delete");
-	printff("Left :"); 
+	Print("Left :"); 
 	PrintDataSize(statistics.readLeft); 
 	PrintDataSize(statistics.writeLeft); 
 	PrintDataSize(statistics.deleteLeft); 
-	printff("\n");
-	printff("Right:"); 
+	Print("\n");
+	Print("Right:"); 
 	PrintDataSize(statistics.readRight); 
 	PrintDataSize(statistics.writeRight); 
 	PrintDataSize(statistics.deleteRight); 
-	printff("\n");
+	Print("\n");
 
-	printff("\n");
-	printff("Copy count     : % 10d\n", statistics.fullCopyCount);
-	printff("Date copy count: % 10d\n", statistics.dateCopyCount);
-	printff("Directory count: % 10d\n", statistics.directoryCount);
-	printff("Delete count   : % 10d\n", statistics.deleteCount);
+	Print("\n");
+	Print("Copy count     : % 10d\n", statistics.fullCopyCount);
+	Print("Date copy count: % 10d\n", statistics.dateCopyCount);
+	Print("Directory count: % 10d\n", statistics.directoryCount);
+	Print("Delete count   : % 10d\n", statistics.deleteCount);
 }
 
 int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
@@ -209,11 +212,11 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 
 	// Check and load directories
 	if (!File_ExistsPath(pathLeft) || !File_IsDirectory(pathLeft)) {
-		printff("Error, directory does not exist: %s\n", pathLeft);
+		Print("Error, directory does not exist: %s\n", pathLeft);
 		return 0;
 	}
 	if (!File_ExistsPath(pathRight) || !File_IsDirectory(pathRight)) {
-		printff("Error, directory does not exist: %s\n", pathRight);
+		Print("Error, directory does not exist: %s\n", pathRight);
 		return 0;
 	}
 	fileNodeLeft = CheckDir(pathLeft, recheck);
@@ -227,11 +230,11 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 
 	// Build actions
 	long long tBuild = Time_GetTime();
-	printff("Building action list.. \n");
+	Print("Building action list.. \n");
 	ActionFileNode actionFileNode = NULL;
 	actionFileNode = ActionFileNode_BuildSync(fileNodeLeft, fileNodeRight);
 	tBuild = Time_GetTime() - tBuild;
-	printff("\ttBuild:"); PrintElapsedTime(tBuild); printff("\n");
+	Print("\ttBuild:"); PrintElapsedTime(tBuild); Print("\n");
 
 	if (dryRun) {
 		// Show action list
@@ -255,11 +258,11 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 
 	// Check and load directories
 	if (!File_ExistsPath(pathLeft) || !File_IsDirectory(pathLeft)) {
-		printff("Error, directory does not exist: %s\n", pathLeft);
+		Print("Error, directory does not exist: %s\n", pathLeft);
 		return 0;
 	}
 	if (!File_ExistsPath(pathRight) || !File_IsDirectory(pathRight)) {
-		printff("Error, directory does not exist: %s\n", pathRight);
+		Print("Error, directory does not exist: %s\n", pathRight);
 		return 0;
 	}
 	fileNodeLeft = CheckDir(pathLeft, reCheck);
@@ -273,11 +276,11 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 
 	// Build actions
 	long long tBuild = Time_GetTime();
-	printff("Building action list.. \n");
+	Print("Building action list.. \n");
 	ActionFileNode actionFileNode = NULL;
 	actionFileNode = ActionFileNode_BuildCopy(fileNodeLeft, fileNodeRight);
 	tBuild = Time_GetTime() - tBuild;
-	printff("\ttBuild:"); PrintElapsedTime(tBuild); printff("\n");
+	Print("\ttBuild:"); PrintElapsedTime(tBuild); Print("\n");
 
 	if (dryRun) {
 		// Show action list

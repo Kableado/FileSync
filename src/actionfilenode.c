@@ -149,19 +149,20 @@ void AccionFileNode_CompareChilds(
 
 }
 
-void ActionFileNode_Statistics(ActionFileNode actionFileNode,
+int ActionFileNode_Statistics(ActionFileNode actionFileNode,
 	ActionQueueStatistics *statistics)
 {
 	statistics->readLeft = 0;
 	statistics->writeLeft = 0;
 	statistics->readRight = 0;
 	statistics->writeRight = 0;
+	statistics->deleteLeft = 0;
+	statistics->deleteRight = 0;
+
 	statistics->fullCopyCount = 0;
 	statistics->dateCopyCount = 0;
 	statistics->directoryCount = 0;
 	statistics->deleteCount = 0;
-	statistics->deleteLeft = 0;
-	statistics->deleteRight = 0;
 
 	while (actionFileNode != NULL) {
 
@@ -202,6 +203,12 @@ void ActionFileNode_Statistics(ActionFileNode actionFileNode,
 
 		actionFileNode = actionFileNode->next;
 	}
+	return (
+		statistics->fullCopyCount +
+		statistics->dateCopyCount +
+		statistics->directoryCount +
+		statistics->deleteCount
+		);
 }
 
 void ActionFileNode_Print(ActionFileNode actionFileNode) {
@@ -219,34 +226,34 @@ void ActionFileNode_Print(ActionFileNode actionFileNode) {
 			//printff("%s == %s\n",pathIzq,pathDer);
 			break;
 		case ActionFileCmp_LeftToRight:
-			printff(" => %s\n", showPath);
+			Print(" => %s\n", showPath);
 			break;
 		case ActionFileCmp_RightToLeft:
-			printff(" <= %s\n", showPath);
+			Print(" <= %s\n", showPath);
 			break;
 		case ActionFileCmp_DeleteLeft:
-			printff(" *- %s\n", showPath);
+			Print(" *- %s\n", showPath);
 			break;
 		case ActionFileCmp_DeleteRight:
-			printff(" -* %s\n", showPath);
+			Print(" -* %s\n", showPath);
 			break;
 		case ActionFileCmp_DateLeftToRight:
-			printff(" -> %s\n", showPath);
+			Print(" -> %s\n", showPath);
 			break;
 		case ActionFileCmp_DateRightToLeft:
-			printff(" <- %s\n", showPath);
+			Print(" <- %s\n", showPath);
 			break;
 		case ActionFileCmp_MakeRightDirectory:
-			printff(" -D %s\n", showPath);
+			Print(" -D %s\n", showPath);
 			break;
 		case ActionFileCmp_MakeLeftDirectory:
-			printff(" D- %s\n", showPath);
+			Print(" D- %s\n", showPath);
 			break;
 		}
 
 		actionFileNode = actionFileNode->next;
 	}
-	printff("End\n");
+	Print("End\n");
 }
 
 void AccionFileNodeAux_CopyDate(char *pathOrig, char *pathDest) {
@@ -302,42 +309,42 @@ int ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 			//printff("%s == %s\n",pathIzq,pathDer);
 			break;
 		case ActionFileCmp_LeftToRight:
-			printff(" => %s\n", showPath);
+			Print(" => %s\n", showPath);
 			AccionFileNodeAux_Copy(fullPathLeft, fullPathRight); numActions++;
 			break;
 		case ActionFileCmp_RightToLeft:
-			printff(" <= %s\n", showPath);
+			Print(" <= %s\n", showPath);
 			AccionFileNodeAux_Copy(fullPathRight, fullPathLeft); numActions++;
 			break;
 		case ActionFileCmp_DeleteLeft:
-			printff(" *- %s\n", showPath);
+			Print(" *- %s\n", showPath);
 			AccionFileNodeAux_Delete(fullPathRight, fullPathLeft); numActions++;
 			break;
 		case ActionFileCmp_DeleteRight:
-			printff(" -* %s\n", showPath);
+			Print(" -* %s\n", showPath);
 			AccionFileNodeAux_Delete(fullPathLeft, fullPathRight); numActions++;
 			break;
 		case ActionFileCmp_DateLeftToRight:
-			printff(" -> %s\n", showPath);
+			Print(" -> %s\n", showPath);
 			AccionFileNodeAux_CopyDate(fullPathLeft, fullPathRight); numActions++;
 			break;
 		case ActionFileCmp_DateRightToLeft:
-			printff(" <- %s\n", showPath);
+			Print(" <- %s\n", showPath);
 			AccionFileNodeAux_CopyDate(fullPathRight, fullPathLeft); numActions++;
 			break;
 		case ActionFileCmp_MakeRightDirectory:
-			printff(" -D %s\n", showPath);
+			Print(" -D %s\n", showPath);
 			AccionFileNodeAux_MakeDir(fullPathLeft, fullPathRight); numActions++;
 			break;
 		case ActionFileCmp_MakeLeftDirectory:
-			printff(" D- %s\n", showPath);
+			Print(" D- %s\n", showPath);
 			AccionFileNodeAux_MakeDir(fullPathRight, fullPathLeft); numActions++;
 			break;
 		}
 
 		actionFileNode = actionFileNode->next;
 	}
-	printff("End\n");
+	Print("End\n");
 	return  numActions;
 }
 
