@@ -47,7 +47,7 @@ typedef struct SActionQueueStatistics {
 	long long deleteRight;
 } ActionQueueStatistics;
 
-void ActionFileNode_Statistics(ActionFileNode actionFileNode,
+int ActionFileNode_Statistics(ActionFileNode actionFileNode,
 	ActionQueueStatistics *statistics);
 
 void ActionFileNode_Print(ActionFileNode actionFileNode);

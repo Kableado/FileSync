@@ -206,7 +206,7 @@ void PrintStatistics(ActionFileNode actionFileNode) {
 	Print("Delete count   : % 10d\n", statistics.deleteCount);
 }
 
-int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
+int Sync(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	FileNode fileNodeLeft;
 	FileNode fileNodeRight;
 
@@ -219,11 +219,11 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 		Print("Error, directory does not exist: %s\n", pathRight);
 		return 0;
 	}
-	fileNodeLeft = CheckDir(pathLeft, recheck);
+	fileNodeLeft = CheckDir(pathLeft, reCheck);
 	if (!fileNodeLeft) {
 		return 0;
 	}
-	fileNodeRight = CheckDir(pathRight, recheck);
+	fileNodeRight = CheckDir(pathRight, reCheck);
 	if (!fileNodeRight) {
 		return 0;
 	}
@@ -244,8 +244,8 @@ int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun) {
 	else {
 		// Run action list
 		if (ActionFileNode_RunList(actionFileNode, pathLeft, pathRight)) {
-			CheckDir(pathLeft, recheck);
-			CheckDir(pathRight, recheck);
+			CheckDir(pathLeft, reCheck);
+			CheckDir(pathRight, reCheck);
 		}
 	}
 
@@ -289,7 +289,10 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	}
 	else {
 		// Run action list
-		ActionFileNode_RunList(actionFileNode, pathLeft, pathRight);
+		if (ActionFileNode_RunList(actionFileNode, pathLeft, pathRight)) {
+			CheckDir(pathLeft, reCheck);
+			CheckDir(pathRight, reCheck);
+		}
 	}
 
 	return (1);

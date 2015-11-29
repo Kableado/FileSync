@@ -18,6 +18,10 @@ FileTime FileTime_Get(char *filename);
 // Sets the current time in POSIX.
 void FileTime_Set(char *filename, FileTime t);
 
+/////////////////////////////
+// FileTime_Print
+//
+// Prints the filetime
 void FileTime_Print(FileTime t);
 
 ///////////////////////////////////////////////
