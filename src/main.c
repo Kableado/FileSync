@@ -10,7 +10,6 @@
 #include "actionfilenodesync.h"
 #include "actionfilenodecopy.h"
 
-
 void Help(char *exe) {
 	char exeFilename[MaxPath];
 	File_GetName(exe, exeFilename);
@@ -186,17 +185,17 @@ void PrintStatistics(ActionFileNode actionFileNode) {
 	}
 	Print("Statistics\n");
 
-	Print("       % 8s    % 8s    % 8s\n", 
+	Print("       % 8s    % 8s    % 8s\n",
 		"Read", "Write", "Delete");
-	Print("Left :"); 
-	PrintDataSize(statistics.readLeft); 
-	PrintDataSize(statistics.writeLeft); 
-	PrintDataSize(statistics.deleteLeft); 
+	Print("Left :");
+	PrintDataSize(statistics.readLeft);
+	PrintDataSize(statistics.writeLeft);
+	PrintDataSize(statistics.deleteLeft);
 	Print("\n");
-	Print("Right:"); 
-	PrintDataSize(statistics.readRight); 
-	PrintDataSize(statistics.writeRight); 
-	PrintDataSize(statistics.deleteRight); 
+	Print("Right:");
+	PrintDataSize(statistics.readRight);
+	PrintDataSize(statistics.writeRight);
+	PrintDataSize(statistics.deleteRight);
 	Print("\n");
 
 	Print("\n");

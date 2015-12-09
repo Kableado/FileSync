@@ -55,7 +55,6 @@ void ActionFileNode_Print(ActionFileNode actionFileNode);
 int ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 	char *pathRight);
 
-
 // Common utilities
 
 void AccionFileNode_DeletePair(FileNode fileNodeLeft, FileNode fileNodeRight,

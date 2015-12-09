@@ -58,7 +58,6 @@ ActionFileNode ActionFileNode_CreateNormal(FileNode fileNodeLeft,
 	return actionFileNode;
 }
 
-
 void AccionFileNode_CompareChilds(
 	ActionFileNode actionFileNodeRoot,
 	ActionFileNode *actionFileNodeQueue,
@@ -80,7 +79,6 @@ void AccionFileNode_CompareChilds(
 	if (!actionFileNodeRoot->left) {
 		fileNodeRight = actionFileNodeRoot->right->child;
 		while (fileNodeRight) {
-
 			CheckPair(NULL, fileNodeRight, actionFileNodeQueue);
 
 			fileNodeRight = fileNodeRight->next;
@@ -92,7 +90,6 @@ void AccionFileNode_CompareChilds(
 	if (!actionFileNodeRoot->right) {
 		fileNodeLeft = actionFileNodeRoot->left->child;
 		while (fileNodeLeft) {
-
 			CheckPair(fileNodeLeft, NULL, actionFileNodeQueue);
 
 			fileNodeLeft = fileNodeLeft->next;
@@ -146,7 +143,6 @@ void AccionFileNode_CompareChilds(
 		fileNodeRightProcessed = fileNodeRightPrevious;
 	}
 	actionFileNodeRoot->right->child = fileNodeRightProcessed;
-
 }
 
 int ActionFileNode_Statistics(ActionFileNode actionFileNode,
@@ -165,7 +161,6 @@ int ActionFileNode_Statistics(ActionFileNode actionFileNode,
 	statistics->deleteCount = 0;
 
 	while (actionFileNode != NULL) {
-
 		switch (actionFileNode->action) {
 		case ActionFileCmp_Nothing:
 			break;
@@ -347,7 +342,6 @@ int ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 	Print("End\n");
 	return  numActions;
 }
-
 
 // ----------------------------------------------------------------------------
 // Common utilities

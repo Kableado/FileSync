@@ -124,7 +124,6 @@ void FileTime_Print(FileTime fileTime) {
 		tms->tm_sec);
 }
 
-
 #ifdef WIN32
 long long File_GetSize(char *fileName) {
 	HANDLE hFile;
@@ -142,7 +141,6 @@ long long File_GetSize(char *fileName) {
 	return (fs.st_size);
 }
 #endif
-
 
 #ifdef WIN32
 void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
@@ -260,10 +258,6 @@ int File_IsFile(char *fileName) {
 }
 #endif
 
-
-
-
-
 #ifdef WIN32
 int File_MakeDirectory(char *path) {
 	return (CreateDirectory(path, NULL));
@@ -321,7 +315,7 @@ void File_IterateDir(char *path,
 		entidad_dir = readdir(directorio);
 		if (entidad_dir != NULL) {
 			if (strcmp(entidad_dir->d_name, ".")
-				&& strcmp(entidad_dir->d_name, "..")) 
+				&& strcmp(entidad_dir->d_name, ".."))
 			{
 				// Each item
 				snprintf(f_path, MaxPath, "%s/%s", path, entidad_dir->d_name);

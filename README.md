@@ -4,7 +4,7 @@ Simple local filesystem file synchronization. For use with external devices (usb
 ## Installation
 Copy the resulting executable to the desired location.
 
-The executable is completelly portable, there are no dependencies. 
+The executable is completelly portable, there are no dependencies.
 
 ## Usage
 Basic usage to syncronize two directories, dirA and dirB:
@@ -39,7 +39,7 @@ The rest of options are listed with no parameters:
 ## Building
 There is a GNU Make compatible Makefile usable on Linux and MingGW.
 
-    make 
+    make
 
 A Visual Studio 2015 solution is also provided under `VisualStudio` subdirectory.
 

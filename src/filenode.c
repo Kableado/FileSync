@@ -387,7 +387,6 @@ void FileNode_PrintNode(FileNode fileNode) {
 	if (fileNode->flags&FileFlag_HasCRC) {
 		Print("\\-CRC  : [%08X]\n", fileNode->crc);
 	}
-
 }
 
 void FileNode_Print(FileNode fileNode) {
@@ -395,7 +394,6 @@ void FileNode_Print(FileNode fileNode) {
 	int end = 0;
 
 	while (fileNodeAux != NULL && !end) {
-
 		if (fileNodeAux->parent != NULL) {
 			FileNode_PrintNode(fileNodeAux);
 		}
@@ -513,7 +511,7 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 			// Scan subdirectories
 			File_IterateDir(filePath, FileNode_Refresh_Iterate, fileNode);
 
-			// Mark as deleted remaining files marked for review  
+			// Mark as deleted remaining files marked for review
 			fileNodeChild = fileNode->child;
 			while (fileNodeChild) {
 				if (fileNodeChild->flags & FileFlag_MarkerForReview) {
@@ -578,4 +576,3 @@ int FileNode_Refresh_Iterate(char *path, char *name, void *d) {
 
 	return (0);
 }
-

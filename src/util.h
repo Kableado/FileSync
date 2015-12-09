@@ -16,7 +16,6 @@ char *String_Copy(char *str);
 // Gets the current time in usecs.
 long long Time_GetTime();
 
-
 /////////////////////////////
 // Time_Pause
 //

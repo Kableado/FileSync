@@ -13,7 +13,6 @@
 
 #define QueueNode(queue,node) (queue)->next = (node); (queue) = (node);
 
-
 void AccionFileNode_CopyPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 	ActionFileNode *actionFileNodeQueue)
 {
@@ -112,4 +111,3 @@ ActionFileNode ActionFileNode_BuildCopy(FileNode fileNodeLeft,
 		AccionFileNode_CopyPair);
 	return actionFileNodeRoot;
 }
-
