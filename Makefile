@@ -1,12 +1,13 @@
 
-ifneq (,$(findstring MINGW,$(shell uname -s)))
+IsMinGW=$(findstring MSYS,$(shell uname -s)) $(findstring MINGW,$(shell uname -s))
+ifneq (,$(IsMinGW))
 	RES_APP = filesync.exe
 	BUILDDIR = build-mingw
 else
 	RES_APP = filesync
 	BUILDDIR = build-linux
 endif
-
+VERBOSE_BUILD=false
 
 CC    = gcc
 RM    = rm -f
@@ -39,8 +40,16 @@ CFLAGS   = -g
 LIBS     = -lm
 
 
-DO_CC=@$(ECHO) "CC: $@" ;\
-	$(CC) $(CFLAGS) -o $@ -c $<
+ifeq ($(VERBOSE_BUILD),true)
+	DO_CC=$(CC) $(CFLAGS) -o $@ -c $<
+	DO_CXX=$(CXX) $(CFLAGS) -o $@ -c $<
+else
+	DO_CC=@$(ECHO) "CC: $@" ;\
+		$(CC) $(CFLAGS) -o $@ -c $<
+	DO_CXX=@$(ECHO) "CXX: $@" ;\
+		$(CXX) $(CFLAGS) -o $@ -c $<
+endif
+
 
 all: $(RES_APP)
 

@@ -1,20 +1,24 @@
-﻿#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
+﻿
 #ifdef WIN32
-#    include <direct.h>
-#	 define _WIN32_WINNT 0x0501
-#	 include <windows.h>
-#	 include <io.h>
-#    include <stdio.h>
-#    include <signal.h>
-#    include <fcntl.h>
+#	define _WIN32_WINNT 0x0501
+#	include <direct.h>
+#	include <windows.h>
+#	include <io.h>
+#	include <stdio.h>
+#	include <signal.h>
+#	include <fcntl.h>
+#	include <sys/types.h>
+#	include <sys/stat.h>
+#	include <time.h>
 #else
-#    include <utime.h>
-#    include <dirent.h>
-#    include <unistd.h>
+#	include <stdio.h>
+#	include <string.h>
+#	include <sys/types.h>
+#	include <sys/stat.h>
+#	include <time.h>
+#	include <utime.h>
+#	include <dirent.h>
+#	include <unistd.h>
 #endif
 
 #include "util.h"
