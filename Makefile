@@ -1,20 +1,21 @@
 
-IsMinGW=$(findstring MSYS,$(shell uname -s)) $(findstring MINGW,$(shell uname -s))
+
+IsMinGW := $(findstring MSYS,$(shell uname -s))$(findstring MINGW,$(shell uname -s))
 ifneq (,$(IsMinGW))
-	RES_APP = filesync.exe
-	BUILDDIR = build-mingw
+	RES_APP  := filesync.exe
+	BUILDDIR := build-$(shell gcc -v 2>&1 | grep "Target:" | cut --delimiter=' ' --fields=2)
 else
-	RES_APP = filesync
-	BUILDDIR = build-linux
+	RES_APP  := filesync
+	BUILDDIR := build-$(shell gcc -v 2>&1 | grep "Target:" | cut --delimiter=' ' --fields=2)
 endif
 VERBOSE_BUILD=false
 
-CC    = gcc
-RM    = rm -f
-ECHO  = echo
-MKDIR = mkdir
+CC    := gcc
+RM    := rm -f
+ECHO  := echo
+MKDIR := mkdir
 
-HEADS = \
+HEADS := \
 		src/util.h \
 		src/crc.h \
 		src/fileutil.h \
@@ -23,7 +24,7 @@ HEADS = \
 		src/actionfilenodesync.h \
 		src/actionfilenodecopy.h
 
-OBJS_BASE =  \
+OBJS_BASE :=  \
 		$(BUILDDIR)/util.o \
 		$(BUILDDIR)/crc.o \
 		$(BUILDDIR)/fileutil.o \
@@ -32,12 +33,12 @@ OBJS_BASE =  \
 		$(BUILDDIR)/actionfilenodesync.o \
 		$(BUILDDIR)/actionfilenodecopy.o
 
-OBJS_APP = \
+OBJS_APP := \
 		$(OBJS_BASE) \
 		$(BUILDDIR)/main.o
 
-CFLAGS   = -g
-LIBS     = -lm
+CFLAGS := -g
+LIBS   := -lm
 
 
 ifeq ($(VERBOSE_BUILD),true)
