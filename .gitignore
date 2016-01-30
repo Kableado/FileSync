@@ -12,3 +12,5 @@ VisualStudio/Release
 VisualStudio/filesync/Release
 MonoDevelop/FileSync/bin
 *.user
+/filesync.exe
+/filesync
