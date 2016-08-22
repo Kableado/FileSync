@@ -262,6 +262,7 @@ void AccionFileNodeAux_Copy(char *pathOrig, char *pathDest) {
 	}
 	else {
 		File_Delete(pathDest);
+		Print("Error Copying to: %s", pathDest);
 	}
 }
 void AccionFileNodeAux_Delete(char *pathOrig, char *pathDest) {
@@ -273,7 +274,9 @@ void AccionFileNodeAux_Delete(char *pathOrig, char *pathDest) {
 	}
 }
 void AccionFileNodeAux_MakeDir(char *pathOrig, char *pathDest) {
-	File_MakeDirectory(pathDest);
+	if (File_MakeDirectory(pathDest) == 0) {
+		Print("Error Making Directory: %s", pathDest);
+	}
 }
 
 int ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
