@@ -7,9 +7,9 @@
 #include "fileutil.h"
 #include "filenode.h"
 #include "actionfilenode.h"
-#include "actionfilenodesync.h"
+#include "actionfilenodecopy.h"
 
-#define maxDeltaTime 4000
+#define MaxDeltaTime 0
 
 #define QueueNode(queue,node) (queue)->next = (node); (queue) = (node);
 
@@ -66,7 +66,7 @@ void AccionFileNode_CopyPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 				AccionFileNode_CompareChilds(actionFileNodeNew,
 					actionFileNodeQueue, AccionFileNode_CopyPair);
 				if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime))
-					<= maxDeltaTime) { // appox. equal
+					<= MaxDeltaTime) { // appox. equal
 					actionFileNodeNew->action = ActionFileCmp_Nothing;
 				}
 				else {
@@ -84,7 +84,7 @@ void AccionFileNode_CopyPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 		else {
 			if (fileNodeLeft->status != FileStatus_Deleted) {
 				if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime))
-					<= maxDeltaTime)
+					<= MaxDeltaTime)
 				{
 					actionFileNodeNew->action = ActionFileCmp_Nothing;
 				}

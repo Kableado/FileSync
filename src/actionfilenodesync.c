@@ -9,7 +9,7 @@
 #include "actionfilenode.h"
 #include "actionfilenodesync.h"
 
-#define maxDeltaTime 4000
+#define MaxDeltaTime 0
 
 #define QueueNode(queue,node) (queue)->next = (node); (queue) = (node);
 
@@ -96,7 +96,7 @@ void AccionFileNode_SyncPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 			// Directory
 
 			// Prepare action for directory pair
-			if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime)) <= maxDeltaTime) { // aprox. equal
+			if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime)) <= MaxDeltaTime) { // aprox. equal
 				if (fileNodeRight->status == FileStatus_Deleted
 					&& fileNodeLeft->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_Nothing;
@@ -151,7 +151,7 @@ void AccionFileNode_SyncPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 			// Files
 
 			// Prepare action for file pair
-			if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime)) <= maxDeltaTime) { // aprox. equal
+			if (abs((int)(fileNodeLeft->fileTime - fileNodeRight->fileTime)) <= MaxDeltaTime) { // aprox. equal
 				if (fileNodeRight->status == FileStatus_Deleted
 					&& fileNodeLeft->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_Nothing;
