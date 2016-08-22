@@ -129,6 +129,7 @@ void FileTime_Print(FileTime fileTime) {
 }
 
 #ifdef WIN32
+
 long long File_GetSize(char *fileName) {
 	HANDLE hFile;
 	DWORD fSize;
@@ -139,6 +140,7 @@ long long File_GetSize(char *fileName) {
 	return (fSize);
 }
 #else
+
 long long File_GetSize(char *fileName) {
 	struct stat fs;
 	lstat(fileName, &fs);
@@ -169,7 +171,7 @@ void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
 #endif
 
 void File_GetName(char *path, char *name) {
-	int i, j;
+	size_t i, j;
 
 	i = strlen(path) - 1;
 	while (i >= 0) {
@@ -276,7 +278,7 @@ int File_MakeDirectory(char *path) {
 
 void File_IterateDir(char *path,
 	int(*func)(char *path, char *name, void *data), void *data) {
-	int handle;
+	intptr_t handle;
 	struct _finddata_t fileinfo;
 	char f_path[MaxPath];
 	int fin = 0;
@@ -352,8 +354,8 @@ int File_Copy(const char *pathOrig, const char *pathDest) {
 	FILE *fOrig = NULL;
 	FILE *fDest = NULL;
 	char *buffer = NULL;
-	int readLen = 0;
-	int writeLen = 0;
+	size_t readLen = 0;
+	size_t writeLen = 0;
 	int status = 0;
 
 	if ((fOrig = fopen(pathOrig, "rb")) == NULL) {

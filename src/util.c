@@ -11,7 +11,7 @@
 // Copies a string.
 char *String_Copy(char *str) {
 	char *strnew;
-	int len;
+	size_t len;
 	len = strlen(str);
 	strnew = malloc(len + 1);
 	if (strnew != NULL) {

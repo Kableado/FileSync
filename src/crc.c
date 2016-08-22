@@ -27,7 +27,7 @@ void CRCTable_Init() {
 	}
 }
 
-unsigned long CRC_BufferInternal(unsigned char *buffer, int len,
+unsigned long CRC_BufferInternal(unsigned char *buffer, unsigned long len,
 	unsigned long crc)
 {
 	unsigned char *p;
@@ -43,7 +43,7 @@ unsigned long CRC_BufferInternal(unsigned char *buffer, int len,
 	return (crc);
 }
 
-unsigned long CRC_Buffer(unsigned char *buffer, int len, unsigned long crc) {
+unsigned long CRC_Buffer(unsigned char *buffer, unsigned long len, unsigned long crc) {
 	CRCTable_Init();
 	return (CRC_BufferInternal(buffer, len, crc));
 }
@@ -57,11 +57,11 @@ unsigned long CRC_File(FILE *file) {
 	crc = 0xFFFFFFFFL;
 	for (;;) {
 		// Fill buffer
-		int count = fread(buffer, 1, 512, file);
+		size_t count = fread(buffer, 1, 512, file);
 		if (count == 0)
 			break;
 
-		crc = CRC_BufferInternal(buffer, count, crc);
+		crc = CRC_BufferInternal(buffer, (int)count, crc);
 	}
 	return (crc ^= 0xFFFFFFFFL);
 }
