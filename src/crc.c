@@ -3,7 +3,7 @@
 unsigned long _crcTable[256];
 int _crcTableInitialized = 0;
 
-#define CRC32_POLYNOMIAL	0xEDB88320L
+#define CRC32_POLYNOMIAL 0xEDB88320L
 
 void CRCTable_Init() {
 	int i;
@@ -28,12 +28,11 @@ void CRCTable_Init() {
 }
 
 unsigned long CRC_BufferInternal(unsigned char *buffer, unsigned long len,
-	unsigned long crc)
-{
+								 unsigned long crc) {
 	unsigned char *p;
 
 	// Calculate CRC from buffer
-	p = (unsigned char*)buffer;
+	p = (unsigned char *)buffer;
 	while (len-- != 0) {
 		unsigned long termA = (crc >> 8) & 0x00FFFFFFL;
 		unsigned long termB = _crcTable[((int)crc ^ *p++) & 0xff];
@@ -43,7 +42,8 @@ unsigned long CRC_BufferInternal(unsigned char *buffer, unsigned long len,
 	return (crc);
 }
 
-unsigned long CRC_Buffer(unsigned char *buffer, unsigned long len, unsigned long crc) {
+unsigned long CRC_Buffer(unsigned char *buffer, unsigned long len,
+						 unsigned long crc) {
 	CRCTable_Init();
 	return (CRC_BufferInternal(buffer, len, crc));
 }

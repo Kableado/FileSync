@@ -5,6 +5,6 @@
 #include "actionfilenode.h"
 
 ActionFileNode ActionFileNode_BuildCopy(FileNode fileNodeLeft,
-	FileNode fileNodeRight);
+										FileNode fileNodeRight);
 
 #endif

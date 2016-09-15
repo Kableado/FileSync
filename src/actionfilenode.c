@@ -17,8 +17,8 @@ ActionFileNode ActionFileNode_Create() {
 		ActionFileNode actionFileNodeFreeAux;
 		int i;
 		// Allocate block
-		actionFileNodeFreeAux = malloc(
-			sizeof(TActionFileNode) * AccionFileNode_Block);
+		actionFileNodeFreeAux =
+			malloc(sizeof(TActionFileNode) * AccionFileNode_Block);
 		if (actionFileNodeFreeAux == NULL) {
 			return NULL;
 		}
@@ -48,8 +48,7 @@ void AccionFileNode_Destroy(ActionFileNode actionFileNode) {
 }
 
 ActionFileNode ActionFileNode_CreateNormal(FileNode fileNodeLeft,
-	FileNode fileNodeRight)
-{
+										   FileNode fileNodeRight) {
 	ActionFileNode actionFileNode;
 	actionFileNode = ActionFileNode_Create();
 	actionFileNode->action = ActionFileCmp_Nothing;
@@ -59,11 +58,9 @@ ActionFileNode ActionFileNode_CreateNormal(FileNode fileNodeLeft,
 }
 
 void AccionFileNode_CompareChilds(
-	ActionFileNode actionFileNodeRoot,
-	ActionFileNode *actionFileNodeQueue,
-	void(*CheckPair)(FileNode fileNodeLeft, FileNode fileNodeRight,
-		ActionFileNode *actionFileNodeQueue))
-{
+	ActionFileNode actionFileNodeRoot, ActionFileNode *actionFileNodeQueue,
+	void (*CheckPair)(FileNode fileNodeLeft, FileNode fileNodeRight,
+					  ActionFileNode *actionFileNodeQueue)) {
 	FileNode fileNodeLeft;
 	FileNode fileNodeRight;
 	FileNode fileNodeRightQueue;
@@ -111,8 +108,7 @@ void AccionFileNode_CompareChilds(
 				// Match, extract right child FileNode to the processed chain
 				if (fileNodeRightPrevious) {
 					fileNodeRightPrevious->next = fileNodeRight->next;
-				}
-				else {
+				} else {
 					fileNodeRightQueue = fileNodeRight->next;
 				}
 				fileNodeRight->next = fileNodeRightProcessed;
@@ -120,8 +116,7 @@ void AccionFileNode_CompareChilds(
 
 				CheckPair(fileNodeLeft, fileNodeRight, actionFileNodeQueue);
 				break;
-			}
-			else {
+			} else {
 				// Next right child
 				fileNodeRightPrevious = fileNodeRight;
 				fileNodeRight = fileNodeRight->next;
@@ -146,8 +141,7 @@ void AccionFileNode_CompareChilds(
 }
 
 int ActionFileNode_Statistics(ActionFileNode actionFileNode,
-	ActionQueueStatistics *statistics)
-{
+							  ActionQueueStatistics *statistics) {
 	statistics->readLeft = 0;
 	statistics->writeLeft = 0;
 	statistics->readRight = 0;
@@ -198,12 +192,8 @@ int ActionFileNode_Statistics(ActionFileNode actionFileNode,
 
 		actionFileNode = actionFileNode->next;
 	}
-	return (
-		statistics->fullCopyCount +
-		statistics->dateCopyCount +
-		statistics->directoryCount +
-		statistics->deleteCount
-		);
+	return (statistics->fullCopyCount + statistics->dateCopyCount +
+			statistics->directoryCount + statistics->deleteCount);
 }
 
 void ActionFileNode_Print(ActionFileNode actionFileNode) {
@@ -211,14 +201,13 @@ void ActionFileNode_Print(ActionFileNode actionFileNode) {
 	while (actionFileNode != NULL) {
 		if (actionFileNode->left) {
 			FileNode_GetFullPath(actionFileNode->left, "", showPath);
-		}
-		else {
+		} else {
 			FileNode_GetFullPath(actionFileNode->right, "", showPath);
 		}
 
 		switch (actionFileNode->action) {
 		case ActionFileCmp_Nothing:
-			//printff("%s == %s\n",pathIzq,pathDer);
+			// printff("%s == %s\n",pathIzq,pathDer);
 			break;
 		case ActionFileCmp_LeftToRight:
 			Print(" => %s\n", showPath);
@@ -259,103 +248,107 @@ void AccionFileNodeAux_CopyDate(char *pathOrig, char *pathDest) {
 void AccionFileNodeAux_Copy(char *pathOrig, char *pathDest) {
 	if (File_Copy(pathOrig, pathDest)) {
 		AccionFileNodeAux_CopyDate(pathOrig, pathDest);
-	}
-	else {
+	} else {
 		File_Delete(pathDest);
-		Print("Error Copying to: %s", pathDest);
+		Print("Error Copying to: %s\n", pathDest);
 	}
 }
 void AccionFileNodeAux_Delete(char *pathOrig, char *pathDest) {
 	if (File_IsDirectory(pathDest)) {
 		File_DeleteDirectory(pathDest);
-	}
-	else {
+	} else {
 		File_Delete(pathDest);
 	}
 }
 void AccionFileNodeAux_MakeDir(char *pathOrig, char *pathDest) {
 	if (File_MakeDirectory(pathDest) == 0) {
-		Print("Error Making Directory: %s", pathDest);
+		Print("Error Making Directory: %s\n", pathDest);
 	}
 }
 
 int ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
-	char *pathRight)
-{
+						   char *pathRight) {
 	int numActions = 0;
 	char fullPathLeft[MaxPath], fullPathRight[MaxPath], showPath[MaxPath];
 	while (actionFileNode != NULL) {
 		if (actionFileNode->left) {
 			FileNode_GetFullPath(actionFileNode->left, pathLeft, fullPathLeft);
 			FileNode_GetFullPath(actionFileNode->left, "", showPath);
-		}
-		else {
+		} else {
 			FileNode_GetFullPath(actionFileNode->right, pathLeft, fullPathLeft);
 			FileNode_GetFullPath(actionFileNode->right, "", showPath);
 		}
 		if (actionFileNode->right) {
 			FileNode_GetFullPath(actionFileNode->right, pathRight,
-				fullPathRight);
-		}
-		else {
+								 fullPathRight);
+		} else {
 			FileNode_GetFullPath(actionFileNode->left, pathRight,
-				fullPathRight);
+								 fullPathRight);
 		}
 
 		switch (actionFileNode->action) {
 		case ActionFileCmp_Nothing:
-			//printff("%s == %s\n",pathIzq,pathDer);
+			// printff("%s == %s\n",pathIzq,pathDer);
 			break;
 		case ActionFileCmp_LeftToRight:
 			Print(" => %s\n", showPath);
-			AccionFileNodeAux_Copy(fullPathLeft, fullPathRight); numActions++;
+			AccionFileNodeAux_Copy(fullPathLeft, fullPathRight);
+			numActions++;
 			break;
 		case ActionFileCmp_RightToLeft:
 			Print(" <= %s\n", showPath);
-			AccionFileNodeAux_Copy(fullPathRight, fullPathLeft); numActions++;
+			AccionFileNodeAux_Copy(fullPathRight, fullPathLeft);
+			numActions++;
 			break;
 		case ActionFileCmp_DeleteLeft:
 			Print(" *- %s\n", showPath);
-			AccionFileNodeAux_Delete(fullPathRight, fullPathLeft); numActions++;
+			AccionFileNodeAux_Delete(fullPathRight, fullPathLeft);
+			numActions++;
 			break;
 		case ActionFileCmp_DeleteRight:
 			Print(" -* %s\n", showPath);
-			AccionFileNodeAux_Delete(fullPathLeft, fullPathRight); numActions++;
+			AccionFileNodeAux_Delete(fullPathLeft, fullPathRight);
+			numActions++;
 			break;
 		case ActionFileCmp_DateLeftToRight:
 			Print(" -> %s\n", showPath);
-			AccionFileNodeAux_CopyDate(fullPathLeft, fullPathRight); numActions++;
+			AccionFileNodeAux_CopyDate(fullPathLeft, fullPathRight);
+			numActions++;
 			break;
 		case ActionFileCmp_DateRightToLeft:
 			Print(" <- %s\n", showPath);
-			AccionFileNodeAux_CopyDate(fullPathRight, fullPathLeft); numActions++;
+			AccionFileNodeAux_CopyDate(fullPathRight, fullPathLeft);
+			numActions++;
 			break;
 		case ActionFileCmp_MakeRightDirectory:
 			Print(" -D %s\n", showPath);
-			AccionFileNodeAux_MakeDir(fullPathLeft, fullPathRight); numActions++;
+			AccionFileNodeAux_MakeDir(fullPathLeft, fullPathRight);
+			numActions++;
 			break;
 		case ActionFileCmp_MakeLeftDirectory:
 			Print(" D- %s\n", showPath);
-			AccionFileNodeAux_MakeDir(fullPathRight, fullPathLeft); numActions++;
+			AccionFileNodeAux_MakeDir(fullPathRight, fullPathLeft);
+			numActions++;
 			break;
 		}
 
 		actionFileNode = actionFileNode->next;
 	}
 	Print("End\n");
-	return  numActions;
+	return numActions;
 }
 
 // ----------------------------------------------------------------------------
 // Common utilities
 
-#define QueueNode(queue,node) (queue)->next = (node); (queue) = (node);
+#define QueueNode(queue, node)                                                 \
+	(queue)->next = (node);                                                    \
+	(queue) = (node);
 
 void AccionFileNode_DeletePair(FileNode fileNodeLeft, FileNode fileNodeRight,
-	ActionFileNode *actionFileNodeQueue)
-{
-	ActionFileNode actionFileNodeNew = ActionFileNode_CreateNormal(
-		fileNodeLeft, fileNodeRight);
+							   ActionFileNode *actionFileNodeQueue) {
+	ActionFileNode actionFileNodeNew =
+		ActionFileNode_CreateNormal(fileNodeLeft, fileNodeRight);
 
 	if (!fileNodeLeft && !fileNodeRight) {
 		AccionFileNode_Destroy(actionFileNodeNew);
@@ -365,15 +358,14 @@ void AccionFileNode_DeletePair(FileNode fileNodeLeft, FileNode fileNodeRight,
 		if (fileNodeRight->flags & FileFlag_Directory) {
 			// Iterate childs for deletion
 			AccionFileNode_CompareChilds(actionFileNodeNew, actionFileNodeQueue,
-				AccionFileNode_DeletePair);
+										 AccionFileNode_DeletePair);
 		}
 
 		if (fileNodeRight->status != FileStatus_Deleted) {
 			// Node delete action
 			actionFileNodeNew->action = ActionFileCmp_DeleteRight;
 			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
-		}
-		else {
+		} else {
 			AccionFileNode_Destroy(actionFileNodeNew);
 		}
 	}
@@ -381,26 +373,25 @@ void AccionFileNode_DeletePair(FileNode fileNodeLeft, FileNode fileNodeRight,
 		if (fileNodeLeft->flags & FileFlag_Directory) {
 			// Iterate childs for deletion
 			AccionFileNode_CompareChilds(actionFileNodeNew, actionFileNodeQueue,
-				AccionFileNode_DeletePair);
+										 AccionFileNode_DeletePair);
 		}
 
 		if (fileNodeLeft->status != FileStatus_Deleted) {
 			// Node delete action
 			actionFileNodeNew->action = ActionFileCmp_DeleteLeft;
 			QueueNode(*actionFileNodeQueue, actionFileNodeNew);
-		}
-		else {
+		} else {
 			AccionFileNode_Destroy(actionFileNodeNew);
 		}
 	}
 	if (fileNodeLeft && fileNodeRight) {
-		if ((fileNodeLeft->flags & FileFlag_Directory)
-			|| (fileNodeRight->flags & FileFlag_Directory)) {
+		if ((fileNodeLeft->flags & FileFlag_Directory) ||
+			(fileNodeRight->flags & FileFlag_Directory)) {
 			// One is Directory
 
 			// Iterate childs for deletion
 			AccionFileNode_CompareChilds(actionFileNodeNew, actionFileNodeQueue,
-				AccionFileNode_DeletePair);
+										 AccionFileNode_DeletePair);
 		}
 
 		if (fileNodeLeft->status != FileStatus_Deleted) {
@@ -411,8 +402,8 @@ void AccionFileNode_DeletePair(FileNode fileNodeLeft, FileNode fileNodeRight,
 		}
 		if (fileNodeRight->status != FileStatus_Deleted) {
 			if (!actionFileNodeNew) {
-				actionFileNodeNew = ActionFileNode_CreateNormal(fileNodeLeft,
-					fileNodeRight);
+				actionFileNodeNew =
+					ActionFileNode_CreateNormal(fileNodeLeft, fileNodeRight);
 			}
 			// Right node delete action
 			actionFileNodeNew->action = ActionFileCmp_DeleteRight;

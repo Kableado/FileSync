@@ -1,24 +1,24 @@
 ﻿
 #ifdef WIN32
-#	define _WIN32_WINNT 0x0501
-#	include <direct.h>
-#	include <windows.h>
-#	include <io.h>
-#	include <stdio.h>
-#	include <signal.h>
-#	include <fcntl.h>
-#	include <sys/types.h>
-#	include <sys/stat.h>
-#	include <time.h>
+#define _WIN32_WINNT 0x0501
+#include <direct.h>
+#include <windows.h>
+#include <io.h>
+#include <stdio.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
 #else
-#	include <stdio.h>
-#	include <string.h>
-#	include <sys/types.h>
-#	include <sys/stat.h>
-#	include <time.h>
-#	include <utime.h>
-#	include <dirent.h>
-#	include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <utime.h>
+#include <dirent.h>
+#include <unistd.h>
 #endif
 
 #include "util.h"
@@ -69,7 +69,7 @@ FileTime FileTime_Get(char *fileName) {
 	HANDLE hFile;
 	FILETIME ftCreate, ftAccess, ftWrite;
 	hFile = CreateFile(fileName, READ_CONTROL, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+					   OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	GetFileTime(hFile, &ftCreate, &ftAccess, &ftWrite);
 	CloseHandle(hFile);
 	return (FileTime_to_POSIX(ftWrite));
@@ -83,7 +83,7 @@ void FileTime_Set(char *fileName, FileTime fileTime) {
 	HANDLE hFile;
 	FILETIME ftWrite;
 	hFile = CreateFile(fileName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
-		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+					   OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	ftWrite = POSIX_to_FileTime(fileTime);
 	SetFileTime(hFile, NULL, NULL, &ftWrite);
 	CloseHandle(hFile);
@@ -123,9 +123,8 @@ void FileTime_Print(FileTime fileTime) {
 	struct tm *tms;
 
 	tms = localtime((time_t *)&fileTime);
-	Print("%04d-%02d-%02d %02d:%02d:%02d", tms->tm_year + 1900,
-		tms->tm_mon + 1, tms->tm_mday, tms->tm_hour, tms->tm_min,
-		tms->tm_sec);
+	Print("%04d-%02d-%02d %02d:%02d:%02d", tms->tm_year + 1900, tms->tm_mon + 1,
+		  tms->tm_mday, tms->tm_hour, tms->tm_min, tms->tm_sec);
 }
 
 #ifdef WIN32
@@ -134,7 +133,7 @@ long long File_GetSize(char *fileName) {
 	HANDLE hFile;
 	DWORD fSize;
 	hFile = CreateFile(fileName, READ_CONTROL, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+					   OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	fSize = GetFileSize(hFile, NULL);
 	CloseHandle(hFile);
 	return (fSize);
@@ -154,7 +153,7 @@ void File_GetSizeAndTime(char *fileName, long long *size, FileTime *time) {
 	DWORD fSize;
 	FILETIME ftCreate, ftAccess, ftWrite;
 	hFile = CreateFile(fileName, READ_CONTROL, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+					   OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	fSize = GetFileSize(hFile, NULL);
 	GetFileTime(hFile, &ftCreate, &ftAccess, &ftWrite);
 	CloseHandle(hFile);
@@ -178,8 +177,7 @@ void File_GetName(char *path, char *name) {
 		if (path[i] == '/' || path[i] == '\\') {
 			i++;
 			break;
-		}
-		else {
+		} else {
 			i--;
 		}
 	}
@@ -265,19 +263,16 @@ int File_IsFile(char *fileName) {
 #endif
 
 #ifdef WIN32
-int File_MakeDirectory(char *path) {
-	return (CreateDirectory(path, NULL));
-}
+int File_MakeDirectory(char *path) { return (CreateDirectory(path, NULL)); }
 #else
-int File_MakeDirectory(char *path) {
-	return (mkdir(path, 0777));
-}
+int File_MakeDirectory(char *path) { return (mkdir(path, 0777)); }
 #endif
 
 #ifdef WIN32
 
 void File_IterateDir(char *path,
-	int(*func)(char *path, char *name, void *data), void *data) {
+					 int (*func)(char *path, char *name, void *data),
+					 void *data) {
 	intptr_t handle;
 	struct _finddata_t fileinfo;
 	char f_path[MaxPath];
@@ -305,7 +300,8 @@ void File_IterateDir(char *path,
 #else
 
 void File_IterateDir(char *path,
-	int(*func)(char *path, char *name, void *data), void *data) {
+					 int (*func)(char *path, char *name, void *data),
+					 void *data) {
 	DIR *directorio;
 	struct dirent *entidad_dir;
 	char f_path[MaxPath];
@@ -320,9 +316,8 @@ void File_IterateDir(char *path,
 	do {
 		entidad_dir = readdir(directorio);
 		if (entidad_dir != NULL) {
-			if (strcmp(entidad_dir->d_name, ".")
-				&& strcmp(entidad_dir->d_name, ".."))
-			{
+			if (strcmp(entidad_dir->d_name, ".") &&
+				strcmp(entidad_dir->d_name, "..")) {
 				// Each item
 				snprintf(f_path, MaxPath, "%s/%s", path, entidad_dir->d_name);
 				fin = func(f_path, entidad_dir->d_name, data);
@@ -365,7 +360,7 @@ int File_Copy(const char *pathOrig, const char *pathDest) {
 		goto cleanup;
 	}
 
-	buffer = malloc(sizeof(char)*MaxBuffer);
+	buffer = malloc(sizeof(char) * MaxBuffer);
 	if (buffer == NULL) {
 		goto cleanup;
 	}
@@ -387,8 +382,14 @@ int File_Copy(const char *pathOrig, const char *pathDest) {
 	}
 
 cleanup:
-	if (fOrig != NULL) { fclose(fOrig); }
-	if (fDest != NULL) { fclose(fDest); }
-	if (buffer != NULL) { free(buffer); }
+	if (fOrig != NULL) {
+		fclose(fOrig);
+	}
+	if (fDest != NULL) {
+		fclose(fDest);
+	}
+	if (buffer != NULL) {
+		free(buffer);
+	}
 	return status;
 }

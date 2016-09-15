@@ -45,7 +45,8 @@ int File_IsFile(char *path);
 int File_MakeDirectory(char *path);
 
 void File_IterateDir(char *path,
-	int(*func)(char *path, char *name, void *data), void *data);
+					 int (*func)(char *path, char *name, void *data),
+					 void *data);
 
 void File_Delete(char *path);
 void File_DeleteDirectory(char *path);

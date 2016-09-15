@@ -95,10 +95,20 @@ void FileNode_AddChild(FileNode fileNode, FileNode fileNodeChild) {
 	fileNodeChild->parent = fileNode;
 }
 
+FileNode FileNode_GetRoot(FileNode fileNode) {
+	FileNode fileNodeParent = fileNode->parent;
+	while (fileNodeParent != NULL && fileNodeParent->parent != NULL) {
+		fileNodeParent = fileNodeParent->parent;
+	}
+	return fileNodeParent;
+}
+
 void FileNode_SetStatusRec(FileNode fileNode, FileStatus status) {
 	FileNode fileNodeChild;
 	if (status == FileStatus_Deleted && fileNode->status != status) {
-		fileNode->fileTime = Time_GetCurrentTime();
+		FileNode fileNodeRoot = FileNode_GetRoot(fileNode);
+		fileNode->fileTime = fileNodeRoot->fileTime;
+		;
 		fileNode->flags |= FileFlag_HasTime;
 	}
 	fileNode->status = status;
@@ -113,8 +123,7 @@ void FileNode_GetPath_Rec(FileNode fileNode, char **pathNode) {
 	if (fileNode->parent) {
 		pathNode[0] = fileNode->parent->name;
 		FileNode_GetPath_Rec(fileNode->parent, pathNode + 1);
-	}
-	else {
+	} else {
 		pathNode[0] = NULL;
 	}
 }
@@ -123,7 +132,9 @@ char *FileNode_GetPath(FileNode fileNode, char *path) {
 	char *pathNodes[MaxPathNodes];
 	int levels, i;
 	char *pathPtr = tempPath;
-	if (path) { pathPtr = path; }
+	if (path) {
+		pathPtr = path;
+	}
 
 	FileNode_GetPath_Rec(fileNode, pathNodes);
 	levels = 0;
@@ -195,8 +206,7 @@ void FileNode_SaveNode(FileNode fileNode, FILE *file) {
 	fwrite((void *)&nameLen, sizeof(nameLen), 1, file);
 	if (nameLen > 0 && nameLen < MaxFilename) {
 		fputs(fileNode->name, file);
-	}
-	else {
+	} else {
 		return;
 	}
 
@@ -213,7 +223,8 @@ void FileNode_SaveNode(FileNode fileNode, FILE *file) {
 
 	// Write date
 	if (fileNode->flags & FileFlag_HasTime) {
-		fwrite((void *)&fileNode->fileTime, sizeof(fileNode->fileTime), 1, file);
+		fwrite((void *)&fileNode->fileTime, sizeof(fileNode->fileTime), 1,
+			   file);
 	}
 
 	// Write CRC
@@ -224,7 +235,8 @@ void FileNode_SaveNode(FileNode fileNode, FILE *file) {
 	// Write files of directory
 	if (fileNode->flags & FileFlag_Directory) {
 		FileNode fileNodeChild;
-		fwrite((void *)&fileNode->childCount, sizeof(fileNode->childCount), 1, file);
+		fwrite((void *)&fileNode->childCount, sizeof(fileNode->childCount), 1,
+			   file);
 		fileNodeChild = fileNode->child;
 		int cnt = 0;
 		while (fileNodeChild) {
@@ -269,7 +281,7 @@ FileNode FileNode_LoadNode(FILE *file) {
 	// Read name
 	fread((void *)&nameLen, sizeof(nameLen), 1, file);
 	fileNode->name[0] = 0;
-	if (nameLen<0 || nameLen>MaxFilename) {
+	if (nameLen < 0 || nameLen > MaxFilename) {
 		FileNode_Delete(fileNode);
 		return NULL;
 	}
@@ -306,7 +318,8 @@ FileNode FileNode_LoadNode(FILE *file) {
 	if (fileNode->flags & FileFlag_Directory) {
 		FileNode fileNodeChildAux = NULL;
 		FileNode fileNodeChild;
-		fread((void *)&fileNode->childCount, sizeof(fileNode->childCount), 1, file);
+		fread((void *)&fileNode->childCount, sizeof(fileNode->childCount), 1,
+			  file);
 		for (i = 0; i < fileNode->childCount; i++) {
 			fileNodeChild = FileNode_LoadNode(file);
 			if (fileNodeChild == NULL) {
@@ -316,8 +329,7 @@ FileNode FileNode_LoadNode(FILE *file) {
 			fileNodeChild->parent = fileNode;
 			if (!fileNodeChildAux) {
 				fileNode->child = fileNodeChild;
-			}
-			else {
+			} else {
 				fileNodeChildAux->next = fileNodeChild;
 			}
 			fileNodeChildAux = fileNodeChild;
@@ -362,8 +374,7 @@ void FileNode_PrintNode(FileNode fileNode) {
 	Print(FileNode_GetPath(fileNode, NULL));
 	if (fileNode->flags & FileFlag_Normal) {
 		Print(" File");
-	}
-	else {
+	} else {
 		Print(" Dir");
 	}
 	Print(" %d", fileNode->status);
@@ -378,13 +389,15 @@ void FileNode_PrintNode(FileNode fileNode) {
 	}
 	Print("\n");
 
-	if (fileNode->flags&FileFlag_HasSize) {
+	if (fileNode->flags & FileFlag_HasSize) {
 		Print("\\-Size : %lld\n", fileNode->size);
 	}
-	if (fileNode->flags&FileFlag_HasTime) {
-		Print("\\-Date : "); FileTime_Print(fileNode->fileTime); Print("\n");
+	if (fileNode->flags & FileFlag_HasTime) {
+		Print("\\-Date : ");
+		FileTime_Print(fileNode->fileTime);
+		Print("\n");
 	}
-	if (fileNode->flags&FileFlag_HasCRC) {
+	if (fileNode->flags & FileFlag_HasCRC) {
 		Print("\\-CRC  : [%08X]\n", fileNode->crc);
 	}
 }
@@ -400,8 +413,7 @@ void FileNode_Print(FileNode fileNode) {
 
 		if (fileNodeAux->child) {
 			fileNodeAux = fileNodeAux->child;
-		}
-		else {
+		} else {
 			while (fileNodeAux->next == NULL) {
 				fileNodeAux = fileNodeAux->parent;
 				if (fileNodeAux == fileNode || fileNodeAux == NULL) {
@@ -428,14 +440,15 @@ FileNode FileNode_Build(char *path) {
 	// Create node
 	fileNode = FileNode_Create();
 	File_GetName(path, fileNode->name);
+	fileNode->fileTime = Time_GetCurrentTime();
+	fileNode->flags |= FileFlag_HasTime;
 
 	if (File_IsDirectory(path)) {
 		// Get information data from directories, and child files
 		fileNode->flags |= FileFlag_Directory;
 		FileNode_LoadTime(fileNode, path);
 		File_IterateDir(path, FileNode_Build_Iterate, fileNode);
-	}
-	else {
+	} else {
 		// Get information data from files
 		fileNode->flags |= FileFlag_Normal;
 		FileNode_LoadSizeAndTime(fileNode, path);
@@ -461,90 +474,91 @@ int FileNode_Build_Iterate(char *path, char *name, void *d) {
 int FileNode_Refresh_Iterate(char *path, char *name, void *d);
 
 FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
+	if (!fileNode) {
+		Print("FileNode_Refresh: Error NULL FileNode\n");
+		return NULL;
+	}
+
 	if (!File_ExistsPath(filePath)) {
 		// The file/directory has been deleted
-		if (!fileNode) {
-			fileNode = FileNode_Create();
-			File_GetName(filePath, fileNode->name);
-		}
 		FileNode_SetStatusRec(fileNode, FileStatus_Deleted);
 		return (fileNode);
 	}
-	if (!fileNode) {
-		// The file has been created
-		fileNode = FileNode_Build(filePath);
-		FileNode_SetStatusRec(fileNode, FileStatus_New);
-	}
-	else {
-		// Check modification
-		FileTime fileTime;
-		long long size;
 
-		// Mark
-		fileNode->flags &= ~FileFlag_MarkerForReview;
+	// Check modification
+	FileTime fileTime;
+	long long size;
 
-		if (File_IsDirectory(filePath)) {
-			FileNode fileNodeChild;
+	// Remove mark
+	fileNode->flags &= ~FileFlag_MarkerForReview;
 
-			// Check directory data
-			if (!(fileNode->flags & FileFlag_Directory)) {
-				fileNode->status = FileStatus_Modified;
-				fileNode->flags |= FileFlag_Directory;
-				fileNode->flags &= ~FileFlag_Normal;
-			}
-			fileTime = FileTime_Get(filePath);
-			if (fileTime != fileNode->fileTime) {
-				fileNode->status = FileStatus_Modified;
-				fileNode->fileTime = fileTime;
-				if (fileNode->fileTime < 0) {
-					fileNode->fileTime = Time_GetCurrentTime();
-				}
-			}
+	if (File_IsDirectory(filePath)) {
+		FileNode fileNodeChild;
 
-			// Mark childs for review
-			fileNodeChild = fileNode->child;
-			while (fileNodeChild) {
-				fileNodeChild->flags |= FileFlag_MarkerForReview;
-				fileNodeChild = fileNodeChild->next;
-			}
-
-			// Scan subdirectories
-			File_IterateDir(filePath, FileNode_Refresh_Iterate, fileNode);
-
-			// Mark as deleted remaining files marked for review
-			fileNodeChild = fileNode->child;
-			while (fileNodeChild) {
-				if (fileNodeChild->flags & FileFlag_MarkerForReview) {
-					fileNodeChild->flags &= ~FileFlag_MarkerForReview;
-					FileNode_SetStatusRec(fileNodeChild, FileStatus_Deleted);
-				}
-				fileNodeChild = fileNodeChild->next;
+		// Check directory data
+		if (!(fileNode->flags & FileFlag_Directory)) {
+			fileNode->status = FileStatus_Modified;
+			fileNode->flags |= FileFlag_Directory;
+			fileNode->flags &= ~FileFlag_Normal;
+		}
+		fileTime = FileTime_Get(filePath);
+		if (fileTime != fileNode->fileTime) {
+			fileNode->status = FileStatus_Modified;
+			fileNode->fileTime = fileTime;
+			if (fileNode->fileTime < 0) {
+				fileNode->fileTime = Time_GetCurrentTime();
 			}
 		}
-		else {
-			// Comprar datos de los ficheros
-			if (!(fileNode->flags & FileFlag_Normal)) {
-				fileNode->status = FileStatus_Modified;
-				fileNode->flags |= FileFlag_Normal;
-				fileNode->flags &= ~FileFlag_Directory;
+
+		// Mark childs for review
+		fileNodeChild = fileNode->child;
+		while (fileNodeChild) {
+			fileNodeChild->flags |= FileFlag_MarkerForReview;
+			fileNodeChild = fileNodeChild->next;
+		}
+
+		// Scan subdirectories
+		File_IterateDir(filePath, FileNode_Refresh_Iterate, fileNode);
+
+		// Mark as deleted remaining files marked for review
+		fileNodeChild = fileNode->child;
+		while (fileNodeChild) {
+			if (fileNodeChild->flags & FileFlag_MarkerForReview) {
+				fileNodeChild->flags &= ~FileFlag_MarkerForReview;
+				FileNode_SetStatusRec(fileNodeChild, FileStatus_Deleted);
 			}
-			File_GetSizeAndTime(filePath, &size, &fileTime);
-			if (size != fileNode->size) {
-				fileNode->status = FileStatus_Modified;
-				fileNode->size = size;
-			}
-			if (fileTime != fileNode->fileTime) {
-				fileNode->status = FileStatus_Modified;
-				fileNode->fileTime = fileTime;
-				if (fileNode->fileTime < 0) {
-					fileNode->fileTime = Time_GetCurrentTime();
-				}
-			}
-			if (fileNode->status == FileStatus_Modified) {
-				fileNode->flags &= ~FileFlag_HasCRC;
+			fileNodeChild = fileNodeChild->next;
+		}
+	} else {
+		// Comprar datos de los ficheros
+		if (!(fileNode->flags & FileFlag_Normal)) {
+			fileNode->status = FileStatus_Modified;
+			fileNode->flags |= FileFlag_Normal;
+			fileNode->flags &= ~FileFlag_Directory;
+		}
+		File_GetSizeAndTime(filePath, &size, &fileTime);
+		if (size != fileNode->size) {
+			fileNode->status = FileStatus_Modified;
+			fileNode->size = size;
+		}
+		if (fileTime != fileNode->fileTime) {
+			fileNode->status = FileStatus_Modified;
+			fileNode->fileTime = fileTime;
+			if (fileNode->fileTime < 0) {
+				fileNode->fileTime = Time_GetCurrentTime();
 			}
 		}
+		if (fileNode->status == FileStatus_Modified) {
+			fileNode->flags &= ~FileFlag_HasCRC;
+		}
 	}
+
+	// Save update time on root FileNode
+	if (fileNode->parent == NULL) {
+		fileNode->fileTime = Time_GetCurrentTime();
+		fileNode->flags |= FileFlag_HasTime;
+	}
+
 	return (fileNode);
 }
 
@@ -567,10 +581,10 @@ int FileNode_Refresh_Iterate(char *path, char *name, void *d) {
 	if (fileNodeChild) {
 		// Exists, Refresh
 		FileNode_Refresh(fileNodeChild, path);
-	}
-	else {
+	} else {
 		// New, Build
-		fileNodeChild = FileNode_Refresh(NULL, path);
+		fileNodeChild = FileNode_Build(path);
+		FileNode_SetStatusRec(fileNodeChild, FileStatus_New);
 		FileNode_AddChild(fileNode, fileNodeChild);
 	}
 

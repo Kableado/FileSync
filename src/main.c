@@ -42,7 +42,8 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	Print("\n================================ FileSync ===================================\n");
+	Print("\n================================ FileSync "
+		  "===================================\n");
 	if (!strcmp(argv[1], "info") && argc >= 3) {
 		// Informacion de ficheros
 		int i;
@@ -53,18 +54,18 @@ int main(int argc, char *argv[]) {
 				FileNode_PrintNode(fileNode);
 			}
 		}
-	}
-	else if (!strcmp(argv[1], "scan") && argc == 4) {
+	} else if (!strcmp(argv[1], "scan") && argc == 4) {
 		// Scan directory information tree and save
 		long long tScan = Time_GetTime();
 		FileNode fileNode;
 		Print("Building FileNode..\n");
 		fileNode = FileNode_Build(argv[2]);
 		tScan = Time_GetTime() - tScan;
-		Print("\ttScan :"); PrintElapsedTime(tScan); Print("\n");
+		Print("\ttScan :");
+		PrintElapsedTime(tScan);
+		Print("\n");
 		FileNode_Save(fileNode, argv[3]);
-	}
-	else if (!strcmp(argv[1], "rescan") && argc == 4) {
+	} else if (!strcmp(argv[1], "rescan") && argc == 4) {
 		// Scan directory information and save tree
 		FileNode fileNode;
 		Print("Loading FileNode..\n");
@@ -74,26 +75,27 @@ int main(int argc, char *argv[]) {
 			long long tScan = Time_GetTime();
 			fileNode = FileNode_Refresh(fileNode, argv[2]);
 			tScan = Time_GetTime() - tScan;
-			Print("\ttScan :"); PrintElapsedTime(tScan); Print("\n");
+			Print("\ttScan :");
+			PrintElapsedTime(tScan);
+			Print("\n");
 			FileNode_Save(fileNode, argv[3]);
-		}
-		else {
+		} else {
 			Print("Building FileNode..\n");
 			long long tScan = Time_GetTime();
 			fileNode = FileNode_Build(argv[2]);
 			tScan = Time_GetTime() - tScan;
-			Print("\ttScan :"); PrintElapsedTime(tScan); Print("\n");
+			Print("\ttScan :");
+			PrintElapsedTime(tScan);
+			Print("\n");
 			FileNode_Save(fileNode, argv[3]);
 		}
-	}
-	else if (!strcmp(argv[1], "read") && argc >= 3) {
+	} else if (!strcmp(argv[1], "read") && argc >= 3) {
 		// Read information tree from file
 		FileNode fileNode;
 		fileNode = FileNode_Load(argv[2]);
 		if (fileNode)
 			FileNode_Print(fileNode);
-	}
-	else if (!strcmp(argv[1], "dir") && argc == 3) {
+	} else if (!strcmp(argv[1], "dir") && argc == 3) {
 		// Read directory information tree
 		char *path = argv[2];
 		FileNode fileNode;
@@ -102,44 +104,34 @@ int main(int argc, char *argv[]) {
 		if (fileNode) {
 			FileNode_Print(fileNode);
 		}
-	}
-	else if (!strcmp(argv[1], "check") && argc == 3) {
+	} else if (!strcmp(argv[1], "check") && argc == 3) {
 		// Read directory information tree
 		char *path = argv[2];
 		FileNode fileNode;
 
 		fileNode = CheckDir(path, 1);
-	}
-	else if (argc == 4) {
+	} else if (argc == 4) {
 		char *cmd = argv[1];
 		char *pathLeft = argv[2];
 		char *pathRight = argv[3];
 		if (!strcmp(cmd, "sync")) {
 			Sync(pathLeft, pathRight, 1, 0);
-		}
-		else if (!strcmp(cmd, "resync")) {
+		} else if (!strcmp(cmd, "resync")) {
 			Sync(pathLeft, pathRight, 0, 0);
-		}
-		else if (!strcmp(cmd, "synctest")) {
+		} else if (!strcmp(cmd, "synctest")) {
 			Sync(pathLeft, pathRight, 1, 1);
-		}
-		else if (!strcmp(cmd, "resynctest")) {
+		} else if (!strcmp(cmd, "resynctest")) {
 			Sync(pathLeft, pathRight, 0, 1);
-		}
-		else if (!strcmp(cmd, "copy")) {
+		} else if (!strcmp(cmd, "copy")) {
 			Copy(pathLeft, pathRight, 1, 0);
-		}
-		else if (!strcmp(cmd, "recopy")) {
+		} else if (!strcmp(cmd, "recopy")) {
 			Copy(pathLeft, pathRight, 0, 0);
-		}
-		else if (!strcmp(cmd, "copytest")) {
+		} else if (!strcmp(cmd, "copytest")) {
 			Copy(pathLeft, pathRight, 1, 1);
-		}
-		else if (!strcmp(cmd, "recopytest")) {
+		} else if (!strcmp(cmd, "recopytest")) {
 			Copy(pathLeft, pathRight, 0, 1);
 		}
-	}
-	else {
+	} else {
 		Help(argv[0]);
 	}
 
@@ -151,22 +143,22 @@ FileNode CheckDir(char *path, int recheck) {
 	FileNode fileNode;
 
 	// Check directory
-	snprintf(dirNodesFile, MaxPath, "%s/"FileNode_Filename, path);
+	snprintf(dirNodesFile, MaxPath, "%s/" FileNode_Filename, path);
 	if (recheck) {
 		Print("Checking Directory.. %s\n", path);
 		long long tScan = Time_GetTime();
 		fileNode = FileNode_Load(dirNodesFile);
 		if (fileNode) {
 			fileNode = FileNode_Refresh(fileNode, path);
-		}
-		else {
+		} else {
 			fileNode = FileNode_Build(path);
 		}
 		tScan = Time_GetTime() - tScan;
-		Print("\ttScan :"); PrintElapsedTime(tScan); Print("\n");
+		Print("\ttScan :");
+		PrintElapsedTime(tScan);
+		Print("\n");
 		FileNode_Save(fileNode, dirNodesFile);
-	}
-	else {
+	} else {
 		Print("Loading Directory.. %s\n", path);
 		fileNode = FileNode_Load(dirNodesFile);
 		if (!fileNode) {
@@ -185,8 +177,7 @@ void PrintStatistics(ActionFileNode actionFileNode) {
 	}
 	Print("Statistics\n");
 
-	Print("       % 8s    % 8s    % 8s\n",
-		"Read", "Write", "Delete");
+	Print("       % 8s    % 8s    % 8s\n", "Read", "Write", "Delete");
 	Print("Left :");
 	PrintDataSize(statistics.readLeft);
 	PrintDataSize(statistics.writeLeft);
@@ -233,14 +224,15 @@ int Sync(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	ActionFileNode actionFileNode = NULL;
 	actionFileNode = ActionFileNode_BuildSync(fileNodeLeft, fileNodeRight);
 	tBuild = Time_GetTime() - tBuild;
-	Print("\ttBuild:"); PrintElapsedTime(tBuild); Print("\n");
+	Print("\ttBuild:");
+	PrintElapsedTime(tBuild);
+	Print("\n");
 
 	if (dryRun) {
 		// Show action list
 		ActionFileNode_Print(actionFileNode);
 		PrintStatistics(actionFileNode);
-	}
-	else {
+	} else {
 		// Run action list
 		if (ActionFileNode_RunList(actionFileNode, pathLeft, pathRight)) {
 			CheckDir(pathLeft, reCheck);
@@ -279,14 +271,15 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	ActionFileNode actionFileNode = NULL;
 	actionFileNode = ActionFileNode_BuildCopy(fileNodeLeft, fileNodeRight);
 	tBuild = Time_GetTime() - tBuild;
-	Print("\ttBuild:"); PrintElapsedTime(tBuild); Print("\n");
+	Print("\ttBuild:");
+	PrintElapsedTime(tBuild);
+	Print("\n");
 
 	if (dryRun) {
 		// Show action list
 		ActionFileNode_Print(actionFileNode);
 		PrintStatistics(actionFileNode);
-	}
-	else {
+	} else {
 		// Run action list
 		if (ActionFileNode_RunList(actionFileNode, pathLeft, pathRight)) {
 			CheckDir(pathLeft, reCheck);

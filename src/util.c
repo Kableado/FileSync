@@ -35,7 +35,7 @@ long long Time_GetTime() {
 	QueryPerformanceFrequency(&freq);
 	QueryPerformanceCounter(&tim);
 	microt = (tim.QuadPart * 1000000) / freq.QuadPart;
-	return(microt);
+	return (microt);
 }
 
 /////////////////////////////
@@ -51,8 +51,7 @@ void Time_Pause(int pausa) {
 		diff = tend - t;
 		if (diff > 1000) {
 			Sleep((int)diff / 1000);
-		}
-		else {
+		} else {
 			Sleep(0);
 		}
 		t = Time_GetTime();
@@ -68,7 +67,7 @@ long long Time_GetTime() {
 	long long usecs;
 	gettimeofday(&t, NULL);
 	usecs = (t.tv_sec * 1000000ll) + (t.tv_usec);
-	return(usecs);
+	return (usecs);
 }
 
 /////////////////////////////
@@ -154,5 +153,5 @@ int Print(char *fmt, ...) {
 
 	// Flush
 	fflush(stdout);
-	return(n);
+	return (n);
 }

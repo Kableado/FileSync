@@ -26,13 +26,12 @@ struct TActionFileNode {
 ActionFileNode ActionFileNode_Create();
 void AccionFileNode_Destroy(ActionFileNode actionFileNode);
 ActionFileNode ActionFileNode_CreateNormal(FileNode fileNodeLeft,
-	FileNode fileNodeRight);
+										   FileNode fileNodeRight);
 
 void AccionFileNode_CompareChilds(
-	ActionFileNode actionFileNodeRoot,
-	ActionFileNode *actionFileNodeQueue,
-	void(*CheckPair)(FileNode fileNodeLeft, FileNode fileNodeRight,
-		ActionFileNode *actionFileNodeQueue));
+	ActionFileNode actionFileNodeRoot, ActionFileNode *actionFileNodeQueue,
+	void (*CheckPair)(FileNode fileNodeLeft, FileNode fileNodeRight,
+					  ActionFileNode *actionFileNodeQueue));
 
 typedef struct SActionQueueStatistics {
 	long long readLeft;
@@ -48,16 +47,16 @@ typedef struct SActionQueueStatistics {
 } ActionQueueStatistics;
 
 int ActionFileNode_Statistics(ActionFileNode actionFileNode,
-	ActionQueueStatistics *statistics);
+							  ActionQueueStatistics *statistics);
 
 void ActionFileNode_Print(ActionFileNode actionFileNode);
 
 int ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
-	char *pathRight);
+						   char *pathRight);
 
 // Common utilities
 
 void AccionFileNode_DeletePair(FileNode fileNodeLeft, FileNode fileNodeRight,
-	ActionFileNode *actionFileNodeQueue);
+							   ActionFileNode *actionFileNodeQueue);
 
 #endif

@@ -5,6 +5,6 @@
 #include "actionfilenode.h"
 
 ActionFileNode ActionFileNode_BuildSync(FileNode fileNodeLeft,
-	FileNode fileNodeRight);
+										FileNode fileNodeRight);
 
 #endif

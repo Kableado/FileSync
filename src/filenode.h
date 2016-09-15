@@ -42,6 +42,7 @@ FileNode FileNode_Create();
 FileNode FileNode_Copy(FileNode fileNode);
 void FileNode_Delete(FileNode fileNode);
 void FileNode_AddChild(FileNode file, FileNode file2);
+FileNode FileNode_GetRoot(FileNode fileNode);
 
 char *FileNode_GetFullPath(FileNode fileNode, char *basePath, char *path);
 
