@@ -46,4 +46,11 @@ int PrintDataSize(long long size);
 // Prints the formated text screen
 int Print(char *fmt, ...);
 
+/////////////////////////////
+// SetError
+// GetError
+//
+void SetError(char *msg);
+char *GetError();
+
 #endif

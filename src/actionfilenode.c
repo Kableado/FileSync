@@ -250,19 +250,23 @@ void AccionFileNodeAux_Copy(char *pathOrig, char *pathDest) {
 		AccionFileNodeAux_CopyDate(pathOrig, pathDest);
 	} else {
 		File_Delete(pathDest);
-		Print("Error Copying to: %s\n", pathDest);
+		Print("Error Copying to: %s, %s\n", pathDest, GetError());
 	}
 }
 void AccionFileNodeAux_Delete(char *pathOrig, char *pathDest) {
 	if (File_IsDirectory(pathDest)) {
-		File_DeleteDirectory(pathDest);
+		if (File_DeleteDirectory(pathDest)) {
+			Print("Error Deleting Directory: %s, %s\n", pathDest, GetError());
+		}
 	} else {
-		File_Delete(pathDest);
+		if (File_Delete(pathDest)) {
+			Print("Error Deleting File: %s, %s\n", pathDest, GetError());
+		}
 	}
 }
 void AccionFileNodeAux_MakeDir(char *pathOrig, char *pathDest) {
 	if (File_MakeDirectory(pathDest) == 0) {
-		Print("Error Making Directory: %s\n", pathDest);
+		Print("Error Making Directory: %s, %s\n", pathDest, GetError());
 	}
 }
 

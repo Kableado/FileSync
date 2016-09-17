@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <errno.h>
 #else
 #include <stdio.h>
 #include <string.h>
@@ -19,6 +20,7 @@
 #include <utime.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <errno.h>
 #endif
 
 #include "util.h"
@@ -200,6 +202,7 @@ int File_ExistsPath(char *path) {
 	rc = GetFileAttributes(path);
 
 	if (rc == INVALID_FILE_ATTRIBUTES) {
+		SetError(strerror(errno));
 		return (0);
 	}
 	return (1);
@@ -209,6 +212,7 @@ int File_IsDirectory(char *fileName) {
 	rc = GetFileAttributes(fileName);
 
 	if (rc == INVALID_FILE_ATTRIBUTES) {
+		SetError(strerror(errno));
 		return (0);
 	}
 	if (rc & FILE_ATTRIBUTE_DIRECTORY) {
@@ -221,6 +225,7 @@ int File_IsFile(char *fileName) {
 	rc = GetFileAttributes(fileName);
 
 	if (rc == INVALID_FILE_ATTRIBUTES) {
+		SetError(strerror(errno));
 		return (0);
 	}
 	if (rc & FILE_ATTRIBUTE_DIRECTORY) {
@@ -242,6 +247,7 @@ int File_IsDirectory(char *fileName) {
 	struct stat info;
 
 	if (lstat(fileName, &info) == -1) {
+		SetError(strerror(errno));
 		return (0);
 	}
 	if (S_ISDIR(info.st_mode)) {
@@ -253,6 +259,7 @@ int File_IsFile(char *fileName) {
 	struct stat info;
 
 	if (lstat(fileName, &info) == -1) {
+		SetError(strerror(errno));
 		return (0);
 	}
 	if (S_ISDIR(info.st_mode)) {
@@ -265,7 +272,14 @@ int File_IsFile(char *fileName) {
 #ifdef WIN32
 int File_MakeDirectory(char *path) { return (CreateDirectory(path, NULL)); }
 #else
-int File_MakeDirectory(char *path) { return (mkdir(path, 0777)); }
+int File_MakeDirectory(char *path) {
+	int rc = mkdir(path, 0777);
+	if (rc != 0) {
+		SetError(strerror(errno));
+		return 0;
+	}
+	return 1;
+}
 #endif
 
 #ifdef WIN32
@@ -328,20 +342,30 @@ void File_IterateDir(char *path,
 }
 #endif
 
-void File_Delete(char *path) {
+int File_Delete(char *path) {
 #ifdef WIN32
-	remove(path);
+	int rc = remove(path);
 #else
-	unlink(path);
+	int rc = unlink(path);
 #endif
+	if (rc != 0) {
+		SetError(strerror(errno));
+		return 0;
+	}
+	return 1;
 }
 
-void File_DeleteDirectory(char *path) {
+int File_DeleteDirectory(char *path) {
 #ifndef WIN32
-	rmdir(path);
+	int rc = rmdir(path);
 #else
-	_rmdir(path);
+	int rc = _rmdir(path);
 #endif
+	if (rc != 0) {
+		SetError(strerror(errno));
+		return 0;
+	}
+	return 1;
 }
 
 #define MaxBuffer 16384
@@ -354,9 +378,11 @@ int File_Copy(const char *pathOrig, const char *pathDest) {
 	int status = 0;
 
 	if ((fOrig = fopen(pathOrig, "rb")) == NULL) {
+		SetError(strerror(errno));
 		goto cleanup;
 	}
 	if ((fDest = fopen(pathDest, "wb")) == NULL) {
+		SetError(strerror(errno));
 		goto cleanup;
 	}
 
@@ -370,8 +396,7 @@ int File_Copy(const char *pathOrig, const char *pathDest) {
 		if (readLen > 0) {
 			writeLen = fwrite(buffer, 1, readLen, fDest);
 			if (writeLen != readLen) {
-				// Write error
-				status = -1;
+				SetError("Write error");
 				goto cleanup;
 			}
 		}

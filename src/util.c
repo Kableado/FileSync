@@ -155,3 +155,16 @@ int Print(char *fmt, ...) {
 	fflush(stdout);
 	return (n);
 }
+
+/////////////////////////////
+// SetError
+// GetError
+//
+char _errorMessage[2048] = "";
+char _errorMessageTemp[2048] = "";
+void SetError(char *msg) { strcpy(_errorMessage, msg); }
+char *GetError() {
+	strcpy(_errorMessageTemp, _errorMessage);
+	strcpy(_errorMessage, "");
+	return _errorMessageTemp;
+}

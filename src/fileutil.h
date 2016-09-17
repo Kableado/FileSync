@@ -48,8 +48,8 @@ void File_IterateDir(char *path,
 					 int (*func)(char *path, char *name, void *data),
 					 void *data);
 
-void File_Delete(char *path);
-void File_DeleteDirectory(char *path);
+int File_Delete(char *path);
+int File_DeleteDirectory(char *path);
 
 int File_Copy(const char *pathOrig, const char *pathDest);
 
