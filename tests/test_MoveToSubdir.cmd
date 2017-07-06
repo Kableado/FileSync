@@ -6,7 +6,8 @@ IF EXIST %testDir%.A rmdir %testDir%.A /S /Q
 IF EXIST %testDir%.B rmdir %testDir%.B /S /Q
 IF EXIST %testDir%.txt del %testDir%.txt
 
-echo:Start> %testDir%.txt
+echo:Test %testName% started> %testDir%.txt
+echo:Test %testName% started
 IF NOT EXIST tmp md tmp
 md %testDir%.A
 md %testDir%.B

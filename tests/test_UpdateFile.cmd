@@ -6,7 +6,8 @@ IF EXIST %testDir%.A rmdir %testDir%.A /S /Q
 IF EXIST %testDir%.B rmdir %testDir%.B /S /Q
 IF EXIST %testDir%.txt del %testDir%.txt
 
-echo:Start> %testDir%.txt
+echo:Test %testName% started> %testDir%.txt
+echo:Test %testName% started
 IF NOT EXIST tmp md tmp
 md %testDir%.A
 md %testDir%.B
@@ -17,7 +18,7 @@ echo:Uno> %testDir%.A\Uno.txt
 echo:Dos> %testDir%.A\Dos.txt
 ..\filesync.exe sync %testDir%.A %testDir%.B >> %testDir%.txt
 
-ping 127.0.0.1 -n 6 > nul
+ping 127.0.0.1 -n 2 > nul
 
 echo:Updated>> %testDir%.A\Uno.txt
 ..\filesync.exe sync %testDir%.A %testDir%.B >> %testDir%.txt
