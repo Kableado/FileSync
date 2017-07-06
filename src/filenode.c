@@ -496,6 +496,10 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 		FileNode fileNodeChild;
 
 		// Check directory data
+		if (fileNode->status == FileStatus_Deleted) {
+			fileNode->status = FileStatus_Modified;
+			fileNode->fileTime = Time_GetCurrentTime();
+		}
 		if (!(fileNode->flags & FileFlag_Directory)) {
 			fileNode->status = FileStatus_Modified;
 			fileNode->flags |= FileFlag_Directory;
@@ -504,9 +508,10 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 		fileTime = FileTime_Get(filePath);
 		if (fileTime != fileNode->fileTime) {
 			fileNode->status = FileStatus_Modified;
-			fileNode->fileTime = fileTime;
-			if (fileNode->fileTime < 0) {
+			if (fileTime < 0 || fileNode->fileTime > fileTime) {
 				fileNode->fileTime = Time_GetCurrentTime();
+			}else{
+				fileNode->fileTime = fileTime;
 			}
 		}
 
@@ -531,6 +536,10 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 		}
 	} else {
 		// Comprar datos de los ficheros
+		if (fileNode->status == FileStatus_Deleted) {
+			fileNode->status = FileStatus_Modified;
+			fileNode->fileTime = Time_GetCurrentTime();
+		}
 		if (!(fileNode->flags & FileFlag_Normal)) {
 			fileNode->status = FileStatus_Modified;
 			fileNode->flags |= FileFlag_Normal;
@@ -543,9 +552,10 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 		}
 		if (fileTime != fileNode->fileTime) {
 			fileNode->status = FileStatus_Modified;
-			fileNode->fileTime = fileTime;
-			if (fileNode->fileTime < 0) {
+			if (fileTime < 0 || fileNode->fileTime > fileTime) {
 				fileNode->fileTime = Time_GetCurrentTime();
+			}else{
+				fileNode->fileTime = fileTime;
 			}
 		}
 		if (fileNode->status == FileStatus_Modified) {
