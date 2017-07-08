@@ -495,20 +495,24 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 	if (File_IsDirectory(filePath)) {
 		FileNode fileNodeChild;
 
-		// Check directory data
+		// Check directory data 
+		if (fileNode->status == FileStatus_Deleted) {
+			fileNode->status = FileStatus_Modified;
+			fileNode->fileTime = Time_GetCurrentTime();
+		}
 		if (!(fileNode->flags & FileFlag_Directory)) {
 			fileNode->status = FileStatus_Modified;
 			fileNode->flags |= FileFlag_Directory;
 			fileNode->flags &= ~FileFlag_Normal;
 		}
 		fileTime = FileTime_Get(filePath);
-		if (fileNode->status == FileStatus_Deleted) {
-			fileNode->status = FileStatus_Modified;
-			fileNode->fileTime = fileTime;
-		}
 		if (fileTime != fileNode->fileTime) {
-			fileNode->status = FileStatus_Modified;
-			fileNode->fileTime = fileTime;
+			fileNode->status = FileStatus_Modified; 
+			if (fileTime < 0 || fileNode->fileTime > fileTime) {
+				fileNode->fileTime = Time_GetCurrentTime();
+			}else{
+				fileNode->fileTime = fileTime;
+			}
 		}
 
 		// Mark childs for review
@@ -532,6 +536,10 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 		}
 	} else {
 		// Comprar datos de los ficheros
+		if (fileNode->status == FileStatus_Deleted) {
+			fileNode->status = FileStatus_Modified;
+			fileNode->fileTime = Time_GetCurrentTime();
+		}
 		if (!(fileNode->flags & FileFlag_Normal)) {
 			fileNode->status = FileStatus_Modified;
 			fileNode->flags |= FileFlag_Normal;
@@ -542,13 +550,13 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 			fileNode->status = FileStatus_Modified;
 			fileNode->size = size;
 		}
-		if (fileNode->status == FileStatus_Deleted) {
-			fileNode->status = FileStatus_Modified;
-			fileNode->fileTime = fileTime;
-		}
 		if (fileTime != fileNode->fileTime) {
-			fileNode->status = FileStatus_Modified;
-			fileNode->fileTime = fileTime;
+			fileNode->status = FileStatus_Modified; 
+			if (fileTime < 0 || fileNode->fileTime > fileTime) {
+				fileNode->fileTime = Time_GetCurrentTime();
+			}else{
+				fileNode->fileTime = fileTime;
+			}
 		}
 		if (fileNode->status == FileStatus_Modified) {
 			fileNode->flags &= ~FileFlag_HasCRC;
