@@ -506,13 +506,9 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 			fileNode->flags &= ~FileFlag_Normal;
 		}
 		fileTime = FileTime_Get(filePath);
-		if (fileTime != fileNode->fileTime) {
+		if (fileTime > fileNode->fileTime) {
 			fileNode->status = FileStatus_Modified; 
-			if (fileTime < 0 || fileNode->fileTime > fileTime) {
-				fileNode->fileTime = Time_GetCurrentTime();
-			}else{
-				fileNode->fileTime = fileTime;
-			}
+			fileNode->fileTime = fileTime;
 		}
 
 		// Mark childs for review
@@ -550,13 +546,9 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 			fileNode->status = FileStatus_Modified;
 			fileNode->size = size;
 		}
-		if (fileTime != fileNode->fileTime) {
+		if (fileTime > fileNode->fileTime) {
 			fileNode->status = FileStatus_Modified; 
-			if (fileTime < 0 || fileNode->fileTime > fileTime) {
-				fileNode->fileTime = Time_GetCurrentTime();
-			}else{
-				fileNode->fileTime = fileTime;
-			}
+			fileNode->fileTime = fileTime;
 		}
 		if (fileNode->status == FileStatus_Modified) {
 			fileNode->flags &= ~FileFlag_HasCRC;
