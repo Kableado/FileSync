@@ -254,7 +254,7 @@ void AccionFileNodeAux_Copy(char *pathOrig, char *pathDest) {
 	}
 }
 void AccionFileNodeAux_Delete(char *pathOrig, char *pathDest) {
-	if (File_IsDirectory(pathDest) == 0) {
+	if (File_IsDirectory(pathDest)) {
 		if (File_DeleteDirectory(pathDest) == 0) {
 			Print("Error Deleting Directory: %s, %s\n", pathDest, GetError());
 		}
