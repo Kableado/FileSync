@@ -4,11 +4,21 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+typedef int bool;
+#define true 1
+#define false 0
+
 /////////////////////////////
 // String_Copy
 //
 // Copies a string.
 char *String_Copy(char *str);
+
+/////////////////////////////
+// String_CompareCaseInsensitive
+//
+// Compares a string case insensitive
+int String_CompareCaseInsensitive(char *str0, char *str1);
 
 /////////////////////////////
 // Time_GetTime
@@ -39,6 +49,11 @@ int PrintElapsedTime(long long time);
 //
 // Prints the data size (input in bytes)
 int PrintDataSize(long long size);
+
+/////////////////////////////
+// Print_SetOutFile
+//
+void Print_SetOutFile(char *fileOut);
 
 /////////////////////////////
 // Print

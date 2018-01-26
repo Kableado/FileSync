@@ -15,8 +15,8 @@ typedef enum EActionFileCmp {
 	ActionFileCmp_MakeLeftDirectory
 } ActionFileCmp;
 
-typedef struct TActionFileNode TActionFileNode, *ActionFileNode;
-struct TActionFileNode {
+typedef struct SActionFileNode TActionFileNode, *ActionFileNode;
+struct SActionFileNode {
 	ActionFileCmp action;
 	FileNode left;
 	FileNode right;

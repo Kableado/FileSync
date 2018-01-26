@@ -16,16 +16,16 @@ md %testDir%.B
 
 echo:Uno> %testDir%.A\Uno.txt
 echo:Dos> %testDir%.A\Dos.txt
-..\filesync.exe sync %testDir%.A %testDir%.B >> %testDir%.txt
+..\filesync.exe -sync -dir %testDir%.A -dir %testDir%.B >> %testDir%.txt
 
 md %testDir%.A\dirUno
 move %testDir%.A\Uno.txt %testDir%.A\dirUno\Uno.txt >NUL
-..\filesync.exe sync %testDir%.A %testDir%.B >> %testDir%.txt
+..\filesync.exe -sync -dir %testDir%.A -dir %testDir%.B >> %testDir%.txt
 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-..\filesync.exe read %testDir%.A/nodesFile.fs >> %testDir%.txt
-..\filesync.exe read %testDir%.B/nodesFile.fs >> %testDir%.txt
+..\filesync.exe -read %testDir%.A/nodesFile.fs >> %testDir%.txt
+..\filesync.exe -read %testDir%.B/nodesFile.fs >> %testDir%.txt
  
 :: Check test results
 

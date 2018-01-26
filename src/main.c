@@ -5,138 +5,11 @@
 #include "util.h"
 #include "crc.h"
 #include "fileutil.h"
+#include "parameteroperation.h"
 #include "filenode.h"
 #include "actionfilenode.h"
 #include "actionfilenodesync.h"
 #include "actionfilenodecopy.h"
-
-void Help(char *exe) {
-	char exeFilename[MaxPath];
-	File_GetName(exe, exeFilename);
-	Print("Usage:\n");
-	Print("    %s info [file] {[file] {..}}\n", exeFilename);
-	Print("    %s scan [dir] [tree] \n", exeFilename);
-	Print("    %s rescan [dir] [tree] \n", exeFilename);
-	Print("    %s read [file] [tree]\n", exeFilename);
-	Print("    %s dir [dir]\n", exeFilename);
-	Print("    %s check [dir]\n", exeFilename);
-	Print("\n");
-	Print("    %s sync [dirA] [dirB]\n", exeFilename);
-	Print("    %s resync [dirA] [dirB]\n", exeFilename);
-	Print("    %s synctest [dirA] [dirB]\n", exeFilename);
-	Print("    %s resynctest [dirA] [dirB]\n", exeFilename);
-	Print("\n");
-	Print("    %s copy [dirA] [dirB]\n", exeFilename);
-	Print("    %s recopy [dirA] [dirB]\n", exeFilename);
-	Print("    %s copytest [dirA] [dirB]\n", exeFilename);
-	Print("    %s recopytest [dirA] [dirB]\n", exeFilename);
-}
-
-FileNode CheckDir(char *path, int recheck);
-int Sync(char *pathLeft, char *pathRight, int recheck, int dryRun);
-int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun);
-
-int main(int argc, char *argv[]) {
-	if (argc < 2) {
-		Help(argv[0]);
-		return 0;
-	}
-
-	Print("\n================================ FileSync "
-		  "===================================\n");
-	if (!strcmp(argv[1], "info") && argc >= 3) {
-		// Informacion de ficheros
-		int i;
-		for (i = 2; i < argc; i++) {
-			if (File_ExistsPath(argv[i])) {
-				FileNode fileNode = FileNode_Build(argv[i]);
-				FileNode_LoadCRC(fileNode, argv[i]);
-				FileNode_PrintNode(fileNode);
-			}
-		}
-	} else if (!strcmp(argv[1], "scan") && argc == 4) {
-		// Scan directory information tree and save
-		long long tScan = Time_GetTime();
-		FileNode fileNode;
-		Print("Building FileNode..\n");
-		fileNode = FileNode_Build(argv[2]);
-		tScan = Time_GetTime() - tScan;
-		Print("\ttScan :");
-		PrintElapsedTime(tScan);
-		Print("\n");
-		FileNode_Save(fileNode, argv[3]);
-	} else if (!strcmp(argv[1], "rescan") && argc == 4) {
-		// Scan directory information and save tree
-		FileNode fileNode;
-		Print("Loading FileNode..\n");
-		fileNode = FileNode_Load(argv[3]);
-		if (fileNode) {
-			Print("Rebuilding FileNode..\n");
-			long long tScan = Time_GetTime();
-			fileNode = FileNode_Refresh(fileNode, argv[2]);
-			tScan = Time_GetTime() - tScan;
-			Print("\ttScan :");
-			PrintElapsedTime(tScan);
-			Print("\n");
-			FileNode_Save(fileNode, argv[3]);
-		} else {
-			Print("Building FileNode..\n");
-			long long tScan = Time_GetTime();
-			fileNode = FileNode_Build(argv[2]);
-			tScan = Time_GetTime() - tScan;
-			Print("\ttScan :");
-			PrintElapsedTime(tScan);
-			Print("\n");
-			FileNode_Save(fileNode, argv[3]);
-		}
-	} else if (!strcmp(argv[1], "read") && argc >= 3) {
-		// Read information tree from file
-		FileNode fileNode;
-		fileNode = FileNode_Load(argv[2]);
-		if (fileNode)
-			FileNode_Print(fileNode);
-	} else if (!strcmp(argv[1], "dir") && argc == 3) {
-		// Read directory information tree
-		char *path = argv[2];
-		FileNode fileNode;
-
-		fileNode = CheckDir(path, 1);
-		if (fileNode) {
-			FileNode_Print(fileNode);
-		}
-	} else if (!strcmp(argv[1], "check") && argc == 3) {
-		// Read directory information tree
-		char *path = argv[2];
-		FileNode fileNode;
-
-		fileNode = CheckDir(path, 1);
-	} else if (argc == 4) {
-		char *cmd = argv[1];
-		char *pathLeft = argv[2];
-		char *pathRight = argv[3];
-		if (!strcmp(cmd, "sync")) {
-			Sync(pathLeft, pathRight, 1, 0);
-		} else if (!strcmp(cmd, "resync")) {
-			Sync(pathLeft, pathRight, 0, 0);
-		} else if (!strcmp(cmd, "synctest")) {
-			Sync(pathLeft, pathRight, 1, 1);
-		} else if (!strcmp(cmd, "resynctest")) {
-			Sync(pathLeft, pathRight, 0, 1);
-		} else if (!strcmp(cmd, "copy")) {
-			Copy(pathLeft, pathRight, 1, 0);
-		} else if (!strcmp(cmd, "recopy")) {
-			Copy(pathLeft, pathRight, 0, 0);
-		} else if (!strcmp(cmd, "copytest")) {
-			Copy(pathLeft, pathRight, 1, 1);
-		} else if (!strcmp(cmd, "recopytest")) {
-			Copy(pathLeft, pathRight, 0, 1);
-		}
-	} else {
-		Help(argv[0]);
-	}
-
-	return (0);
-}
 
 FileNode CheckDir(char *path, int recheck) {
 	char dirNodesFile[MaxPath];
@@ -289,3 +162,173 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 
 	return (1);
 }
+
+typedef struct SApplicationConfiguration TApplicationConfiguration, *ApplicationConfiguration;
+struct SApplicationConfiguration {
+	char *Dirs[10];
+	bool NoScan;
+	bool Dummy;
+	bool Sync;
+	bool Copy;
+	bool NoAction;
+	char *Log;
+};
+TApplicationConfiguration defaultConfig = { {NULL}, false, false, false, false, false, NULL };
+
+bool SetParam_Dir(int argc, char *argv[], void *data) {
+	ApplicationConfiguration config = (ApplicationConfiguration)data;
+	if (File_ExistsPath(argv[0]) == 0) {
+		Print("Error: Path \"%s\" does not exist.\n", argv[0]);
+		return false;
+	}
+	char **destDir = config->Dirs;
+	while (destDir[0] != NULL) { destDir++; }
+	destDir[0] = argv[0];
+	destDir++;
+	destDir = NULL;
+	return true;
+}
+
+bool SetParam_NoCheck(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->NoScan = true;
+	return true;
+}
+
+bool SetParam_Dummy(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->Dummy = true;
+	return true;
+}
+
+bool SetParam_Sync(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->Sync = true;
+	return true;
+}
+
+bool SetParam_Copy(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->Copy = true;
+	return true;
+}
+
+bool SetParam_Log(int argc, char *argv[], void *data) {
+	ApplicationConfiguration config = (ApplicationConfiguration)data;
+	config->Log = argv[0];
+	Print_SetOutFile(config->Log);
+	return true;
+}
+
+bool Func_Scan(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->NoAction = true;
+
+	// Scan directory information tree and save
+	long long tScan = Time_GetTime();
+	FileNode fileNode;
+	Print("Building FileNode..\n");
+	fileNode = FileNode_Build(argv[0]);
+	tScan = Time_GetTime() - tScan;
+	Print("\ttScan :");
+	PrintElapsedTime(tScan);
+	Print("\n");
+	FileNode_Save(fileNode, argv[1]);
+	return true;
+}
+
+bool Func_Rescan(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->NoAction = true;
+
+	// Scan directory information and save tree
+	FileNode fileNode;
+	Print("Loading FileNode..\n");
+	fileNode = FileNode_Load(argv[1]);
+	if (fileNode) {
+		Print("Rebuilding FileNode..\n");
+		long long tScan = Time_GetTime();
+		fileNode = FileNode_Refresh(fileNode, argv[0]);
+		tScan = Time_GetTime() - tScan;
+		Print("\ttScan :");
+		PrintElapsedTime(tScan);
+		Print("\n");
+		FileNode_Save(fileNode, argv[1]);
+	} else {
+		Print("Building FileNode..\n");
+		long long tScan = Time_GetTime();
+		fileNode = FileNode_Build(argv[0]);
+		tScan = Time_GetTime() - tScan;
+		Print("\ttScan :");
+		PrintElapsedTime(tScan);
+		Print("\n");
+		FileNode_Save(fileNode, argv[1]);
+	}
+	return true;
+}
+
+bool Func_Read(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->NoAction = true;
+
+	// Read information tree from file
+	FileNode fileNode;
+	fileNode = FileNode_Load(argv[0]);
+	if (fileNode) {
+		FileNode_Print(fileNode);
+	}
+	return true;
+}
+
+bool Func_Check(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->NoAction = true;
+
+	// Read directory information tree
+	char *path = argv[0];
+	FileNode fileNode;
+
+	fileNode = CheckDir(path, 1);
+	return true;
+}
+
+TParameterOperation _parameterOperations[] = {
+	{ "dir", 1, "Specify a directory", SetParam_Dir },
+	{ "nocheck", 0, "Do not check for changes on directories", SetParam_NoCheck },
+	{ "dummy", 0, "Do not perform operations", SetParam_Dummy },
+	{ "copy", 0, "Copy first directory to second directory", SetParam_Copy },
+	{ "sync", 0, "Synchronize between two directories", SetParam_Sync },
+	{ "log", 1, "Log actions to file", SetParam_Log },
+
+	{ "scan", 2, "Scan directory and save to filenode file", Func_Rescan },
+	{ "rescan", 2, "Rescan directory and save to filenode file", Func_Rescan },
+	{ "read", 1, "Read filenode file", Func_Read },
+	{ "check", 1, "Check changes on a directory", Func_Check },
+
+	{ NULL, 0, NULL, NULL },
+};
+
+int main(int argc, char *argv[]) {
+	TApplicationConfiguration config = defaultConfig;
+
+	int parameterParsingResult = ParameterOperation_Parse(argc, argv, _parameterOperations, &config);
+	if (parameterParsingResult <= 0) {
+		ParameterOperation_PrintHelp(_parameterOperations);
+		return 0;
+	}
+	if (config.NoAction) {
+		return 0;
+	}
+
+	Print("\n================================ FileSync ===================================\n");
+
+	if (config.Copy == false && config.Sync == false) {
+		Print("Error: Action not specified.\n");
+		return 0;
+	}
+	if (config.Dirs[0] == NULL || config.Dirs[1] == NULL) {
+		Print("Error: Two directories are needed.\n");
+		return 0;
+	}
+	if (config.Copy) {
+		Copy(config.Dirs[0], config.Dirs[1], (config.NoScan == false), config.Dummy);
+	}
+	if (config.Sync) {
+		Sync(config.Dirs[0], config.Dirs[1], (config.NoScan == false), config.Dummy);
+	}
+
+	return 0;
+}
+

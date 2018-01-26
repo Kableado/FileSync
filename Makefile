@@ -19,6 +19,7 @@ HEADS := \
 		src/util.h \
 		src/crc.h \
 		src/fileutil.h \
+		src/parameteroperation.h \
 		src/filenode.h \
 		src/actionfilenode.h \
 		src/actionfilenodesync.h \
@@ -28,6 +29,7 @@ OBJS_BASE :=  \
 		$(BUILDDIR)/util.o \
 		$(BUILDDIR)/crc.o \
 		$(BUILDDIR)/fileutil.o \
+		$(BUILDDIR)/parameteroperation.o \
 		$(BUILDDIR)/filenode.o \
 		$(BUILDDIR)/actionfilenode.o \
 		$(BUILDDIR)/actionfilenodesync.o \
@@ -71,6 +73,9 @@ $(BUILDDIR)/crc.o: src/crc.c $(HEADS)
 	$(DO_CC)
 
 $(BUILDDIR)/fileutil.o: src/fileutil.c $(HEADS)
+	$(DO_CC)
+
+$(BUILDDIR)/parameteroperation.o: src/parameteroperation.c $(HEADS)
 	$(DO_CC)
 
 $(BUILDDIR)/filenode.o: src/filenode.c $(HEADS)

@@ -138,6 +138,7 @@
     <ClCompile Include="..\..\src\filenode.c" />
     <ClCompile Include="..\..\src\fileutil.c" />
     <ClCompile Include="..\..\src\main.c" />
+    <ClCompile Include="..\..\src\parameteroperation.c" />
     <ClCompile Include="..\..\src\util.c" />
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +148,7 @@
     <ClInclude Include="..\..\src\crc.h" />
     <ClInclude Include="..\..\src\filenode.h" />
     <ClInclude Include="..\..\src\fileutil.h" />
+    <ClInclude Include="..\..\src\parameteroperation.h" />
     <ClInclude Include="..\..\src\util.h" />
   </ItemGroup>
   <ItemGroup>

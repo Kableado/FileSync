@@ -16,20 +16,20 @@ md %testDir%.B
 
 echo:Uno> %testDir%.A\Uno.txt
 echo:Dos> %testDir%.A\Dos.txt
-..\filesync.exe sync %testDir%.A %testDir%.B >> %testDir%.txt
+..\filesync.exe -sync -dir %testDir%.A -dir %testDir%.B >> %testDir%.txt
 
 del %testDir%.A\Uno.txt
-..\filesync.exe sync %testDir%.A %testDir%.B >> %testDir%.txt
+..\filesync.exe -sync -dir %testDir%.A -dir %testDir%.B >> %testDir%.txt
 
 ping 127.0.0.1 -n 2 > nul
 
 echo:UnoRepuesto> %testDir%.A\Uno.txt
-..\filesync.exe sync %testDir%.A %testDir%.B >> %testDir%.txt
+..\filesync.exe -sync -dir %testDir%.A -dir %testDir%.B >> %testDir%.txt
 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-..\filesync.exe read %testDir%.A/nodesFile.fs >> %testDir%.txt
-..\filesync.exe read %testDir%.B/nodesFile.fs >> %testDir%.txt
+..\filesync.exe -read %testDir%.A/nodesFile.fs >> %testDir%.txt
+..\filesync.exe -read %testDir%.B/nodesFile.fs >> %testDir%.txt
  
 :: Check test results
 

@@ -1,7 +1,9 @@
-﻿#include <stdio.h>
+﻿#include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdarg.h>
 
 #include "util.h"
 
@@ -13,11 +15,29 @@ char *String_Copy(char *str) {
 	char *strnew;
 	size_t len;
 	len = strlen(str);
-	strnew = malloc(len + 1);
+	strnew = (char *)malloc(len + 1);
 	if (strnew != NULL) {
 		strcpy(strnew, str);
 	}
 	return (strnew);
+}
+
+/////////////////////////////
+// String_CompareCaseInsensitive
+//
+// Compares a string case insensitive
+int String_CompareCaseInsensitive(char *str0, char *str1) {
+	for (int i = 0; ; i++) {
+		char c0 = tolower(str0[i]);
+		char c1 = tolower(str1[i]);
+		if (c0 != c1) {
+			return (c0 < c1) ? -1 : 1;
+		}
+
+		if (c0 == '\0') {
+			return 0;
+		}
+	}
 }
 
 #if WIN32
@@ -138,21 +158,44 @@ int PrintDataSize(long long size) {
 	return Print("% 8.3f TiB", tibSize);
 }
 
+
+FILE *outFile = NULL;
+
+/////////////////////////////
+// Print_SetOutFile
+//
+void Print_SetOutFile(char *fileOut) {
+	if (fileOut == NULL) { return; }
+	outFile = fopen(fileOut, "a");
+}
+
+
+#define Print_BuferSize 4096
 /////////////////////////////
 // Print
 //
 // Prints the formated text screen
 int Print(char *fmt, ...) {
 	va_list ap;
+	char buffer[Print_BuferSize];
 	int n;
 
 	// Print
 	va_start(ap, fmt);
-	n = vprintf(fmt, ap);
+	//n = vprintf(fmt, ap);
+	n = vsnprintf(buffer, Print_BuferSize, fmt, ap);
 	va_end(ap);
 
-	// Flush
+	// Output to stdout
+	fputs(buffer, stdout);
 	fflush(stdout);
+
+	// Output to outFile
+	if(outFile != NULL){
+		fputs(buffer, outFile);
+		fflush(outFile);
+	}
+
 	return (n);
 }
 
