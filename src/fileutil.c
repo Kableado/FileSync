@@ -386,7 +386,7 @@ int File_Copy(const char *pathOrig, const char *pathDest) {
 		goto cleanup;
 	}
 
-	buffer = malloc(sizeof(char) * MaxBuffer);
+	buffer = (char *)malloc(sizeof(char) * MaxBuffer);
 	if (buffer == NULL) {
 		goto cleanup;
 	}

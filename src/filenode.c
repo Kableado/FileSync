@@ -17,7 +17,7 @@ FileNode FileNode_Create() {
 		FileNode nodes;
 		int i;
 		// Allocate a block
-		nodes = malloc(sizeof(TFileNode) * FileNode_Block);
+		nodes = (FileNode)malloc(sizeof(TFileNode) * FileNode_Block);
 		if (nodes == NULL) {
 			return NULL;
 		}
@@ -294,7 +294,7 @@ FileNode FileNode_LoadNode(FILE *file) {
 	fread((void *)&fileNode->flags, sizeof(fileNode->flags), 1, file);
 
 	// Read status
-	fileNode->status = fgetc(file);
+	fileNode->status = (FileStatus)fgetc(file);
 
 	// Read status
 	if (fileNode->flags & FileFlag_HasSize) {
@@ -459,7 +459,7 @@ FileNode FileNode_Build(char *path) {
 
 int FileNode_Build_Iterate(char *path, char *name, void *d) {
 	FileNode fileNode;
-	FileNode fileNodeParent = d;
+	FileNode fileNodeParent = (FileNode)d;
 
 	if (!strcmp(name, FileNode_Filename)) {
 		return (0);
@@ -565,7 +565,7 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 }
 
 int FileNode_Refresh_Iterate(char *path, char *name, void *d) {
-	FileNode fileNode = d;
+	FileNode fileNode = (FileNode)d;
 	FileNode fileNodeChild;
 
 	if (!strcmp(name, FileNode_Filename)) {

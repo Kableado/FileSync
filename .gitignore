@@ -19,5 +19,5 @@ VisualStudio/filesync/x64/*
 *.ilk
 *.VC.db
 *.VC.opendb
-tests/tmp/*
+tests/*
 .vs
