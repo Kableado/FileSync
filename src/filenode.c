@@ -377,7 +377,6 @@ void FileNode_PrintNode(FileNode fileNode) {
 	} else {
 		Print(" Dir");
 	}
-	Print(" %d", fileNode->status);
 	if (fileNode->status == FileStatus_New) {
 		Print(" New");
 	}
@@ -496,17 +495,17 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 		FileNode fileNodeChild;
 
 		// Check directory data 
+		fileTime = FileTime_Get(filePath);
 		if (fileNode->status == FileStatus_Deleted) {
 			fileNode->status = FileStatus_Modified;
-			fileNode->fileTime = Time_GetCurrentTime();
+			fileNode->fileTime = fileTime;
 		}
 		if (!(fileNode->flags & FileFlag_Directory)) {
 			fileNode->status = FileStatus_Modified;
 			fileNode->flags |= FileFlag_Directory;
 			fileNode->flags &= ~FileFlag_Normal;
 		}
-		fileTime = FileTime_Get(filePath);
-		if (fileTime > fileNode->fileTime) {
+		if (fileTime != fileNode->fileTime) {
 			fileNode->status = FileStatus_Modified; 
 			fileNode->fileTime = fileTime;
 		}
@@ -532,21 +531,21 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 		}
 	} else {
 		// Comprar datos de los ficheros
+		File_GetSizeAndTime(filePath, &size, &fileTime);
 		if (fileNode->status == FileStatus_Deleted) {
 			fileNode->status = FileStatus_Modified;
-			fileNode->fileTime = Time_GetCurrentTime();
+			fileNode->fileTime = fileTime;
 		}
 		if (!(fileNode->flags & FileFlag_Normal)) {
 			fileNode->status = FileStatus_Modified;
 			fileNode->flags |= FileFlag_Normal;
 			fileNode->flags &= ~FileFlag_Directory;
 		}
-		File_GetSizeAndTime(filePath, &size, &fileTime);
 		if (size != fileNode->size) {
 			fileNode->status = FileStatus_Modified;
 			fileNode->size = size;
 		}
-		if (fileTime > fileNode->fileTime) {
+		if (fileTime != fileNode->fileTime) {
 			fileNode->status = FileStatus_Modified; 
 			fileNode->fileTime = fileTime;
 		}
