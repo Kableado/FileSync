@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "util.h"
-#include "crc.h"
-#include "fileutil.h"
-#include "filenode.h"
 #include "actionfilenode.h"
 #include "actionfilenodesync.h"
+#include "crc.h"
+#include "filenode.h"
+#include "fileutil.h"
+#include "util.h"
 
 #define MaxDeltaTime 0
 
@@ -96,6 +96,12 @@ void AccionFileNode_SyncPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 				if (fileNodeRight->status == FileStatus_Deleted &&
 					fileNodeLeft->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_Nothing;
+				} else if (fileNodeLeft->status == FileStatus_Undeleted &&
+						   fileNodeRight->status == FileStatus_Deleted) {
+					actionFileNodeNew->action = ActionFileCmp_LeftToRight;
+				} else if (fileNodeLeft->status == FileStatus_Deleted &&
+						   fileNodeRight->status == FileStatus_Undeleted) {
+					actionFileNodeNew->action = ActionFileCmp_RightToLeft;
 				} else if (fileNodeRight->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_DeleteLeft;
 				} else if (fileNodeLeft->status == FileStatus_Deleted) {
@@ -161,6 +167,12 @@ void AccionFileNode_SyncPair(FileNode fileNodeLeft, FileNode fileNodeRight,
 				if (fileNodeRight->status == FileStatus_Deleted &&
 					fileNodeLeft->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_Nothing;
+				} else if (fileNodeLeft->status == FileStatus_Undeleted &&
+						   fileNodeRight->status == FileStatus_Deleted) {
+					actionFileNodeNew->action = ActionFileCmp_LeftToRight;
+				} else if (fileNodeLeft->status == FileStatus_Deleted &&
+						   fileNodeRight->status == FileStatus_Undeleted) {
+					actionFileNodeNew->action = ActionFileCmp_RightToLeft;
 				} else if (fileNodeRight->status == FileStatus_Deleted) {
 					actionFileNodeNew->action = ActionFileCmp_DeleteLeft;
 				} else if (fileNodeLeft->status == FileStatus_Deleted) {

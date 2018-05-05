@@ -5,7 +5,7 @@
 
 #define FileNode_Filename "nodesFile.fs"
 
-#define FileNode_Version 4
+#define FileNode_Version 5
 
 #define FileFlag_Root 1
 #define FileFlag_Normal 2
@@ -20,7 +20,8 @@ typedef enum EFileStatus {
 	FileStatus_None,
 	FileStatus_New,
 	FileStatus_Modified,
-	FileStatus_Deleted
+	FileStatus_Deleted,
+	FileStatus_Undeleted
 } FileStatus;
 
 typedef struct TFileNode TFileNode, *FileNode;

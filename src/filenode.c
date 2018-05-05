@@ -105,12 +105,7 @@ FileNode FileNode_GetRoot(FileNode fileNode) {
 
 void FileNode_SetStatusRec(FileNode fileNode, FileStatus status) {
 	FileNode fileNodeChild;
-	if (status == FileStatus_Deleted && fileNode->status != status) {
-		FileNode fileNodeRoot = FileNode_GetRoot(fileNode);
-		fileNode->fileTime = fileNodeRoot->fileTime;
-		;
-		fileNode->flags |= FileFlag_HasTime;
-	}
+	
 	fileNode->status = status;
 	fileNodeChild = fileNode->child;
 	while (fileNodeChild) {
@@ -384,7 +379,10 @@ void FileNode_PrintNode(FileNode fileNode) {
 		Print(" Modified");
 	}
 	if (fileNode->status == FileStatus_Deleted) {
-		Print(" Deleted!!!");
+		Print(" Deleted");
+	}
+	if (fileNode->status == FileStatus_Undeleted) {
+		Print(" Undeleted");
 	}
 	Print("\n");
 
@@ -497,7 +495,7 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 		// Check directory data 
 		fileTime = FileTime_Get(filePath);
 		if (fileNode->status == FileStatus_Deleted) {
-			fileNode->status = FileStatus_Modified;
+			fileNode->status = FileStatus_Undeleted;
 			fileNode->fileTime = fileTime;
 		}
 		if (!(fileNode->flags & FileFlag_Directory)) {
@@ -533,7 +531,7 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 		// Comprar datos de los ficheros
 		File_GetSizeAndTime(filePath, &size, &fileTime);
 		if (fileNode->status == FileStatus_Deleted) {
-			fileNode->status = FileStatus_Modified;
+			fileNode->status = FileStatus_Undeleted;
 			fileNode->fileTime = fileTime;
 		}
 		if (!(fileNode->flags & FileFlag_Normal)) {
