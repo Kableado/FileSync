@@ -30,7 +30,14 @@ FileNode CheckDir(char *path, int recheck) {
 		Print("\ttScan :");
 		PrintElapsedTime(tScan);
 		Print("\n");
+
+		long long tSave = Time_GetTime();
 		FileNode_Save(fileNode, dirNodesFile);
+		tSave = Time_GetTime() - tSave;
+		Print("\ttSave :");
+		PrintElapsedTime(tSave);
+		Print("\n");
+
 	} else {
 		Print("Loading Directory.. %s\n", path);
 		fileNode = FileNode_Load(dirNodesFile);
