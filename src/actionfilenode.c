@@ -217,28 +217,28 @@ void ActionFileNode_Print(ActionFileNode actionFileNode) {
 			// printff("%s == %s\n",pathIzq,pathDer);
 			break;
 		case ActionFileCmp_LeftToRight:
-			Print(" => %s\n", showPath);
+			Print(". => %s\n", showPath);
 			break;
 		case ActionFileCmp_RightToLeft:
-			Print(" <= %s\n", showPath);
+			Print(". <= %s\n", showPath);
 			break;
 		case ActionFileCmp_DeleteLeft:
-			Print(" *- %s\n", showPath);
+			Print(". *- %s\n", showPath);
 			break;
 		case ActionFileCmp_DeleteRight:
-			Print(" -* %s\n", showPath);
+			Print(". -* %s\n", showPath);
 			break;
 		case ActionFileCmp_DateLeftToRight:
-			Print(" -> %s\n", showPath);
+			Print(". -> %s\n", showPath);
 			break;
 		case ActionFileCmp_DateRightToLeft:
-			Print(" <- %s\n", showPath);
+			Print(". <- %s\n", showPath);
 			break;
 		case ActionFileCmp_MakeRightDirectory:
-			Print(" -D %s\n", showPath);
+			Print(". -D %s\n", showPath);
 			break;
 		case ActionFileCmp_MakeLeftDirectory:
-			Print(" D- %s\n", showPath);
+			Print(". D- %s\n", showPath);
 			break;
 		}
 
