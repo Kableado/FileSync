@@ -15,11 +15,20 @@ typedef enum EActionFileCmp {
 	ActionFileCmp_MakeLeftDirectory
 } ActionFileCmp;
 
+typedef enum EActionFileNodeResult {
+	ActionFileNodeResult_Nothing,
+	ActionFileNodeResult_Ok,
+	ActionFileNodeResult_Error
+} ActionFileNodeResult;
+
 typedef struct SActionFileNode TActionFileNode, *ActionFileNode;
 struct SActionFileNode {
 	ActionFileCmp action;
 	FileNode left;
 	FileNode right;
+
+	ActionFileNodeResult result;
+
 	ActionFileNode next;
 };
 
@@ -47,7 +56,8 @@ typedef struct SActionQueueStatistics {
 } ActionQueueStatistics;
 
 int ActionFileNode_Statistics(ActionFileNode actionFileNode,
-							  ActionQueueStatistics *statistics);
+							  ActionQueueStatistics *statistics,
+							  ActionFileNodeResult result);
 
 void ActionFileNode_Print(ActionFileNode actionFileNode);
 

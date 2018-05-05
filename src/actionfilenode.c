@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "util.h"
-#include "crc.h"
-#include "fileutil.h"
-#include "filenode.h"
 #include "actionfilenode.h"
+#include "crc.h"
+#include "filenode.h"
+#include "fileutil.h"
+#include "util.h"
 
 ActionFileNode _actionFileNodeFree = NULL;
 #define AccionFileNode_Block 1024
@@ -37,6 +37,7 @@ ActionFileNode ActionFileNode_Create() {
 	actionFileNode->action = ActionFileCmp_Nothing;
 	actionFileNode->left = NULL;
 	actionFileNode->right = NULL;
+	actionFileNode->result = ActionFileNodeResult_Nothing;
 	actionFileNode->next = NULL;
 
 	return (actionFileNode);
@@ -141,7 +142,8 @@ void AccionFileNode_CompareChilds(
 }
 
 int ActionFileNode_Statistics(ActionFileNode actionFileNode,
-							  ActionQueueStatistics *statistics) {
+							  ActionQueueStatistics *statistics,
+							  ActionFileNodeResult result) {
 	statistics->readLeft = 0;
 	statistics->writeLeft = 0;
 	statistics->readRight = 0;
@@ -155,6 +157,11 @@ int ActionFileNode_Statistics(ActionFileNode actionFileNode,
 	statistics->deleteCount = 0;
 
 	while (actionFileNode != NULL) {
+		if (actionFileNode->result != result) {
+			actionFileNode = actionFileNode->next;
+			continue;
+		}
+
 		switch (actionFileNode->action) {
 		case ActionFileCmp_Nothing:
 			break;
@@ -240,33 +247,39 @@ void ActionFileNode_Print(ActionFileNode actionFileNode) {
 	Print("End\n");
 }
 
-void AccionFileNodeAux_CopyDate(char *pathOrig, char *pathDest) {
+bool AccionFileNodeAux_CopyDate(char *pathOrig, char *pathDest) {
 	FileTime ft = FileTime_Get(pathOrig);
 	FileTime_Set(pathDest, ft);
+	return true;
 }
 
-void AccionFileNodeAux_Copy(char *pathOrig, char *pathDest) {
+bool AccionFileNodeAux_Copy(char *pathOrig, char *pathDest) {
 	if (File_Copy(pathOrig, pathDest)) {
-		AccionFileNodeAux_CopyDate(pathOrig, pathDest);
+		return AccionFileNodeAux_CopyDate(pathOrig, pathDest);
 	} else {
 		File_Delete(pathDest);
 		Print("Error Copying to: %s, %s\n", pathDest, GetError());
+		return false;
 	}
 }
-void AccionFileNodeAux_Delete(char *pathOrig, char *pathDest) {
+bool AccionFileNodeAux_Delete(char *pathOrig, char *pathDest) {
 	if (File_IsDirectory(pathDest)) {
 		if (File_DeleteDirectory(pathDest) == 0) {
 			Print("Error Deleting Directory: %s, %s\n", pathDest, GetError());
+			return false;
 		}
 	} else {
 		if (File_Delete(pathDest) == 0) {
 			Print("Error Deleting File: %s, %s\n", pathDest, GetError());
+			return false;
 		}
 	}
+	return true;
 }
-void AccionFileNodeAux_MakeDir(char *pathOrig, char *pathDest) {
+bool AccionFileNodeAux_MakeDir(char *pathOrig, char *pathDest) {
 	if (File_MakeDirectory(pathDest) == 0) {
 		Print("Error Making Directory: %s, %s\n", pathDest, GetError());
+		return false;
 	}
 }
 
@@ -296,42 +309,74 @@ int ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 			break;
 		case ActionFileCmp_LeftToRight:
 			Print(" => %s\n", showPath);
-			AccionFileNodeAux_Copy(fullPathLeft, fullPathRight);
+			if (AccionFileNodeAux_Copy(fullPathLeft, fullPathRight)) {
+				actionFileNode->result = ActionFileNodeResult_Ok;
+			} else {
+				actionFileNode->result = ActionFileNodeResult_Error;
+			}
 			numActions++;
 			break;
 		case ActionFileCmp_RightToLeft:
 			Print(" <= %s\n", showPath);
-			AccionFileNodeAux_Copy(fullPathRight, fullPathLeft);
+			if (AccionFileNodeAux_Copy(fullPathRight, fullPathLeft)) {
+				actionFileNode->result = ActionFileNodeResult_Ok;
+			} else {
+				actionFileNode->result = ActionFileNodeResult_Error;
+			}
 			numActions++;
 			break;
 		case ActionFileCmp_DeleteLeft:
 			Print(" *- %s\n", showPath);
-			AccionFileNodeAux_Delete(fullPathRight, fullPathLeft);
+			if (AccionFileNodeAux_Delete(fullPathRight, fullPathLeft)) {
+				actionFileNode->result = ActionFileNodeResult_Ok;
+			} else {
+				actionFileNode->result = ActionFileNodeResult_Error;
+			}
 			numActions++;
 			break;
 		case ActionFileCmp_DeleteRight:
 			Print(" -* %s\n", showPath);
-			AccionFileNodeAux_Delete(fullPathLeft, fullPathRight);
+			if (AccionFileNodeAux_Delete(fullPathLeft, fullPathRight)) {
+				actionFileNode->result = ActionFileNodeResult_Ok;
+			} else {
+				actionFileNode->result = ActionFileNodeResult_Error;
+			}
 			numActions++;
 			break;
 		case ActionFileCmp_DateLeftToRight:
 			Print(" -> %s\n", showPath);
-			AccionFileNodeAux_CopyDate(fullPathLeft, fullPathRight);
+			if (AccionFileNodeAux_CopyDate(fullPathLeft, fullPathRight)) {
+				actionFileNode->result = ActionFileNodeResult_Ok;
+			} else {
+				actionFileNode->result = ActionFileNodeResult_Error;
+			}
 			numActions++;
 			break;
 		case ActionFileCmp_DateRightToLeft:
 			Print(" <- %s\n", showPath);
-			AccionFileNodeAux_CopyDate(fullPathRight, fullPathLeft);
+			if (AccionFileNodeAux_CopyDate(fullPathRight, fullPathLeft)) {
+				actionFileNode->result = ActionFileNodeResult_Ok;
+			} else {
+				actionFileNode->result = ActionFileNodeResult_Error;
+			}
 			numActions++;
 			break;
 		case ActionFileCmp_MakeRightDirectory:
 			Print(" -D %s\n", showPath);
-			AccionFileNodeAux_MakeDir(fullPathLeft, fullPathRight);
+			if (AccionFileNodeAux_MakeDir(fullPathLeft, fullPathRight)) {
+				actionFileNode->result = ActionFileNodeResult_Ok;
+			} else {
+				actionFileNode->result = ActionFileNodeResult_Error;
+			}
 			numActions++;
 			break;
 		case ActionFileCmp_MakeLeftDirectory:
 			Print(" D- %s\n", showPath);
-			AccionFileNodeAux_MakeDir(fullPathRight, fullPathLeft);
+			if (AccionFileNodeAux_MakeDir(fullPathRight, fullPathLeft)) {
+				actionFileNode->result = ActionFileNodeResult_Ok;
+			} else {
+				actionFileNode->result = ActionFileNodeResult_Error;
+			}
 			numActions++;
 			break;
 		}

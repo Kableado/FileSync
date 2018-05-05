@@ -42,9 +42,9 @@ FileNode CheckDir(char *path, int recheck) {
 	return fileNode;
 }
 
-void PrintStatistics(ActionFileNode actionFileNode) {
+void PrintStatistics(ActionFileNode actionFileNode, ActionFileNodeResult result) {
 	ActionQueueStatistics statistics;
-	if (ActionFileNode_Statistics(actionFileNode, &statistics) == 0) {
+	if (ActionFileNode_Statistics(actionFileNode, &statistics, result) == 0) {
 		Print("Noting to do.\n");
 		return;
 	}
@@ -104,10 +104,11 @@ int Sync(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	if (dryRun) {
 		// Show action list
 		ActionFileNode_Print(actionFileNode);
-		PrintStatistics(actionFileNode);
+		PrintStatistics(actionFileNode, ActionFileNodeResult_Nothing);
 	} else {
 		// Run action list
 		if (ActionFileNode_RunList(actionFileNode, pathLeft, pathRight)) {
+			PrintStatistics(actionFileNode, ActionFileNodeResult_Ok);
 			CheckDir(pathLeft, reCheck);
 			CheckDir(pathRight, reCheck);
 		}
@@ -151,10 +152,11 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	if (dryRun) {
 		// Show action list
 		ActionFileNode_Print(actionFileNode);
-		PrintStatistics(actionFileNode);
+		PrintStatistics(actionFileNode, ActionFileNodeResult_Nothing);
 	} else {
 		// Run action list
 		if (ActionFileNode_RunList(actionFileNode, pathLeft, pathRight)) {
+			PrintStatistics(actionFileNode, ActionFileNodeResult_Ok);
 			CheckDir(pathLeft, reCheck);
 			CheckDir(pathRight, reCheck);
 		}
