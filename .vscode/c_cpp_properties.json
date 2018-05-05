@@ -3,14 +3,17 @@
         {
             "name": "Mac",
             "includePath": [
-                "/usr/include"
+                "/usr/include",
+                "${workspaceRoot}",
+                "${workspaceRoot}/src/"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": "",
                 "path": [
                     "/usr/include",
-                    "${workspaceRoot}"
+                    "${workspaceRoot}",
+                    "${workspaceRoot}/src/"
                 ]
             },
             "intelliSenseMode": "clang-x64",
@@ -22,23 +25,31 @@
         {
             "name": "Linux",
             "includePath": [
-                "/usr/include"
+                "/usr/include",
+                "${workspaceRoot}",
+                "${workspaceRoot}/src/"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": "",
                 "path": [
                     "/usr/include",
-                    "${workspaceRoot}"
+                    "${workspaceRoot}",
+                    "${workspaceRoot}/src/"
                 ]
             },
-            "intelliSenseMode": "clang-x64"
+            "intelliSenseMode": "clang-x64",
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
         },
         {
             "name": "Win32",
             "includePath": [
                 "C:\\msys64\\mingw64\\include",
-                "C:\\msys64\\mingw64\\x86_64-w64-mingw32\\include"
+                "C:\\msys64\\mingw64\\x86_64-w64-mingw32\\include",
+                "${workspaceRoot}",
+                "${workspaceRoot}/src/"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
@@ -46,15 +57,16 @@
                 "path": [
                     "C:\\msys64\\mingw64\\include",
                     "C:\\msys64\\mingw64\\x86_64-w64-mingw32\\include",
-                    "${workspaceRoot}"
+                    "${workspaceRoot}",
+                    "${workspaceRoot}/src/"
                 ]
             },
             "intelliSenseMode": "msvc-x64",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "defines": [
-                "WIN32"
-            ]
+			"defines": [
+				"WIN32"
+			]
         }
     ],
     "version": 3
