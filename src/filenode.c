@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "util.h"
 #include "crc.h"
-#include "fileutil.h"
 #include "filenode.h"
+#include "fileutil.h"
+#include "util.h"
 
 FileNode _freeFileNode = NULL;
 int _n_filenode = 0;
@@ -105,7 +105,7 @@ FileNode FileNode_GetRoot(FileNode fileNode) {
 
 void FileNode_SetStatusRec(FileNode fileNode, FileStatus status) {
 	FileNode fileNodeChild;
-	
+
 	fileNode->status = status;
 	fileNodeChild = fileNode->child;
 	while (fileNodeChild) {
@@ -492,7 +492,7 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 	if (File_IsDirectory(filePath)) {
 		FileNode fileNodeChild;
 
-		// Check directory data 
+		// Check directory data
 		fileTime = FileTime_Get(filePath);
 		if (fileNode->status == FileStatus_Deleted) {
 			fileNode->status = FileStatus_Undeleted;
@@ -504,7 +504,7 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 			fileNode->flags &= ~FileFlag_Normal;
 		}
 		if (fileTime != fileNode->fileTime) {
-			fileNode->status = FileStatus_Modified; 
+			fileNode->status = FileStatus_Modified;
 			fileNode->fileTime = fileTime;
 		}
 
@@ -544,7 +544,7 @@ FileNode FileNode_Refresh(FileNode fileNode, char *filePath) {
 			fileNode->size = size;
 		}
 		if (fileTime != fileNode->fileTime) {
-			fileNode->status = FileStatus_Modified; 
+			fileNode->status = FileStatus_Modified;
 			fileNode->fileTime = fileTime;
 		}
 		if (fileNode->status == FileStatus_Modified) {

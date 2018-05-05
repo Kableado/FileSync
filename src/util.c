@@ -1,9 +1,9 @@
 ﻿#include <ctype.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdarg.h>
 
 #include "util.h"
 
@@ -27,7 +27,7 @@ char *String_Copy(char *str) {
 //
 // Compares a string case insensitive
 int String_CompareCaseInsensitive(char *str0, char *str1) {
-	for (int i = 0; ; i++) {
+	for (int i = 0;; i++) {
 		char c0 = tolower(str0[i]);
 		char c1 = tolower(str1[i]);
 		if (c0 != c1) {
@@ -158,17 +158,17 @@ int PrintDataSize(long long size) {
 	return Print("% 8.3f TiB", tibSize);
 }
 
-
 FILE *outFile = NULL;
 
 /////////////////////////////
 // Print_SetOutFile
 //
 void Print_SetOutFile(char *fileOut) {
-	if (fileOut == NULL) { return; }
+	if (fileOut == NULL) {
+		return;
+	}
 	outFile = fopen(fileOut, "a");
 }
-
 
 #define Print_BuferSize 4096
 /////////////////////////////
@@ -182,7 +182,7 @@ int Print(char *fmt, ...) {
 
 	// Print
 	va_start(ap, fmt);
-	//n = vprintf(fmt, ap);
+	// n = vprintf(fmt, ap);
 	n = vsnprintf(buffer, Print_BuferSize, fmt, ap);
 	va_end(ap);
 
@@ -191,7 +191,7 @@ int Print(char *fmt, ...) {
 	fflush(stdout);
 
 	// Output to outFile
-	if(outFile != NULL){
+	if (outFile != NULL) {
 		fputs(buffer, outFile);
 		fflush(outFile);
 	}

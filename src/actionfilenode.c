@@ -387,8 +387,8 @@ int ActionFileNode_RunList(ActionFileNode actionFileNode, char *pathLeft,
 	return numActions;
 }
 
-// ----------------------------------------------------------------------------
-// Common utilities
+	// ----------------------------------------------------------------------------
+	// Common utilities
 
 #define QueueNode(queue, node)                                                 \
 	(queue)->next = (node);                                                    \

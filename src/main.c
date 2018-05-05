@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "util.h"
+#include "actionfilenode.h"
+#include "actionfilenodecopy.h"
+#include "actionfilenodesync.h"
 #include "crc.h"
+#include "filenode.h"
 #include "fileutil.h"
 #include "parameteroperation.h"
-#include "filenode.h"
-#include "actionfilenode.h"
-#include "actionfilenodesync.h"
-#include "actionfilenodecopy.h"
+#include "util.h"
 
 FileNode CheckDir(char *path, int recheck) {
 	char dirNodesFile[MaxPath];
@@ -42,7 +42,8 @@ FileNode CheckDir(char *path, int recheck) {
 	return fileNode;
 }
 
-void PrintStatistics(ActionFileNode actionFileNode, ActionFileNodeResult result) {
+void PrintStatistics(ActionFileNode actionFileNode,
+					 ActionFileNodeResult result) {
 	ActionQueueStatistics statistics;
 	if (ActionFileNode_Statistics(actionFileNode, &statistics, result) == 0) {
 		Print("Noting to do.\n");
@@ -165,7 +166,8 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	return (1);
 }
 
-typedef struct SApplicationConfiguration TApplicationConfiguration, *ApplicationConfiguration;
+typedef struct SApplicationConfiguration TApplicationConfiguration,
+	*ApplicationConfiguration;
 struct SApplicationConfiguration {
 	char *Dirs[10];
 	bool NoScan;
@@ -175,7 +177,8 @@ struct SApplicationConfiguration {
 	bool NoAction;
 	char *Log;
 };
-TApplicationConfiguration defaultConfig = { {NULL}, false, false, false, false, false, NULL };
+TApplicationConfiguration defaultConfig = {{NULL}, false, false, false,
+										   false,  false, NULL};
 
 bool SetParam_Dir(int argc, char *argv[], void *data) {
 	ApplicationConfiguration config = (ApplicationConfiguration)data;
@@ -184,7 +187,9 @@ bool SetParam_Dir(int argc, char *argv[], void *data) {
 		return false;
 	}
 	char **destDir = config->Dirs;
-	while (destDir[0] != NULL) { destDir++; }
+	while (destDir[0] != NULL) {
+		destDir++;
+	}
 	destDir[0] = argv[0];
 	destDir++;
 	destDir = NULL;
@@ -287,25 +292,26 @@ bool Func_Check(int argc, char *argv[], void *data) {
 }
 
 TParameterOperation _parameterOperations[] = {
-	{ "dir", 1, "Specify a directory", SetParam_Dir },
-	{ "nocheck", 0, "Do not check for changes on directories", SetParam_NoCheck },
-	{ "dummy", 0, "Do not perform operations", SetParam_Dummy },
-	{ "copy", 0, "Copy first directory to second directory", SetParam_Copy },
-	{ "sync", 0, "Synchronize between two directories", SetParam_Sync },
-	{ "log", 1, "Log actions to file", SetParam_Log },
+	{"dir", 1, "Specify a directory", SetParam_Dir},
+	{"nocheck", 0, "Do not check for changes on directories", SetParam_NoCheck},
+	{"dummy", 0, "Do not perform operations", SetParam_Dummy},
+	{"copy", 0, "Copy first directory to second directory", SetParam_Copy},
+	{"sync", 0, "Synchronize between two directories", SetParam_Sync},
+	{"log", 1, "Log actions to file", SetParam_Log},
 
-	{ "scan", 2, "Scan directory and save to filenode file", Func_Rescan },
-	{ "rescan", 2, "Rescan directory and save to filenode file", Func_Rescan },
-	{ "read", 1, "Read filenode file", Func_Read },
-	{ "check", 1, "Check changes on a directory", Func_Check },
+	{"scan", 2, "Scan directory and save to filenode file", Func_Rescan},
+	{"rescan", 2, "Rescan directory and save to filenode file", Func_Rescan},
+	{"read", 1, "Read filenode file", Func_Read},
+	{"check", 1, "Check changes on a directory", Func_Check},
 
-	{ NULL, 0, NULL, NULL },
+	{NULL, 0, NULL, NULL},
 };
 
 int main(int argc, char *argv[]) {
 	TApplicationConfiguration config = defaultConfig;
 
-	int parameterParsingResult = ParameterOperation_Parse(argc, argv, _parameterOperations, &config);
+	int parameterParsingResult =
+		ParameterOperation_Parse(argc, argv, _parameterOperations, &config);
 	if (parameterParsingResult <= 0) {
 		ParameterOperation_PrintHelp(_parameterOperations);
 		return 0;
@@ -314,7 +320,8 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	Print("\n================================ FileSync ===================================\n");
+	Print("\n================================ FileSync "
+		  "===================================\n");
 
 	if (config.Copy == false && config.Sync == false) {
 		Print("Error: Action not specified.\n");
@@ -325,12 +332,13 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 	if (config.Copy) {
-		Copy(config.Dirs[0], config.Dirs[1], (config.NoScan == false), config.Dummy);
+		Copy(config.Dirs[0], config.Dirs[1], (config.NoScan == false),
+			 config.Dummy);
 	}
 	if (config.Sync) {
-		Sync(config.Dirs[0], config.Dirs[1], (config.NoScan == false), config.Dummy);
+		Sync(config.Dirs[0], config.Dirs[1], (config.NoScan == false),
+			 config.Dummy);
 	}
 
 	return 0;
 }
-

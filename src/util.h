@@ -1,10 +1,12 @@
 ﻿#ifndef _UTIL_
 #define _UTIL_
 
-#include <stdlib.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
+#ifndef bool
 typedef int bool;
+#endif
 #define true 1
 #define false 0
 

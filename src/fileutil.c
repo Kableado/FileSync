@@ -2,29 +2,29 @@
 #ifdef WIN32
 #define _WIN32_WINNT 0x0501
 #include <direct.h>
-#include <windows.h>
-#include <io.h>
-#include <stdio.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <io.h>
+#include <signal.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
+#include <windows.h>
 #else
+#include <dirent.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <time.h>
-#include <utime.h>
-#include <dirent.h>
 #include <unistd.h>
-#include <errno.h>
+#include <utime.h>
 #endif
 
-#include "util.h"
 #include "fileutil.h"
+#include "util.h"
 
 #ifdef WIN32
 long long FileTime_to_POSIX(FILETIME fileTime) {
