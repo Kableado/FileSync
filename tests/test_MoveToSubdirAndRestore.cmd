@@ -7,7 +7,7 @@ IF EXIST %testDir%.B rmdir %testDir%.B /S /Q
 IF EXIST %testDir%.txt del %testDir%.txt
 
 echo:Test %testName% started> %testDir%.txt
-echo:Test %testName% started
+echo [7mTest %testName% started[0m
 IF NOT EXIST tmp md tmp
 md %testDir%.A
 md %testDir%.B
@@ -50,9 +50,13 @@ IF NOT EXIST %testDir%.B\Dos.txt goto error
 goto end
 :error
 echo:Test %testName% Failed...>> %testDir%.txt
-echo:Test %testName% Failed...
+echo [41mTest %testName% Failed...[0m
 goto eof
 :end
 echo:Test %testName% OK!>> %testDir%.txt
-echo:Test %testName% OK!
+echo [42mTest %testName% OK![0m
 :eof
+echo:>> %testDir%.txt
+echo:
+echo:>> %testDir%.txt
+echo:
