@@ -9,32 +9,28 @@ The executable is completelly portable, there are no dependencies.
 ## Usage
 Basic usage to syncronize two directories, dirA and dirB:
 
-    filesync sync dirA dirB
+    filesync -sync -dir dirA -dir dirB
 
 To make a efficient copy from dirA to dirB:
 
-    filesync copy dirA dirB
+    filesync -copy -dir dirA -dir dirB
 
 The rest of options are listed with no parameters:
 
-    $ filesync
-    Usage:
-        filesync info [file] {[file] {..}}
-        filesync scan [dir] [tree]
-        filesync rescan [dir] [tree]
-        filesync read [file] [tree]
-        filesync dir [dir]
-        filesync check [dir]
-
-        filesync sync [dirA] [dirB]
-        filesync resync [dirA] [dirB]
-        filesync synctest [dirA] [dirB]
-        filesync resynctest [dirA] [dirB]
-
-        filesync copy [dirA] [dirB]
-        filesync recopy [dirA] [dirB]
-        filesync copytest [dirA] [dirB]
-        filesync recopytest [dirA] [dirB]
+```
+$ filesync
+Parameters:
+        -dir [Item]: Specify a directory.
+        -nocheck: Do not check for changes on directories.
+        -dummy: Do not perform operations.
+        -copy: Copy first directory to second directory.
+        -sync: Synchronize between two directories.
+        -log [Item]: Log actions to file.
+        -scan [Item] [Item]: Scan directory and save to filenode file.
+        -rescan [Item] [Item]: Rescan directory and save to filenode file.
+        -read [Item]: Read filenode file.
+        -check [Item]: Check changes on a directory.
+```
 
 ## Building
 There is a GNU Make compatible Makefile usable on Linux and MingGW.
