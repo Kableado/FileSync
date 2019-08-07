@@ -317,6 +317,8 @@ TParameterOperation _parameterOperations[] = {
 int main(int argc, char *argv[]) {
 	TApplicationConfiguration config = defaultConfig;
 
+	Exceptions_Init();
+
 	int parameterParsingResult =
 		ParameterOperation_Parse(argc, argv, _parameterOperations, &config);
 	if (parameterParsingResult <= 0) {

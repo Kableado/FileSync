@@ -211,3 +211,139 @@ char *GetError() {
 	strcpy(_errorMessage, "");
 	return _errorMessageTemp;
 }
+
+
+
+
+/////////////////////////////
+// Exceptions_Init
+//
+#ifdef WIN32
+
+LONG WINAPI Win32UnhandledExceptionFilter(
+	struct _EXCEPTION_POINTERS *lpTopLevelExceptionFilter) {
+	char cadena[255];
+
+	sprintf(
+		cadena, "!!! Crash: Unrecoverable exception at 0x%p",
+		(void *)lpTopLevelExceptionFilter->ExceptionRecord->ExceptionAddress);
+	printf(cadena);
+	printf("\n");
+	FatalAppExit(0, cadena);
+
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
+void Exceptions_Init() {
+	SetUnhandledExceptionFilter(Win32UnhandledExceptionFilter);
+}
+
+#else
+#ifdef EMSCRIPTEN
+
+void Exceptions_Init() {}
+
+#else
+
+#include <signal.h>
+#include <dlfcn.h>
+#include <execinfo.h>
+#include <memory.h>
+
+void Exception_Signal(int senhal, siginfo_t *info, void *ptr) {
+	int kill_self = 0;
+	
+	printf("!!! Crash: ");
+	switch (senhal) {
+	case SIGHUP:
+		printf("SIGUP");
+		break;
+	case SIGINT:
+		printf("SIGINT");
+		break;
+	case SIGQUIT:
+		printf("SIGQUIT");
+		break;
+	case SIGILL:
+		printf("SIGILL");
+		break;
+	case SIGTRAP:
+		printf("SIGTRAP");
+		break;
+	case SIGFPE:
+		printf("SIGFPE ");
+		if (info->si_code == FPE_INTDIV) {
+			printf("entero div zero");
+		}
+		if (info->si_code == FPE_INTOVF) {
+			printf("entero desbordado");
+		}
+		if (info->si_code == FPE_FLTDIV) {
+			printf("float div zero");
+		}
+		if (info->si_code == FPE_FLTOVF) {
+			printf("float desbordado");
+		}
+		if (info->si_code == FPE_FLTUND) {
+			printf("float desbordado por defecto");
+		}
+		if (info->si_code == FPE_FLTRES) {
+			printf("float inexacto");
+		}
+		if (info->si_code == FPE_FLTINV) {
+			printf("operacion float invalida");
+		}
+		if (info->si_code == FPE_FLTSUB) {
+			printf("subscript fuera de rango");
+		}
+		break;
+	case SIGSEGV:
+		printf("SIGSEGV");
+		kill_self = 1;
+		break;
+	case SIGTERM:
+		printf("SIGTERM");
+		break;
+	case SIGABRT:
+		printf("SIGABRT");
+		break;
+	default:
+		printf("%d", senhal);
+	}
+	printf("\n");
+
+	if (kill_self) {
+		pid_t parent_pid;
+		char cadena[256];
+		parent_pid = getpid();
+		sprintf(cadena, "kill -9 %d", parent_pid);
+		system(cadena);
+	}
+
+	// Salir
+	exit(0);
+}
+#include <fenv.h>
+int feenableexcept();
+
+void Exceptions_Init() {
+	struct sigaction action;
+
+	memset(&action, 0, sizeof(action));
+	action.sa_sigaction = Exception_Signal;
+	action.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGHUP, &action, 0);
+	sigaction(SIGINT, &action, 0);
+	sigaction(SIGQUIT, &action, 0);
+	sigaction(SIGILL, &action, 0);
+	sigaction(SIGTRAP, &action, 0);
+	sigaction(SIGFPE, &action, 0);
+	sigaction(SIGSEGV, &action, 0);
+	sigaction(SIGTERM, &action, 0);
+	sigaction(SIGABRT, &action, 0);
+}
+
+#endif
+#endif
+

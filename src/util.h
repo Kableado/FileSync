@@ -70,4 +70,9 @@ int Print(char *fmt, ...);
 void SetError(char *msg);
 char *GetError();
 
+/////////////////////////////
+// Exceptions_Init
+//
+void Exceptions_Init();
+
 #endif
