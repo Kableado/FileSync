@@ -87,8 +87,8 @@ void FileNode_Delete(FileNode fn) {
 }
 
 void FileNode_AddChild(FileNode fileNode, FileNode fileNodeChild) {
-	if (!fileNodeChild || !fileNode)
-		return;
+	if (fileNodeChild == NULL || fileNode == NULL) { return; }
+
 	fileNodeChild->next = fileNode->child;
 	fileNode->child = fileNodeChild;
 	fileNode->childCount++;
@@ -105,6 +105,8 @@ FileNode FileNode_GetRoot(FileNode fileNode) {
 
 void FileNode_SetStatusRec(FileNode fileNode, FileStatus status) {
 	FileNode fileNodeChild;
+
+	if (fileNode == NULL) { return; }
 
 	fileNode->status = status;
 	fileNodeChild = fileNode->child;
