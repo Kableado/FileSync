@@ -4,18 +4,9 @@
             "name": "Mac",
             "includePath": [
                 "/usr/include",
-                "${workspaceRoot}",
-                "${workspaceRoot}/src/"
+                "${workspaceFolder}",
+                "${workspaceFolder}/src/"
             ],
-            "browse": {
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": "",
-                "path": [
-                    "/usr/include",
-                    "${workspaceRoot}",
-                    "${workspaceRoot}/src/"
-                ]
-            },
             "intelliSenseMode": "clang-x64",
             "macFrameworkPath": [
                 "/System/Library/Frameworks",
@@ -26,18 +17,9 @@
             "name": "Linux",
             "includePath": [
                 "/usr/include",
-                "${workspaceRoot}",
-                "${workspaceRoot}/src/"
+                "${workspaceFolder}",
+                "${workspaceFolder}/src/"
             ],
-            "browse": {
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": "",
-                "path": [
-                    "/usr/include",
-                    "${workspaceRoot}",
-                    "${workspaceRoot}/src/"
-                ]
-            },
             "intelliSenseMode": "clang-x64",
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
@@ -46,28 +28,23 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:\\msys64\\mingw64\\include",
-                "C:\\msys64\\mingw64\\x86_64-w64-mingw32\\include",
-                "${workspaceRoot}",
-                "${workspaceRoot}/src/"
+                "C:/msys64/mingw64/include",
+                "C:/msys64/mingw64/x86_64-w64-mingw32/include",
+                "${workspaceFolder}",
+                "${workspaceFolder}/src/"
             ],
-            "browse": {
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": "",
-                "path": [
-                    "C:\\msys64\\mingw64\\include",
-                    "C:\\msys64\\mingw64\\x86_64-w64-mingw32\\include",
-                    "${workspaceRoot}",
-                    "${workspaceRoot}/src/"
-                ]
-            },
-            "intelliSenseMode": "msvc-x64",
-            "cStandard": "c11",
+            "defines": [
+                "WIN32",
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "C:/msys64/mingw64/bin/g++.exe",
+            "cStandard": "c17",
             "cppStandard": "c++17",
-			"defines": [
-				"WIN32"
-			]
+            "intelliSenseMode": "windows-gcc-x64"
         }
     ],
-    "version": 3
+    "version": 4
 }
