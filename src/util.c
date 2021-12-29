@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 
+#include <stdlib.h>
 #include "util.h"
 
 /////////////////////////////
@@ -78,6 +79,7 @@ void Time_Pause(int pausa) {
 	} while (tend >= t);
 }
 #else
+#include <sys/time.h>
 /////////////////////////////
 // Time_GetTime
 //
@@ -249,6 +251,7 @@ void Exceptions_Init() {}
 #include <dlfcn.h>
 #include <execinfo.h>
 #include <memory.h>
+#include <unistd.h>
 
 void Exception_Signal(int senhal, siginfo_t *info, void *ptr) {
 	int kill_self = 0;
