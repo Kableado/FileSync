@@ -3,10 +3,10 @@
 IsMinGW := $(findstring MSYS,$(shell uname -s))$(findstring MINGW,$(shell uname -s))
 ifneq (,$(IsMinGW))
 	RES_APP  := filesync.exe
-	BUILDDIR := build-$(shell gcc -v 2>&1 | grep "Target:" | cut --delimiter=' ' --fields=2)
+	BUILDDIR := build-$(shell gcc -dumpmachine)
 else
 	RES_APP  := filesync
-	BUILDDIR := build-$(shell gcc -v 2>&1 | grep "Target:" | cut --delimiter=' ' --fields=2)
+	BUILDDIR := build-$(shell gcc -dumpmachine)
 endif
 VERBOSE_BUILD=false
 
