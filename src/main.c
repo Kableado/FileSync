@@ -109,6 +109,8 @@ int Sync(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	PrintElapsedTime(tBuild);
 	Print("\n");
 
+	int postCheckDir = 0;
+	long long tRun = Time_GetTime();
 	if (dryRun) {
 		// Show action list
 		ActionFileNode_Print(actionFileNode);
@@ -117,9 +119,17 @@ int Sync(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 		// Run action list
 		if (ActionFileNode_RunList(actionFileNode, pathLeft, pathRight)) {
 			PrintStatistics(actionFileNode, ActionFileNodeResult_Ok);
-			CheckDir(pathLeft, reCheck);
-			CheckDir(pathRight, reCheck);
+			postCheckDir = 1;
 		}
+	}
+	tRun = Time_GetTime() - tRun;
+	Print("\ttRun:");
+	PrintElapsedTime(tRun);
+	Print("\n");
+
+	if (postCheckDir) {
+		CheckDir(pathLeft, reCheck);
+		CheckDir(pathRight, reCheck);
 	}
 
 	return (1);
@@ -157,6 +167,8 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 	PrintElapsedTime(tBuild);
 	Print("\n");
 
+	int postCheckDir = 0;
+	long long tRun = Time_GetTime();
 	if (dryRun) {
 		// Show action list
 		ActionFileNode_Print(actionFileNode);
@@ -165,9 +177,17 @@ int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun) {
 		// Run action list
 		if (ActionFileNode_RunList(actionFileNode, pathLeft, pathRight)) {
 			PrintStatistics(actionFileNode, ActionFileNodeResult_Ok);
-			CheckDir(pathLeft, reCheck);
-			CheckDir(pathRight, reCheck);
+			postCheckDir = 1;
 		}
+	}
+	tRun = Time_GetTime() - tRun;
+	Print("\ttRun:");
+	PrintElapsedTime(tRun);
+	Print("\n");
+
+	if (postCheckDir) {
+		CheckDir(pathLeft, reCheck);
+		CheckDir(pathRight, reCheck);
 	}
 
 	return (1);
