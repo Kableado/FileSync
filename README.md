@@ -36,7 +36,7 @@ Parameters:
 There is a GNU Make compatible Makefile usable on Linux and MingGW.
 
     make
-    
+
 ## Contributing
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
@@ -51,7 +51,7 @@ There is a GNU Make compatible Makefile usable on Linux and MingGW.
 
     The MIT License (MIT)
 
-    Copyright (c) 2014-2015 Valeriano Alfonso Rodriguez
+    Copyright (c) 2014-2021 Valeriano Alfonso Rodriguez
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

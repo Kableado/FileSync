@@ -1,4 +1,7 @@
-﻿#ifndef _FILEUTIL_
+﻿// SPDX-License-Identifier: MIT
+// Copyright (c) 2014-2021 Valeriano Alfonso Rodriguez
+
+#ifndef _FILEUTIL_
 #define _FILEUTIL_
 
 ////////////////////////////////////////////////

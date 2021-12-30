@@ -1,4 +1,6 @@
-﻿
+﻿// SPDX-License-Identifier: MIT
+// Copyright (c) 2014-2021 Valeriano Alfonso Rodriguez
+
 #ifdef WIN32
 #define _WIN32_WINNT 0x0501
 #include <direct.h>

@@ -1,4 +1,5 @@
-
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2014-2021 Valeriano Alfonso Rodriguez
 
 IsMinGW := $(findstring MSYS,$(shell uname -s))$(findstring MINGW,$(shell uname -s))
 ifneq (,$(IsMinGW))

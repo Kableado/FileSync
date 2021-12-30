@@ -1,4 +1,7 @@
-﻿#ifndef _FILENODE_H_
+﻿// SPDX-License-Identifier: MIT
+// Copyright (c) 2014-2021 Valeriano Alfonso Rodriguez
+
+#ifndef _FILENODE_H_
 #define _FILENODE_H_
 
 #include "fileutil.h"

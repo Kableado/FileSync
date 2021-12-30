@@ -1,4 +1,7 @@
-﻿#include <stdio.h>
+﻿// SPDX-License-Identifier: MIT
+// Copyright (c) 2014-2021 Valeriano Alfonso Rodriguez
+
+#include <stdio.h>
 
 unsigned long _crcTable[256];
 int _crcTableInitialized = 0;

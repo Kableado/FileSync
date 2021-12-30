@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2014-2021 Valeriano Alfonso Rodriguez
+
 #include "parameteroperation.h"
 #include "util.h"
 
