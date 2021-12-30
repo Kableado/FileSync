@@ -1,9 +1,5 @@
 {
     "files.associations": {
-        "time.h": "c",
-        "signal.h": "c",
-        "execinfo.h": "c",
-        "dlfcn.h": "c",
-        "siginfo_t.h": "c"
+        "*.h": "c"
     }
 }
