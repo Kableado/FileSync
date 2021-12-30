@@ -36,9 +36,7 @@ Parameters:
 There is a GNU Make compatible Makefile usable on Linux and MingGW.
 
     make
-
-A Visual Studio 2015 solution is also provided under `VisualStudio` subdirectory.
-
+    
 ## Contributing
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
