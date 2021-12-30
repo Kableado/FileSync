@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -306,7 +306,7 @@ TParameterOperation _parameterOperations[] = {
 	{"sync", 0, "Synchronize between two directories", SetParam_Sync},
 	{"log", 1, "Log actions to file", SetParam_Log},
 
-	{"scan", 2, "Scan directory and save to filenode file", Func_Rescan},
+	{"scan", 2, "Scan directory and save to filenode file", Func_Scan},
 	{"rescan", 2, "Rescan directory and save to filenode file", Func_Rescan},
 	{"read", 1, "Read filenode file", Func_Read},
 	{"check", 1, "Check changes on a directory", Func_Check},
