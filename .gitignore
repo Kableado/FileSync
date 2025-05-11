@@ -21,3 +21,5 @@ VisualStudio/filesync/x64/*
 *.VC.opendb
 tests/*
 .vs
+
+/.issues/
