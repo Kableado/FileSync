@@ -13,8 +13,22 @@
 #include "fileutil.h"
 #include "parameteroperation.h"
 #include "util.h"
+#include "p2p.h" // Include the new P2P header
 // For FileNode_Filename
 #include "filenode.h"
+
+// For signal handling
+#include <signal.h>
+
+// Global flag for shutdown
+volatile sig_atomic_t shutdown_requested = 0;
+
+void handle_signal(int signal) {
+    if (signal == SIGINT || signal == SIGTERM) {
+        Print("\nShutdown signal received. Cleaning up...\n");
+        shutdown_requested = 1;
+    }
+}
 
 // Structure to hold data passed to the callback for initial scan of directories
 typedef struct {
@@ -141,6 +155,8 @@ int FindShareableDirectories(VolumeInfo *volumes, int volumeCount, ShareableDir 
 
 // Function prototype for auto-sync (implementation will be below main)
 void AutoSyncShareableDirectories(bool reCheck, bool dryRun);
+// Function prototype for Sync
+int Sync(char *pathLeft, char *pathRight, int reCheck, int dryRun);
 
 typedef struct {
     char *baseName;
@@ -468,14 +484,60 @@ struct SApplicationConfiguration {
 	bool Sync;
 	bool Copy;
 	bool AutoSync; // New flag for auto-sync mode
+	bool Daemon; // New flag for P2P daemon mode
+	char *NodeListFile; // File containing list of known nodes
+	int P2PPort;       // TCP port for P2P data communication
+	int RescanInterval; // Rescan interval for discovering nodes
+    int numDirs;        // Count of directories specified by -dir
 	bool NoAction;
 	char *Log;
 };
-TApplicationConfiguration defaultConfig = {{NULL}, false, false, false,
-										   false,  false, false, NULL};
+TApplicationConfiguration defaultConfig = {
+    {NULL}, // Dirs
+    false,  // NoScan
+    false,  // Dummy
+    false,  // Sync
+    false,  // Copy
+    false,  // AutoSync
+    false,  // Daemon
+    NULL,   // NodeListFile
+    4856,   // P2PPort
+    30,     // RescanInterval
+    0,      // numDirs
+    false,  // NoAction
+    NULL    // Log
+};
 
 bool SetParam_AutoSync(int argc, char *argv[], void *data) {
 	((ApplicationConfiguration)data)->AutoSync = true;
+	return true;
+}
+
+bool SetParam_Daemon(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->Daemon = true;
+	return true;
+}
+
+bool SetParam_NodeList(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->NodeListFile = argv[0];
+	return true;
+}
+
+bool SetParam_P2PPort(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->P2PPort = atoi(argv[0]);
+	if (((ApplicationConfiguration)data)->P2PPort <= 0 || ((ApplicationConfiguration)data)->P2PPort > 65535) {
+		Print("Error: Invalid P2P port number %s. Must be between 1 and 65535.\n", argv[0]);
+		return false;
+	}
+	return true;
+}
+
+bool SetParam_RescanInterval(int argc, char *argv[], void *data) {
+	((ApplicationConfiguration)data)->RescanInterval = atoi(argv[0]);
+	if (((ApplicationConfiguration)data)->RescanInterval <= 0) {
+		Print("Error: Invalid rescan interval %s. Must be a positive integer.\n", argv[0]);
+		return false;
+	}
 	return true;
 }
 
@@ -485,14 +547,24 @@ bool SetParam_Dir(int argc, char *argv[], void *data) {
 		Print("Error: Path \"%s\" does not exist.\n", argv[0]);
 		return false;
 	}
-	char **destDir = config->Dirs;
-	while (destDir[0] != NULL) {
-		destDir++;
+	// Find the next available slot in Dirs, ensuring not to overflow
+	int i = 0;
+	while (i < (sizeof(config->Dirs)/sizeof(config->Dirs[0])) && config->Dirs[i] != NULL) {
+		i++;
 	}
-	destDir[0] = argv[0];
-	destDir++;
-	destDir = NULL;
-	return true;
+
+	if (i < (sizeof(config->Dirs)/sizeof(config->Dirs[0]))) {
+		config->Dirs[i] = argv[0];
+        config->numDirs = i + 1; // Update the count of directories
+        // Ensure the next one is NULL if we are not at max capacity yet for loops that check NULL
+        if ((i + 1) < (sizeof(config->Dirs)/sizeof(config->Dirs[0]))) {
+            config->Dirs[i+1] = NULL;
+        }
+		return true;
+	} else {
+		Print("Error: Maximum number of directories (%zu) already specified.\n", sizeof(config->Dirs)/sizeof(config->Dirs[0]));
+		return false;
+	}
 }
 
 bool SetParam_NoCheck(int argc, char *argv[], void *data) {
@@ -598,6 +670,10 @@ TParameterOperation _parameterOperations[] = {
 	{"sync", 0, "Synchronize between two directories", SetParam_Sync},
 	{"auto-sync", 0, "Automatically find and synchronize shareable directories across volumes", SetParam_AutoSync},
 	{"log", 1, "Log actions to file", SetParam_Log},
+	{"daemon", 0, "Run in P2P daemon mode", SetParam_Daemon},
+	{"node-list", 1, "Specify a file containing a list of known P2P nodes", SetParam_NodeList},
+	{"p2p-port", 1, "Specify the TCP port for P2P data communication (default 4856)", SetParam_P2PPort},
+	{"rescan-interval", 1, "Specify the P2P node discovery rescan interval in seconds (default 30)", SetParam_RescanInterval},
 
 	{"scan", 2, "Scan directory and save to filenode file", Func_Scan},
 	{"rescan", 2, "Rescan directory and save to filenode file", Func_Rescan},
@@ -646,7 +722,195 @@ int main(int argc, char *argv[]) {
 	Print("\n================================ FileSync "
 		  "===================================\n");
 
-    if (config.AutoSync) {
+    if (config.Daemon) {
+        Print("Starting P2P Daemon Mode...\n");
+        Print("Node List File: %s\n", config.NodeListFile ? config.NodeListFile : "Not specified");
+        Print("P2P UDP Discovery Port: %d, P2P TCP Data Port: %d\n", config.P2PPort, config.P2PPort); // Assuming P2PPort is used for both UDP discovery and base for TCP, or make them distinct
+        Print("Rescan Interval: %d seconds\n", config.RescanInterval);
+
+        // Initialize P2P Node Discovery (UDP)
+        // Note: P2P_InitNodeDiscovery's 'port' argument is for UDP.
+        // The TCP server will listen on config.P2PPort (or a dedicated TCP port if defined differently).
+        if (!P2P_InitNodeDiscovery(config.P2PPort, config.RescanInterval)) {
+            Print("Error: Failed to initialize P2P Node Discovery (UDP).\n");
+            return 1; // Indicate an error
+        }
+
+        // Initialize P2P TCP Server, providing it with the configured directories
+        if (!P2P_InitTCPServer(config.P2PPort, config.Dirs, config.numDirs)) {
+            Print("Error: Failed to initialize P2P TCP Server.\n");
+            P2P_ShutdownNodeDiscovery(); // Clean up UDP part
+            return 1; // Indicate an error
+        }
+
+        if (config.NodeListFile) {
+            NodeInfo loaded_nodes[10]; // Max 10 nodes from file for this example
+            int count = P2P_LoadNodesFromFile(config.NodeListFile, loaded_nodes, 10);
+            Print("Loaded %d nodes from file %s\n", count, config.NodeListFile);
+            // These nodes are now part of the P2P_GetDiscoveredNodes list if P2P_LoadNodesFromFile adds them
+        }
+
+        // Setup signal handling
+        signal(SIGINT, handle_signal);
+        signal(SIGTERM, handle_signal);
+
+        Print("P2P Daemon running... Press Ctrl+C to exit.\n");
+        while(!shutdown_requested) {
+            NodeInfo current_nodes[20];
+            int node_count = P2P_GetDiscoveredNodes(current_nodes, 20);
+            if (node_count > 0 && !shutdown_requested) { // Check shutdown_requested again before heavy processing
+                Print("Discovered %d nodes:\n", node_count);
+                for (int i = 0; i < node_count; i++) {
+                    Print("  Node %d: IP %s, Port %d (TCP)\n", i + 1, current_nodes[i].ip_address, current_nodes[i].port);
+
+                    // Attempt to connect and send a "hello" message
+                    int client_socket = P2P_ConnectToNode(current_nodes[i].ip_address, current_nodes[i].port);
+                    if (client_socket >= 0) {
+                        Print("  Successfully connected to node %s:%d for sync operations.\n", current_nodes[i].ip_address, current_nodes[i].port);
+
+                        // 1. Send REQ_SHARE_LIST
+                        if (P2P_SendData(client_socket, P2P_MSG_REQ_SHARE_LIST, strlen(P2P_MSG_REQ_SHARE_LIST))) {
+                            Print("    Sent REQ_SHARE_LIST to node.\n");
+
+                            char recv_buffer[4096]; // Buffer for receiving response
+                            int bytes_received = P2P_ReceiveData(client_socket, recv_buffer, sizeof(recv_buffer) - 1);
+                            if (bytes_received > 0) {
+                                recv_buffer[bytes_received] = '\0';
+                                Print("    Received from node: %s (len %d)\n", recv_buffer, bytes_received); // Print only first part for brevity if long
+
+                                // 2. Parse SHARE_LIST_RESP
+                                if (strncmp(recv_buffer, P2P_MSG_SHARE_LIST_RESP, strlen(P2P_MSG_SHARE_LIST_RESP)) == 0) {
+                                    char *p_after_msg_type = recv_buffer + strlen(P2P_MSG_SHARE_LIST_RESP);
+                                    if (*p_after_msg_type != ' ') {
+                                        Print("    Error: Malformed SHARE_LIST_RESP (missing space after msg type '%s')\n", P2P_MSG_SHARE_LIST_RESP);
+                                        P2P_CloseConnection(client_socket); // Close and try next node or iteration
+                                        continue;
+                                    }
+                                    char *num_start_ptr = p_after_msg_type + 1; // Skip space
+
+                                    char *end_ptr_num;
+                                    long share_count_long = strtol(num_start_ptr, &end_ptr_num, 10);
+
+                                    if (num_start_ptr == end_ptr_num) { // No digits were read
+                                        Print("    Error: Malformed SHARE_LIST_RESP (could not parse count from '%s')\n", num_start_ptr);
+                                        P2P_CloseConnection(client_socket);
+                                        continue;
+                                    }
+                                    int share_count = (int)share_count_long;
+                                    Print("    Node reported %d shareable directories.\n", share_count);
+
+                                    char* ptr = end_ptr_num; // ptr is now at the start of the first binary int (len_name)
+                                    // No space skipping needed here as binary data follows count directly
+
+                                    P2PShareableDir remote_shares[10]; // Max 10 for this example
+                                    int parsed_count = 0;
+                                    for (int k = 0; k < share_count && parsed_count < 10; k++) {
+                                        if (ptr >= recv_buffer + bytes_received) break; // Bounds check
+
+                                        int name_len = 0;
+                                        memcpy(&name_len, ptr, sizeof(int));
+                                        ptr += sizeof(int);
+                                        if (ptr + name_len > recv_buffer + bytes_received) break;
+                                        memcpy(remote_shares[parsed_count].name, ptr, name_len);
+                                        remote_shares[parsed_count].name[name_len] = '\0';
+                                        ptr += name_len;
+
+                                        if (ptr >= recv_buffer + bytes_received) break;
+                                        int path_len = 0;
+                                        memcpy(&path_len, ptr, sizeof(int));
+                                        ptr += sizeof(int);
+                                        if (ptr + path_len > recv_buffer + bytes_received) break;
+                                        memcpy(remote_shares[parsed_count].path, ptr, path_len);
+                                        remote_shares[parsed_count].path[path_len] = '\0';
+                                        ptr += path_len;
+
+                                        Print("      Remote Share %d: Name: '%s', Path: '%s'\n", parsed_count + 1, remote_shares[parsed_count].name, remote_shares[parsed_count].path);
+                                        parsed_count++;
+                                    }
+
+                                    // TODO: Compare with local shares and initiate sync if needed
+                                    // This involves calling local FindShareableDirectories, comparing,
+                                    // then potentially REQ_FILE_NODE etc.
+                                    Print("    Parsed %d share(s) from remote node.\n", parsed_count);
+
+                                    // Client focuses on its first configured directory for P2P matching.
+                                    if (config.numDirs > 0 && config.Dirs[0] != NULL) {
+                                        char primary_local_dir_path[MaxPath];
+                                        strncpy(primary_local_dir_path, config.Dirs[0], MaxPath -1);
+                                        primary_local_dir_path[MaxPath-1] = '\0';
+
+                                        char primary_local_dir_name[MaxFilename];
+                                        File_GetName(primary_local_dir_path, primary_local_dir_name);
+
+                                        // Check if this primary local dir is actually shareable (has nodesFile.fs)
+                                        char marker_check_path[MaxPath];
+                                        snprintf(marker_check_path, MaxPath, "%s/%s", primary_local_dir_path, FileNode_Filename);
+                                        if (!File_ExistsPath(marker_check_path)){
+                                            Print("    Primary local directory %s is not shareable (missing %s).\n", primary_local_dir_path, FileNode_Filename);
+                                        } else {
+                                            Print("    Client's primary local share for P2P: Name='%s', Path='%s'\n", primary_local_dir_name, primary_local_dir_path);
+                                            bool match_found_for_primary = false;
+                                            for (int r_idx = 0; r_idx < parsed_count; r_idx++) {
+                                                if (strcmp(primary_local_dir_name, remote_shares[r_idx].name) == 0) {
+                                                    match_found_for_primary = true;
+                                                    if (strcmp(primary_local_dir_path, remote_shares[r_idx].path) != 0) {
+                                                        Print("      MATCH FOUND for P2P Sync with primary local dir: '%s'\n", primary_local_dir_name);
+                                                        Print("        Local Path : %s\n", primary_local_dir_path);
+                                                        Print("        Remote Path: %s\n", remote_shares[r_idx].path);
+                                                        // TODO: Initiate actual FileNode exchange and sync logic for this pair.
+                                                    } else {
+                                                        Print("      Primary local share '%s' has identical path as remote, no P2P sync needed: %s\n", primary_local_dir_name, primary_local_dir_path);
+                                                    }
+                                                    // Typically, sync one primary local dir with one matching remote dir per peer.
+                                                    // If multiple remote shares match the primary local name (unlikely for distinct paths),
+                                                    // an additional selection logic might be needed, or just pick the first.
+                                                    // For now, we'd act on the first match.
+                                                    break; // Found a match for the primary local dir, stop searching remote shares for this peer.
+                                                }
+                                            }
+                                            if (!match_found_for_primary) {
+                                                Print("    No remote share found matching client's primary local share '%s'.\n", primary_local_dir_name);
+                                            }
+                                        }
+                                    } else {
+                                        Print("    Client has no directories configured with -dir for P2P matching.\n");
+                                    }
+                                } else if (strncmp(recv_buffer, P2P_MSG_ERROR, strlen(P2P_MSG_ERROR)) == 0) {
+                                    Print("    Node responded with error: %s\n", recv_buffer);
+                                } else {
+                                    Print("    Received unexpected response from node: %s\n", recv_buffer);
+                                }
+                            } else if (bytes_received == 0) {
+                                Print("    Node closed connection gracefully after REQ_SHARE_LIST.\n");
+                            } else {
+                                Print("    Error receiving data from node after REQ_SHARE_LIST.\n");
+                            }
+                        } else {
+                            Print("    Failed to send REQ_SHARE_LIST to node.\n");
+                        }
+                        P2P_CloseConnection(client_socket);
+                    } else {
+                        Print("  Failed to connect to node %s:%d for sync.\n", current_nodes[i].ip_address, current_nodes[i].port);
+                    }
+                }
+            } else {
+                Print("No nodes discovered yet.\n");
+            }
+            // Main daemon loop work would go here, e.g., checking for local file changes,
+            // handling incoming requests (if TCP server thread delegates to main thread), etc.
+            Print("Daemon main loop iteration complete. Sleeping for 5 seconds...\n");
+            Time_Pause(5000 * 1000); // Sleep for 5000ms (5 seconds)
+        }
+
+        Print("Shutting down P2P Daemon...\n");
+        P2P_ShutdownTCPServer();       // Shutdown TCP server first
+        P2P_ShutdownNodeDiscovery();   // Then shutdown UDP discovery
+#ifdef _WIN32
+        CleanupWindowsSockets(); // Final Winsock cleanup if both are down
+#endif
+        Print("P2P Daemon stopped.\n");
+
+    } else if (config.AutoSync) {
         Print("Starting Automatic Synchronization...\n");
         // config.NoScan means reCheck=true. config.Dummy is dryRun.
         AutoSyncShareableDirectories(!config.NoScan, config.Dummy);

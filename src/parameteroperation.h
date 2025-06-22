@@ -11,7 +11,7 @@ struct SParameterOperation {
 	char *Name;
 	int NumItems;
 	char *Description;
-	bool (*SetFunc)(int argumentCount, char *arguments[], void *data);
+	_Bool (*SetFunc)(int argumentCount, char *arguments[], void *data);
 };
 
 int ParameterOperation_Parse(int argumentCount, char *arguments[],

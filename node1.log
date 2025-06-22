@@ -1,0 +1,50 @@
+
+================================ FileSync ===================================
+Starting P2P Daemon Mode...
+Node List File: Not specified
+P2P UDP Discovery Port: 4856, P2P TCP Data Port: 4856
+Rescan Interval: 30 seconds
+P2P Node Discovery initialized. UDP Port: 4856, Rescan Interval: 30 seconds.
+P2P_GetShareableDirsFromConfig: Checking 2 configured paths.
+P2P_GetShareableDirsFromConfig: Checking configured path: ./node1/MyProject
+P2P_GetShareableDirsFromConfig: Looking for marker file: ./node1/MyProject/nodesFile.fs
+P2P_GetShareableDirsFromConfig: Found marker file for ./node1/MyProject
+P2P_GetShareableDirsFromConfig: Added share: Name='MyProject', Path='./node1/MyProject'
+P2P_GetShareableDirsFromConfig: Checking configured path: ./node1/AnotherShare
+P2P_GetShareableDirsFromConfig: Looking for marker file: ./node1/AnotherShare/nodesFile.fs
+P2P_GetShareableDirsFromConfig: Found marker file for ./node1/AnotherShare
+P2P_GetShareableDirsFromConfig: Added share: Name='AnotherShare', Path='./node1/AnotherShare'
+P2P_GetShareableDirsFromConfig: Found 2 shareable directories from config.
+P2P_InitTCPServer: Will publish 2 shares.
+P2P Discovery Thread Started. UDP Port: 4856, Interval: 30
+P2P TCP Server initialized. Listening on port 4856.
+P2P Daemon running... Press Ctrl+C to exit.
+No nodes discovered yet.
+Daemon main loop iteration complete. Sleeping for 5 seconds...
+P2P TCP Server Thread Started. Listening on port: 4856
+P2P TCP Server: Accepted connection from 127.0.0.1:49498 on socket 5
+P2P TCP Server: Received from 127.0.0.1:49498 on socket 5: 'REQ_SHARE_LIST'
+P2P TCP Server: Received REQ_SHARE_LIST from 127.0.0.1:49498
+P2P TCP Server: Reporting 2 configured local shareable directories.
+P2P TCP Server: Sent SHARE_LIST_RESP with (up to) 2 dirs.
+Closing P2P TCP connection socket 5
+No nodes discovered yet.
+Daemon main loop iteration complete. Sleeping for 5 seconds...
+P2P TCP Server: Accepted connection from 127.0.0.1:49508 on socket 5
+P2P TCP Server: Received from 127.0.0.1:49508 on socket 5: 'REQ_SHARE_LIST'
+P2P TCP Server: Received REQ_SHARE_LIST from 127.0.0.1:49508
+P2P TCP Server: Reporting 2 configured local shareable directories.
+P2P TCP Server: Sent SHARE_LIST_RESP with (up to) 2 dirs.
+Closing P2P TCP connection socket 5
+No nodes discovered yet.
+Daemon main loop iteration complete. Sleeping for 5 seconds...
+
+Shutdown signal received. Cleaning up...
+Shutting down P2P Daemon...
+Shutting down P2P TCP Server (active)...
+P2P TCP Server Thread Exiting.
+P2P TCP Server shut down.
+Shutting down P2P Node Discovery (active)...
+P2P Discovery Thread Exiting.
+P2P Node Discovery shut down.
+P2P Daemon stopped.

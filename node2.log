@@ -1,0 +1,66 @@
+
+================================ FileSync ===================================
+Starting P2P Daemon Mode...
+Node List File: ./node_list_for_node2.txt
+P2P UDP Discovery Port: 4857, P2P TCP Data Port: 4857
+Rescan Interval: 30 seconds
+P2P Node Discovery initialized. UDP Port: 4857, Rescan Interval: 30 seconds.
+P2P_GetShareableDirsFromConfig: Checking 2 configured paths.
+P2P_GetShareableDirsFromConfig: Checking configured path: ./node2/MyProject
+P2P_GetShareableDirsFromConfig: Looking for marker file: ./node2/MyProject/nodesFile.fs
+P2P_GetShareableDirsFromConfig: Found marker file for ./node2/MyProject
+P2P_GetShareableDirsFromConfig: Added share: Name='MyProject', Path='./node2/MyProject'
+P2P_GetShareableDirsFromConfig: Checking configured path: ./node2/OtherShare
+P2P_GetShareableDirsFromConfig: Looking for marker file: ./node2/OtherShare/nodesFile.fs
+P2P_GetShareableDirsFromConfig: Found marker file for ./node2/OtherShare
+P2P_GetShareableDirsFromConfig: Added share: Name='OtherShare', Path='./node2/OtherShare'
+P2P_GetShareableDirsFromConfig: Found 2 shareable directories from config.
+P2P_InitTCPServer: Will publish 2 shares.
+P2P Discovery Thread Started. UDP Port: 4857, Interval: 30
+P2P TCP Server initialized. Listening on port 4857.
+Loaded 1 nodes from ./node_list_for_node2.txt.
+Loaded 1 nodes from file ./node_list_for_node2.txt
+P2P Daemon running... Press Ctrl+C to exit.
+Discovered 1 nodes:
+  Node 1: IP 127.0.0.1, Port 4856 (TCP)
+P2P TCP Server Thread Started. Listening on port: 4857
+P2P_ConnectToNode: Successfully connected to 127.0.0.1:4856 on socket 5
+  Successfully connected to node 127.0.0.1:4856 for sync operations.
+    Sent REQ_SHARE_LIST to node.
+    Received from node: SHARE_LIST_RESP 2	 (len 91)
+    Node reported 2 shareable directories.
+      Remote Share 1: Name: 'MyProject', Path: './node1/MyProject'
+      Remote Share 2: Name: 'AnotherShare', Path: './node1/AnotherShare'
+    Parsed 2 share(s) from remote node.
+    Client's primary local share for P2P: Name='MyProject', Path='./node2/MyProject'
+      MATCH FOUND for P2P Sync with primary local dir: 'MyProject'
+        Local Path : ./node2/MyProject
+        Remote Path: ./node1/MyProject
+Closing P2P TCP connection socket 5
+Daemon main loop iteration complete. Sleeping for 5 seconds...
+Discovered 1 nodes:
+  Node 1: IP 127.0.0.1, Port 4856 (TCP)
+P2P_ConnectToNode: Successfully connected to 127.0.0.1:4856 on socket 5
+  Successfully connected to node 127.0.0.1:4856 for sync operations.
+    Sent REQ_SHARE_LIST to node.
+    Received from node: SHARE_LIST_RESP 2	 (len 91)
+    Node reported 2 shareable directories.
+      Remote Share 1: Name: 'MyProject', Path: './node1/MyProject'
+      Remote Share 2: Name: 'AnotherShare', Path: './node1/AnotherShare'
+    Parsed 2 share(s) from remote node.
+    Client's primary local share for P2P: Name='MyProject', Path='./node2/MyProject'
+      MATCH FOUND for P2P Sync with primary local dir: 'MyProject'
+        Local Path : ./node2/MyProject
+        Remote Path: ./node1/MyProject
+Closing P2P TCP connection socket 5
+Daemon main loop iteration complete. Sleeping for 5 seconds...
+
+Shutdown signal received. Cleaning up...
+Shutting down P2P Daemon...
+Shutting down P2P TCP Server (active)...
+P2P TCP Server Thread Exiting.
+P2P TCP Server shut down.
+Shutting down P2P Node Discovery (active)...
+P2P Discovery Thread Exiting.
+P2P Node Discovery shut down.
+P2P Daemon stopped.

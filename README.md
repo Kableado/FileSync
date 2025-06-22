@@ -31,7 +31,57 @@ Parameters:
         -read [Item]: Read filenode file.
         -check [Item]: Check changes on a directory.
         -auto-sync: Automatically find and synchronize shareable directories across volumes.
+        -daemon: Run in P2P daemon mode for continuous synchronization with other FileSync instances on the network.
+        -node-list [Item]: Specify a file containing a list of known P2P nodes (IPs or hostnames, one per line, e.g., 192.168.1.100 or node.example.com:4856).
+        -p2p-port [Item]: Specify the network port for P2P communication (default 4856 for both UDP discovery and TCP data).
+        -rescan-interval [Item]: Specify the P2P node discovery rescan interval in seconds (default 30).
 ```
+
+## P2P Daemon Mode for Network Synchronization
+
+FileSync can run in a daemon mode to continuously synchronize directories with other FileSync instances running in daemon mode on the same network.
+
+**How it Works:**
+
+1.  **Node Discovery (UDP):** When started in daemon mode, FileSync uses UDP broadcasts/multicasts on the specified P2P port (default 4856) to announce its presence and discover other FileSync daemons.
+2.  **Node List (Optional):** A list of known nodes (IP addresses or hostnames, optionally with ports) can be provided via the `-node-list` argument. The daemon will attempt to connect to these nodes directly.
+3.  **TCP Communication:** Once peers are discovered, they communicate over TCP on the specified P2P port (default 4856) to exchange information about shareable directories and transfer file data.
+4.  **Directory Synchronization:**
+    *   When running with `-daemon`, you must also specify at least one local directory using `-dir /path/to/local_dir1`.
+    *   The daemon will then look for remote FileSync instances that also share a directory with the *same base name* as `/path/to/local_dir1`.
+    *   If a primary operation like `-sync` or `-copy` is specified along with `-daemon -dir /path/to/local_dir1 -dir /path/to/local_dir2 ...`, the P2P synchronization will attempt to perform this operation between `/path/to/local_dir1` and a matching remote share. (Note: `-copy` in P2P context would mean local_dir1 is source, remote is destination. `-sync` is bi-directional). If only one `-dir` is given with `-daemon -sync`, it will try to sync that directory with matching remote shares.
+    *   The synchronization process involves exchanging directory metadata (`nodesFile.fs`) and then transferring only the necessary changed files, similar to local sync.
+5.  **Continuous Operation:** The daemon runs continuously, periodically rescanning for new nodes and checking for updates with known peers. The rescan interval is configurable.
+
+**Usage:**
+
+To start FileSync in daemon mode, synchronizing `MyProject` with peers:
+
+    filesync -daemon -sync -dir /home/user/Work/MyProject -p2p-port 4856
+
+To start in daemon mode with a specific list of known peers:
+
+    filesync -daemon -sync -dir /home/user/Work/MyProject -node-list /path/to/my_nodes.txt
+
+**Node List File Format:**
+
+The node list file should contain one node per line. Nodes can be specified as:
+*   IP address (e.g., `192.168.1.101`)
+*   Hostname (e.g., `filesync-peer.local`)
+*   IP address with port (e.g., `192.168.1.101:4857`)
+*   Hostname with port (e.g., `filesync-peer.local:4857`)
+
+If the port is not specified, the port given by `-p2p-port` (or its default 4856) will be used. Lines starting with `#` are treated as comments and ignored.
+
+**Behavioral Flags with Daemon Mode:**
+
+*   `-nocheck`: Similar to local sync, this will rely on the existing `nodesFile.fs` for comparisons without rescanning the local directory for every P2P interaction.
+*   `-dummy`: Performs a dry run. P2P communication will occur, share lists exchanged, and sync actions planned, but no actual file transfers or modifications will happen.
+*   `-log [Item]`: Logs daemon activity and P2P interactions to the specified file.
+
+**Preparing Directories for P2P Sync:**
+
+Just like local or auto-sync, directories must be initialized (contain a `nodesFile.fs`) to be considered for P2P synchronization. Run `filesync -check -dir /path/to/yourdir` or use it in a local sync/copy operation first.
 
 ## Automatic Synchronization Across Volumes
 

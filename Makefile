@@ -24,7 +24,8 @@ HEADS := \
 		src/filenode.h \
 		src/actionfilenode.h \
 		src/actionfilenodesync.h \
-		src/actionfilenodecopy.h
+		src/actionfilenodecopy.h \
+		src/p2p.h
 
 OBJS_BASE :=  \
 		$(BUILDDIR)/util.o \
@@ -34,7 +35,8 @@ OBJS_BASE :=  \
 		$(BUILDDIR)/filenode.o \
 		$(BUILDDIR)/actionfilenode.o \
 		$(BUILDDIR)/actionfilenodesync.o \
-		$(BUILDDIR)/actionfilenodecopy.o
+		$(BUILDDIR)/actionfilenodecopy.o \
+		$(BUILDDIR)/p2p.o
 
 OBJS_APP := \
 		$(OBJS_BASE) \
@@ -42,6 +44,21 @@ OBJS_APP := \
 
 CFLAGS := -g
 LIBS   := -lm
+
+# Add threading library for POSIX systems
+ifneq (,$(findstring linux-gnu,$(shell gcc -dumpmachine)))
+	LIBS += -pthread
+endif
+ifneq (,$(findstring darwin,$(shell gcc -dumpmachine)))
+	LIBS += -pthread
+endif
+
+# For MinGW, Winsock is linked via pragma comment in p2p.c (Ws2_32.lib)
+# If other specific Windows libraries were needed, they could be added here.
+# Example for MinGW if explicit linking needed:
+# ifneq (,$(IsMinGW))
+#    LIBS += -lws2_32
+# endif
 
 
 ifeq ($(VERBOSE_BUILD),true)
@@ -89,6 +106,9 @@ $(BUILDDIR)/actionfilenodesync.o: src/actionfilenodesync.c $(HEADS)
 	$(DO_CC)
 
 $(BUILDDIR)/actionfilenodecopy.o: src/actionfilenodecopy.c $(HEADS)
+	$(DO_CC)
+
+$(BUILDDIR)/p2p.o: src/p2p.c $(HEADS)
 	$(DO_CC)
 
 $(BUILDDIR)/main.o: src/main.c $(HEADS)
