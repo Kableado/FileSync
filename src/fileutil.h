@@ -56,4 +56,18 @@ int File_DeleteDirectory(char *path);
 
 int File_Copy(const char *pathOrig, const char *pathDest);
 
+///////////////////////////////////////////////
+// Volume Information
+
+typedef struct {
+	char path[MaxPath];
+	char name[MaxFilename]; // Volume label or device name
+	char fsType[MaxFilename]; // Filesystem type
+} VolumeInfo;
+
+// Populates the 'volumes' array with information about connected volumes.
+// Returns the number of volumes found, or a negative value on error.
+// The caller is responsible for freeing the 'volumes' array using free().
+int File_GetVolumes(VolumeInfo **volumes, int *count);
+
 #endif

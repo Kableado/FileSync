@@ -420,3 +420,122 @@ cleanup:
 	}
 	return status;
 }
+
+#ifdef WIN32
+int File_GetVolumes(VolumeInfo **volumes, int *count) {
+	WCHAR driveStrings[255];
+	WCHAR *currentDrive;
+	DWORD bytesReturned;
+	UINT driveType;
+	int numVolumes = 0;
+	VolumeInfo *volArray = NULL;
+	WCHAR volumeNameBuffer[MaxPath + 1];
+	WCHAR fsNameBuffer[MaxPath + 1];
+
+	bytesReturned = GetLogicalDriveStringsW(sizeof(driveStrings) / sizeof(WCHAR) -1, driveStrings);
+	if (bytesReturned == 0 || bytesReturned > sizeof(driveStrings) / sizeof(WCHAR)) {
+		SetError("Failed to get logical drive strings");
+		*count = 0;
+		*volumes = NULL;
+		return -1;
+	}
+
+	currentDrive = driveStrings;
+	while (*currentDrive) {
+		driveType = GetDriveTypeW(currentDrive);
+		if (driveType == DRIVE_FIXED || driveType == DRIVE_REMOVABLE) {
+			numVolumes++;
+			VolumeInfo *tempVolArray = (VolumeInfo *)realloc(volArray, numVolumes * sizeof(VolumeInfo));
+			if (tempVolArray == NULL) {
+				SetError("Memory allocation failed for volArray realloc");
+				free(volArray); // Free the original array
+				*count = 0;
+				*volumes = NULL;
+				return -1;
+			}
+			volArray = tempVolArray;
+
+			// Convert WCHAR to char for path
+			WideCharToMultiByte(CP_UTF8, 0, currentDrive, -1, volArray[numVolumes - 1].path, MaxPath, NULL, NULL);
+
+			// Get Volume Information
+			if (GetVolumeInformationW(currentDrive, volumeNameBuffer, MaxPath + 1, NULL, NULL, NULL, fsNameBuffer, MaxPath + 1)) {
+				WideCharToMultiByte(CP_UTF8, 0, volumeNameBuffer, -1, volArray[numVolumes - 1].name, MaxFilename, NULL, NULL);
+				WideCharToMultiByte(CP_UTF8, 0, fsNameBuffer, -1, volArray[numVolumes - 1].fsType, MaxFilename, NULL, NULL);
+			} else {
+				strncpy(volArray[numVolumes - 1].name, "N/A", MaxFilename -1);
+				volArray[numVolumes-1].name[MaxFilename-1] = '\0';
+				strncpy(volArray[numVolumes - 1].fsType, "N/A", MaxFilename-1);
+				volArray[numVolumes-1].fsType[MaxFilename-1] = '\0';
+			}
+		}
+		currentDrive += wcslen(currentDrive) + 1;
+	}
+
+	*volumes = volArray;
+	*count = numVolumes;
+	return numVolumes;
+}
+#else // POSIX implementation (Linux)
+#include <mntent.h>
+#include <sys/statvfs.h> // For statvfs if needed later for more details
+
+int File_GetVolumes(VolumeInfo **volumes, int *count) {
+	FILE *mount_table;
+	struct mntent *mount_entry;
+	int numVolumes = 0;
+	VolumeInfo *volArray = NULL;
+
+	mount_table = setmntent("/proc/mounts", "r"); // or /etc/mtab
+	if (mount_table == NULL) {
+		SetError("Failed to open /proc/mounts");
+		*count = 0;
+		*volumes = NULL;
+		return -1;
+	}
+
+	while ((mount_entry = getmntent(mount_table)) != NULL) {
+		// Filter out some common non-user mount types
+		const char* fs_type = mount_entry->mnt_type;
+		if (strcmp(fs_type, "tmpfs") == 0 || strcmp(fs_type, "devtmpfs") == 0 ||
+			strcmp(fs_type, "sysfs") == 0 || strcmp(fs_type, "proc") == 0 ||
+			strcmp(fs_type, "cgroup") == 0 || strcmp(fs_type, "cgroup2") == 0 ||
+			strcmp(fs_type, "debugfs") == 0 || strcmp(fs_type, "pstore") == 0 ||
+			strcmp(fs_type, "squashfs") == 0 || // Often used for snaps or system images
+			strcmp(fs_type, "iso9660") == 0 || // CD/DVD
+			strncmp(mount_entry->mnt_fsname, "/dev/loop", 9) == 0 || // Loop devices (often snaps)
+			strncmp(mount_entry->mnt_dir, "/snap/", 6) == 0 || // Snap mounts
+			strncmp(mount_entry->mnt_dir, "/boot", 5) == 0 // Often separate system partition
+		) {
+			continue;
+		}
+
+		// Consider it a relevant volume
+		numVolumes++;
+		VolumeInfo *tempVolArray = (VolumeInfo *)realloc(volArray, numVolumes * sizeof(VolumeInfo));
+		if (tempVolArray == NULL) {
+			SetError("Memory allocation failed for volArray realloc");
+			free(volArray); // Free the original array
+			endmntent(mount_table);
+			*count = 0;
+			*volumes = NULL;
+			return -1;
+		}
+		volArray = tempVolArray;
+
+		strncpy(volArray[numVolumes - 1].path, mount_entry->mnt_dir, MaxPath -1);
+		volArray[numVolumes - 1].path[MaxPath -1] = '\0';
+
+		strncpy(volArray[numVolumes - 1].name, mount_entry->mnt_fsname, MaxFilename -1); // Using device name as "name"
+		volArray[numVolumes - 1].name[MaxFilename -1] = '\0';
+
+		strncpy(volArray[numVolumes - 1].fsType, mount_entry->mnt_type, MaxFilename-1);
+		volArray[numVolumes - 1].fsType[MaxFilename-1] = '\0';
+	}
+
+	endmntent(mount_table);
+	*volumes = volArray;
+	*count = numVolumes;
+	return numVolumes;
+}
+#endif
