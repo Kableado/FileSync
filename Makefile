@@ -24,7 +24,12 @@ HEADS := \
 		src/filenode.h \
 		src/actionfilenode.h \
 		src/actionfilenodesync.h \
-		src/actionfilenodecopy.h
+		src/actionfilenodecopy.h \
+		src/p2p_discovery.h \
+		src/p2p_nodelist.h \
+		src/p2p_connection_handler.h \
+		src/p2p_tcp_server.h
+
 
 OBJS_BASE :=  \
 		$(BUILDDIR)/util.o \
@@ -34,14 +39,31 @@ OBJS_BASE :=  \
 		$(BUILDDIR)/filenode.o \
 		$(BUILDDIR)/actionfilenode.o \
 		$(BUILDDIR)/actionfilenodesync.o \
-		$(BUILDDIR)/actionfilenodecopy.o
+		$(BUILDDIR)/actionfilenodecopy.o \
+		$(BUILDDIR)/p2p_discovery.o \
+		$(BUILDDIR)/p2p_nodelist.o \
+		$(BUILDDIR)/p2p_connection_handler.o \
+		$(BUILDDIR)/p2p_tcp_server.o
+
 
 OBJS_APP := \
 		$(OBJS_BASE) \
 		$(BUILDDIR)/main.o
 
 CFLAGS := -g
-LIBS   := -lm
+LIBS   := -lm -lpthread
+
+# Add Windows-specific libraries if MinGW
+ifneq (,$(IsMinGW))
+	LIBS += -lws2_32
+else
+# On POSIX systems, ensure pthread is linked.
+# Some compilers might do this automatically with -pthread flag in CFLAGS,
+# but explicitly adding to LIBS is safer for wider compatibility.
+# The -lpthread is already added above for all systems,
+# it's usually ignored if not applicable (like on MinGW if -pthread CFLAG is used instead)
+# or handled correctly.
+endif
 
 
 ifeq ($(VERBOSE_BUILD),true)
@@ -92,6 +114,18 @@ $(BUILDDIR)/actionfilenodecopy.o: src/actionfilenodecopy.c $(HEADS)
 	$(DO_CC)
 
 $(BUILDDIR)/main.o: src/main.c $(HEADS)
+	$(DO_CC)
+
+$(BUILDDIR)/p2p_discovery.o: src/p2p_discovery.c $(HEADS)
+	$(DO_CC)
+
+$(BUILDDIR)/p2p_nodelist.o: src/p2p_nodelist.c $(HEADS)
+	$(DO_CC)
+
+$(BUILDDIR)/p2p_connection_handler.o: src/p2p_connection_handler.c $(HEADS)
+	$(DO_CC)
+
+$(BUILDDIR)/p2p_tcp_server.o: src/p2p_tcp_server.c $(HEADS)
 	$(DO_CC)
 
 

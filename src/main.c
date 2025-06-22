@@ -16,6 +16,10 @@
 // For FileNode_Filename
 #include "filenode.h"
 
+// Function prototypes for functions defined later in this file
+int Sync(char *pathLeft, char *pathRight, int reCheck, int dryRun);
+int Copy(char *pathLeft, char *pathRight, int reCheck, int dryRun);
+
 // Structure to hold data passed to the callback for initial scan of directories
 typedef struct {
     char **potentialPaths; // Array of paths that are directories
